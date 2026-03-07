@@ -26,8 +26,17 @@ import AppSidebar from "@/shared/components/layout/AppSidebar";
 import SendMessageModal from "@/features/messages/components/SendMessageModal";
 import MessageDetailsModal from "@/features/messages/components/MessageDetailsModal";
 
+// Blocked page
+import BlockedPage from "@/features/penalties/pages/BlockedPage";
+
 const DashboardLayout = () => {
   actions();
+
+  const { user } = useAuth();
+
+  if (user?.penaltyPoints >= 12) {
+    return <BlockedPage />;
+  }
 
   return (
     <>
