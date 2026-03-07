@@ -21,6 +21,11 @@ import SchedulesPage from "@/features/schedules/pages/SchedulesPage";
 // Pages — Messages
 import TeacherMessagesPage from "@/features/messages/pages/TeacherMessagesPage";
 
+// Pages — Penalties
+import CreatePenaltyPage from "@/features/penalties/pages/CreatePenaltyPage";
+import MyPenaltiesPage from "@/features/penalties/pages/MyPenaltiesPage";
+import GivenPenaltiesPage from "@/features/penalties/pages/GivenPenaltiesPage";
+
 // Router
 import { Routes as RoutesWrapper, Route, Navigate } from "react-router-dom";
 
@@ -47,6 +52,11 @@ const Routes = () => {
           {/* Messages */}
           <Route path="/messages" element={<TeacherMessagesPage />} />
           <Route path="/my-messages" element={<TeacherMessagesPage />} />
+
+          {/* Penalties */}
+          <Route path="/penalties/create" element={<CreatePenaltyPage />} />
+          <Route path="/penalties/my" element={<MyPenaltiesPage />} />
+          <Route path="/penalties/given" element={<GivenPenaltiesPage />} />
         </Route>
       </Route>
 

@@ -6,6 +6,7 @@ import {
   PanelLeft,
   TrendingUp,
   ChevronRight,
+  AlertTriangle,
 } from "lucide-react";
 
 // Router
@@ -94,6 +95,26 @@ const navItems = [
       {
         title: "Dars jadvali",
         url: "/schedules",
+      },
+    ],
+  },
+  {
+    title: "Jarimalar",
+    url: "/penalties/create",
+    icon: AlertTriangle,
+    isActive: false,
+    items: [
+      {
+        title: "Jarima yozish",
+        url: "/penalties/create",
+      },
+      {
+        title: "Mening jarimalarim",
+        url: "/penalties/my",
+      },
+      {
+        title: "Bergan jarimalarim",
+        url: "/penalties/given",
       },
     ],
   },
