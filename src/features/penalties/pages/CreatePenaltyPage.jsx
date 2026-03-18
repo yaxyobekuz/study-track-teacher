@@ -27,19 +27,13 @@ const CreatePenaltyPage = () => {
   const {
     userId,
     categoryId,
-    title,
     description,
-    points,
-    isCustom,
     setField,
     setFields,
   } = useObjectState({
     userId: "",
     categoryId: "",
-    title: "",
     description: "",
-    points: "",
-    isCustom: false,
   });
 
   const [files, setFiles] = useState(null);
@@ -80,31 +74,13 @@ const CreatePenaltyPage = () => {
       .catch(() => {});
   }, []);
 
-  // Kategoriya tanlanganda ball va sarlavhani to'ldirish
-  useEffect(() => {
-    if (!isCustom && categoryId) {
-      const cat = categories.find((c) => c.value === categoryId);
-      if (cat) {
-        setField("points", cat.points);
-        setField("title", cat.title);
-      }
-    }
-  }, [categoryId]);
-
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitting(true);
 
     const formData = new FormData();
     formData.append("userId", userId);
-    formData.append("isCustom", isCustom);
-
-    if (isCustom) {
-      formData.append("title", title);
-      formData.append("points", points);
-    } else {
-      formData.append("categoryId", categoryId);
-    }
+    formData.append("categoryId", categoryId);
 
     if (description) formData.append("description", description);
 
@@ -121,10 +97,7 @@ const CreatePenaltyPage = () => {
         setFields({
           userId: "",
           categoryId: "",
-          title: "",
           description: "",
-          points: "",
-          isCustom: false,
         });
         setFiles(null);
       })
@@ -153,47 +126,14 @@ const CreatePenaltyPage = () => {
             options={students}
           />
 
-          <div className="flex items-center gap-2">
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isCustom}
-                onChange={(e) => setField("isCustom", e.target.checked)}
-                className="rounded border-gray-300 text-indigo-500 focus:ring-indigo-500"
-              />
-              Custom jarima
-            </label>
-          </div>
-
-          {!isCustom && (
-            <Select
-              required
-              label="Kategoriya"
-              value={categoryId}
-              placeholder="Kategoriyani tanlang..."
-              onChange={(v) => setField("categoryId", v)}
-              options={categories}
-            />
-          )}
-
-          {isCustom && (
-            <>
-              <Input
-                required
-                label="Sarlavha"
-                value={title}
-                onChange={(v) => setField("title", v)}
-              />
-              <Input
-                required
-                label="Ball"
-                type="number"
-                min={1}
-                value={points}
-                onChange={(v) => setField("points", v)}
-              />
-            </>
-          )}
+          <Select
+            required
+            label="Kategoriya"
+            value={categoryId}
+            placeholder="Kategoriyani tanlang..."
+            onChange={(v) => setField("categoryId", v)}
+            options={categories}
+          />
 
           <Input
             label="Izoh"
