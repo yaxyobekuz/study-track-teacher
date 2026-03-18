@@ -2,8 +2,8 @@
 import { toast } from "sonner";
 
 // API
-import { messagesAPI } from "@/shared/api/messages.api";
-import { classesAPI } from "@/shared/api/classes.api";
+import { messagesAPI } from "@/features/messages/api/messages.api";
+import { classesAPI } from "@/features/classes/api/classes.api";
 
 // Router
 import { useSearchParams } from "react-router-dom";

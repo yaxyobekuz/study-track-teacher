@@ -2,9 +2,9 @@
 import { toast } from "sonner";
 
 // API
-import { messagesAPI } from "@/shared/api/messages.api";
-import { classesAPI } from "@/shared/api/classes.api";
-import { usersAPI } from "@/shared/api/users.api";
+import { messagesAPI } from "@/features/messages/api/messages.api";
+import { classesAPI } from "@/features/classes/api/classes.api";
+import { usersAPI } from "@/features/users/api/users.api";
 
 // Store
 import useAuth from "@/shared/hooks/useAuth";
