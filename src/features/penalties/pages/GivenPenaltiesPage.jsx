@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 
 // API
-import { penaltiesAPI } from "@/shared/api/penalties.api";
+import { penaltiesAPI } from "@/features/penalties/api/penalties.api";
 
 // Components
 import Card from "@/shared/components/ui/Card";

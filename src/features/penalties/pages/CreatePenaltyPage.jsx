@@ -5,8 +5,8 @@ import { toast } from "sonner";
 import { useState, useEffect } from "react";
 
 // API
-import { penaltiesAPI } from "@/shared/api/penalties.api";
-import { usersAPI } from "@/shared/api/users.api";
+import { penaltiesAPI } from "@/features/penalties/api/penalties.api";
+import { usersAPI } from "@/features/users/api/users.api";
 
 // Components
 import Card from "@/shared/components/ui/Card";

@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 
 // API
-import { penaltiesAPI } from "@/shared/api/penalties.api";
+import { penaltiesAPI } from "@/features/penalties/api/penalties.api";
 
 // Components
 import Card from "@/shared/components/ui/Card";
