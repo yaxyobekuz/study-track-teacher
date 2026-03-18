@@ -26,8 +26,8 @@ import { getDayOfWeekUZ } from "@/shared/utils/date.utils";
 import useArrayStore from "@/shared/hooks/useArrayStore";
 
 // API
-import { gradesAPI } from "@/shared/api/grades.api";
-import { schedulesAPI } from "@/shared/api/schedules.api";
+import { gradesAPI } from "@/features/grades/api/grades.api";
+import { schedulesAPI } from "@/features/schedules/api/schedules.api";
 import Button from "@/shared/components/form/button";
 import { useNavigate } from "react-router-dom";
 

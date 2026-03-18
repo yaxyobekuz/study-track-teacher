@@ -2,8 +2,8 @@
 import { toast } from "sonner";
 
 // API
-import { gradesAPI } from "@/shared/api/grades.api";
-import { schedulesAPI } from "@/shared/api/schedules.api";
+import { gradesAPI } from "@/features/grades/api/grades.api";
+import { schedulesAPI } from "@/features/schedules/api/schedules.api";
 
 // React
 import { useState, useEffect } from "react";
