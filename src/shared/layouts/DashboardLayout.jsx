@@ -5,10 +5,10 @@ import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 
 // API
-import { usersAPI } from "@/shared/api/users.api";
-import { classesAPI } from "@/shared/api/classes.api";
-import { holidaysAPI } from "@/shared/api/holidays.api";
-import { subjectsAPI } from "@/shared/api/subjects.api";
+import { usersAPI } from "@/features/users/api/users.api";
+import { classesAPI } from "@/features/classes/api/classes.api";
+import { holidaysAPI } from "@/features/holidays/api/holidays.api";
+import { subjectsAPI } from "@/features/subjects/api/subjects.api";
 
 // Hooks
 import useAuth from "@/shared/hooks/useAuth";
