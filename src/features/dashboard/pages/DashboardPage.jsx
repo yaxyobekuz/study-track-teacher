@@ -26,7 +26,7 @@ import { getDayOfWeekUZ } from "@/shared/utils/date.utils";
 import { getRoleLabel } from "@/shared/helpers/role.helpers";
 
 // API
-import { schedulesAPI } from "@/shared/api/schedules.api";
+import { schedulesAPI } from "@/features/schedules/api/schedules.api";
 
 // Hooks
 import useArrayStore from "@/shared/hooks/useArrayStore";
