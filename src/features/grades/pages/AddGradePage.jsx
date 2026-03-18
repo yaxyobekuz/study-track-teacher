@@ -140,7 +140,6 @@ const AddGrade = () => {
           grade: parseInt(gradeValue),
           comment: student.grade.comment || "",
         });
-        toast.success("Baho muvaffaqiyatli yangilandi");
       } else {
         await gradesAPI.create({
           studentId: student._id,
@@ -150,7 +149,6 @@ const AddGrade = () => {
           grade: parseInt(gradeValue),
           comment: "",
         });
-        toast.success("Baho muvaffaqiyatli qo'yildi");
       }
 
       await fetchStudentsWithGrades(false);
@@ -166,7 +164,6 @@ const AddGrade = () => {
     setLoadingStudentId(student._id);
     try {
       await gradesAPI.delete(student.grade._id);
-      toast.success("Baho muvaffaqiyatli o'chirildi");
       await fetchStudentsWithGrades(false);
     } catch (error) {
       toast.error(error.response?.data?.message || "Xatolik yuz berdi");
