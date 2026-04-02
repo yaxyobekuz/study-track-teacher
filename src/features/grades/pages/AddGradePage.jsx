@@ -10,7 +10,7 @@ import { useState, useEffect } from "react";
 
 // Components
 import Card from "@/shared/components/ui/Card";
-import Select from "@/shared/components/form/select";
+import Select from "@/shared/components/ui/select/Select";
 
 // Helpers
 import { getGradeColor } from "@/shared/helpers/grade.helpers";
@@ -21,6 +21,7 @@ import useObjectStore from "@/shared/hooks/useObjectStore";
 // Icons
 import { CalendarOff, Trash2, Loader2 } from "lucide-react";
 import Button from "@/shared/components/form/button";
+import { cn } from "@/shared/utils/cn";
 
 const AddGrade = () => {
   const [todayClasses, setTodayClasses] = useState([]);
@@ -200,8 +201,10 @@ const AddGrade = () => {
 
   return (
     <div>
+      <h1 className="page-title mb-4">Baho qo'yish</h1>
+
       {/* Filters */}
-      <Card className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-2 gap-4 mb-4">
         <Select
           required
           label="Sinf"
@@ -227,7 +230,7 @@ const AddGrade = () => {
             };
           })}
         />
-      </Card>
+      </div>
 
       {/* Current Topic Display */}
       {selectedClass && selectedSubjectWithOrder && currentTopic && (
@@ -244,38 +247,39 @@ const AddGrade = () => {
 
       {/* Students Table */}
       {selectedClass && selectedSubjectWithOrder && (
-        <Card responsive>
-          <div className="bg-white rounded-lg overflow-hidden">
-            {/* No data */}
-            {students.length === 0 && !loading && (
-              <div className="text-center py-12">
-                <p className="text-gray-500">Bu sinfda o'quvchilar yo'q</p>
-              </div>
-            )}
+        <div className="rounded-lg overflow-hidden">
+          {/* No data */}
+          {students.length === 0 && !loading && (
+            <div className="text-center py-12">
+              <p className="text-gray-500">Bu sinfda o'quvchilar yo'q</p>
+            </div>
+          )}
 
-            {/* Loading state */}
-            {loading && (
-              <div className="text-center py-12">
-                <p className="text-gray-500">Yuklanmoqda...</p>
-              </div>
-            )}
+          {/* Loading state */}
+          {loading && (
+            <div className="text-center py-12">
+              <p className="text-gray-500">Yuklanmoqda...</p>
+            </div>
+          )}
 
-            {/* Students Table */}
-            {students.length > 0 && !loading && (
-              <div className="rounded-lg overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  {/* Thead */}
-                  <thead>
-                    <tr>
-                      <th className="px-6 py-3 text-left max-sm:hidden">#</th>
-                      <th className="px-6 py-3 text-left">O'quvchi</th>
-                      <th className="px-6 py-3 text-left">Baho</th>
-                    </tr>
-                  </thead>
+          {/* Students Table */}
+          {students.length > 0 && !loading && (
+            <div className="rounded-lg overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                {/* Thead */}
+                <thead>
+                  <tr>
+                    <th className="px-6 py-3 text-left max-sm:hidden">#</th>
+                    <th className="px-6 py-3 text-left">O'quvchi</th>
+                    <th className="px-6 py-3 text-left">Baho</th>
+                  </tr>
+                </thead>
 
-                  {/* Tbody */}
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {students.map((student, index) => {
+                {/* Tbody */}
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {students
+                    .sort((a, b) => a.firstName.localeCompare(b.firstName))
+                    .map((student, index) => {
                       const hasGrade = student.grade !== null;
                       const isRowLoading = loadingStudentId === student._id;
 
@@ -307,7 +311,6 @@ const AddGrade = () => {
                               ) : (
                                 <>
                                   <Select
-                                    size="md"
                                     value={
                                       hasGrade
                                         ? String(student.grade.grade)
@@ -316,14 +319,14 @@ const AddGrade = () => {
                                     onChange={(value) =>
                                       handleGradeChange(student, value)
                                     }
-                                    className="w-40"
                                     disabled={isRowLoading}
                                     placeholder="Bahoni tanlang"
-                                    triggerClassName={
+                                    triggerClassName={cn(
+                                      "w-40",
                                       hasGrade
                                         ? getGradeColor(student.grade.grade)
-                                        : ""
-                                    }
+                                        : "",
+                                    )}
                                     options={[
                                       { label: "5 - A'lo", value: "5" },
                                       { label: "4 - Yaxshi", value: "4" },
@@ -353,12 +356,11 @@ const AddGrade = () => {
                         </tr>
                       );
                     })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </Card>
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       )}
 
       {!selectedClass && (
