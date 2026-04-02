@@ -1,27 +1,30 @@
 // UI
 import { toast } from "sonner";
 
-// API
-import { gradesAPI } from "@/features/grades/api/grades.api";
-import { schedulesAPI } from "@/features/schedules/api/schedules.api";
+// Utils
+import { cn } from "@/shared/utils/cn";
 
 // React
 import { useState, useEffect } from "react";
 
 // Components
 import Card from "@/shared/components/ui/Card";
+import Input from "@/shared/components/ui/input/Input";
 import Select from "@/shared/components/ui/select/Select";
-
-// Helpers
-import { getGradeColor } from "@/shared/helpers/grade.helpers";
+import Button from "@/shared/components/ui/button/Button";
 
 // Hooks
 import useObjectStore from "@/shared/hooks/useObjectStore";
 
 // Icons
 import { CalendarOff, Trash2, Loader2 } from "lucide-react";
-import Button from "@/shared/components/form/button";
-import { cn } from "@/shared/utils/cn";
+
+// Helpers
+import { getGradeColor } from "@/shared/helpers/grade.helpers";
+
+// API
+import { gradesAPI } from "@/features/grades/api/grades.api";
+import { schedulesAPI } from "@/features/schedules/api/schedules.api";
 
 const AddGrade = () => {
   const [todayClasses, setTodayClasses] = useState([]);
@@ -32,6 +35,7 @@ const AddGrade = () => {
   const [currentTopic, setCurrentTopic] = useState(null);
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedSubjectWithOrder, setSelectedSubjectWithOrder] = useState(""); // Format: "subjectId_order"
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Holiday Info
   const { getEntity } = useObjectStore("holidayCheck");
@@ -68,6 +72,7 @@ const AddGrade = () => {
       fetchTeacherSubjects();
       setSelectedSubjectWithOrder("");
       setStudents([]);
+      setSearchQuery("");
       localStorage.setItem("addGrade_selectedClass", selectedClass);
     }
   }, [selectedClass]);
@@ -75,6 +80,7 @@ const AddGrade = () => {
   useEffect(() => {
     if (selectedClass && selectedSubjectWithOrder) {
       fetchStudentsWithGrades();
+      setSearchQuery("");
       localStorage.setItem(
         "addGrade_selectedSubjectWithOrder",
         selectedSubjectWithOrder,
@@ -264,101 +270,116 @@ const AddGrade = () => {
 
           {/* Students Table */}
           {students.length > 0 && !loading && (
-            <div className="rounded-lg overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                {/* Thead */}
-                <thead>
-                  <tr>
-                    <th className="px-6 py-3 text-left max-sm:hidden">#</th>
-                    <th className="px-6 py-3 text-left">O'quvchi</th>
-                    <th className="px-6 py-3 text-left">Baho</th>
-                  </tr>
-                </thead>
+            <>
+              <Input
+                className="mb-4"
+                value={searchQuery}
+                placeholder="Qidirish..."
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
 
-                {/* Tbody */}
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {students
-                    .sort((a, b) => a.firstName.localeCompare(b.firstName))
-                    .map((student, index) => {
-                      const hasGrade = student.grade !== null;
-                      const isRowLoading = loadingStudentId === student._id;
+              <div className="rounded-lg overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  {/* Thead */}
+                  <thead>
+                    <tr>
+                      <th className="px-6 py-3 text-left max-sm:hidden">#</th>
+                      <th className="px-6 py-3 text-left">O'quvchi</th>
+                      <th className="px-6 py-3 text-left">Baho</th>
+                    </tr>
+                  </thead>
 
-                      return (
-                        <tr key={student._id} className="hover:bg-gray-50">
-                          {/* Index */}
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 max-sm:hidden">
-                            {index + 1}
-                          </td>
+                  {/* Tbody */}
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {students
+                      .sort((a, b) => a.firstName.localeCompare(b.firstName))
+                      .filter((student) => {
+                        const q = searchQuery.trim().toLowerCase();
+                        if (!q) return true;
+                        const fullName =
+                          `${student.firstName} ${student.lastName}`.toLowerCase();
+                        return fullName.includes(q);
+                      })
+                      .map((student, index) => {
+                        const hasGrade = student.grade !== null;
+                        const isRowLoading = loadingStudentId === student._id;
 
-                          {/* Student */}
-                          <td className="px-4 py-4 whitespace-nowrap xs:px-6">
-                            <div className="text-sm font-medium text-gray-900">
-                              {student.firstName} <br className="xs:hidden" />{" "}
-                              {student.lastName}
-                            </div>
-                          </td>
+                        return (
+                          <tr key={student._id} className="hover:bg-gray-50">
+                            {/* Index */}
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 max-sm:hidden">
+                              {index + 1}
+                            </td>
 
-                          {/* Grade */}
-                          <td className="px-6 py-4 whitespace-nowrap max-sm:pl-0">
-                            <div className="flex items-center gap-2">
-                              {isRowLoading ? (
-                                <div className="flex items-center justify-center w-40 h-10">
-                                  <Loader2
-                                    className="size-6 text-indigo-600 animate-spin"
-                                    strokeWidth={2}
-                                  />
-                                </div>
-                              ) : (
-                                <>
-                                  <Select
-                                    value={
-                                      hasGrade
-                                        ? String(student.grade.grade)
-                                        : ""
-                                    }
-                                    onChange={(value) =>
-                                      handleGradeChange(student, value)
-                                    }
-                                    disabled={isRowLoading}
-                                    placeholder="Bahoni tanlang"
-                                    triggerClassName={cn(
-                                      "w-40",
-                                      hasGrade
-                                        ? getGradeColor(student.grade.grade)
-                                        : "",
-                                    )}
-                                    options={[
-                                      { label: "5 - A'lo", value: "5" },
-                                      { label: "4 - Yaxshi", value: "4" },
-                                      { label: "3 - Qoniqarli", value: "3" },
-                                      { label: "2 - Qoniqarsiz", value: "2" },
-                                      { label: "1 - Yomon", value: "1" },
-                                    ]}
-                                  />
+                            {/* Student */}
+                            <td className="px-4 py-4 whitespace-nowrap xs:px-6">
+                              <div className="text-sm font-medium text-gray-900">
+                                {student.firstName} <br className="xs:hidden" />{" "}
+                                {student.lastName}
+                              </div>
+                            </td>
 
-                                  {hasGrade && (
-                                    <Button
-                                      variant="danger"
-                                      className="size-10"
+                            {/* Grade */}
+                            <td className="px-6 py-4 whitespace-nowrap max-sm:pl-0">
+                              <div className="flex items-center gap-2">
+                                {isRowLoading ? (
+                                  <div className="flex items-center justify-center w-40 h-10">
+                                    <Loader2
+                                      className="size-6 text-indigo-600 animate-spin"
+                                      strokeWidth={2}
+                                    />
+                                  </div>
+                                ) : (
+                                  <>
+                                    <Select
+                                      value={
+                                        hasGrade
+                                          ? String(student.grade.grade)
+                                          : ""
+                                      }
+                                      onChange={(value) =>
+                                        handleGradeChange(student, value)
+                                      }
                                       disabled={isRowLoading}
-                                      onClick={() => handleDeleteGrade(student)}
-                                    >
-                                      <Trash2
-                                        className="size-4"
-                                        strokeWidth={1.5}
-                                      />
-                                    </Button>
-                                  )}
-                                </>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
-            </div>
+                                      placeholder="Bahoni tanlang"
+                                      triggerClassName={cn(
+                                        "w-40",
+                                        hasGrade
+                                          ? getGradeColor(student.grade.grade)
+                                          : "",
+                                      )}
+                                      options={[
+                                        { label: "5 - A'lo", value: "5" },
+                                        { label: "4 - Yaxshi", value: "4" },
+                                        { label: "3 - Qoniqarli", value: "3" },
+                                        { label: "2 - Qoniqarsiz", value: "2" },
+                                        { label: "1 - Yomon", value: "1" },
+                                      ]}
+                                    />
+
+                                    {hasGrade && (
+                                      <Button
+                                        variant="danger"
+                                        className="size-10"
+                                        disabled={isRowLoading}
+                                        onClick={() =>
+                                          handleDeleteGrade(student)
+                                        }
+                                      >
+                                        <Trash2 strokeWidth={1.5} />
+                                      </Button>
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       )}
