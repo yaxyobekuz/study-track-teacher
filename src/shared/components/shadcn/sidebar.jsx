@@ -33,8 +33,8 @@ import { cva } from "class-variance-authority";
 import { useIsMobile } from "@/shared/hooks/useMobile";
 
 // Components
-import { Input } from "@/shared/components/shadcn/input";
-import { Button } from "@/shared/components/shadcn/button";
+import Input from "@/shared/components/ui/input/Input";
+import Button from "@/shared/components/ui/button/Button";
 
 // Skeleton
 import { Skeleton } from "@/shared/components/shadcn/skeleton";
@@ -400,7 +400,7 @@ const SidebarContent = React.forwardRef(({ className, ...props }, ref) => {
       ref={ref}
       data-sidebar="content"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
+        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto hidden-scrollbar group-data-[collapsible=icon]:overflow-hidden",
         className,
       )}
       {...props}
