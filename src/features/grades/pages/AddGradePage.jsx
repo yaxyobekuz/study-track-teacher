@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { cn } from "@/shared/utils/cn";
 
 // React
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 // Components
 import Card from "@/shared/components/ui/Card";
@@ -15,6 +15,7 @@ import Button from "@/shared/components/ui/button/Button";
 
 // Hooks
 import useObjectStore from "@/shared/hooks/useObjectStore";
+import useObjectState from "@/shared/hooks/useObjectState";
 
 // Icons
 import { CalendarOff, Trash2, Loader2 } from "lucide-react";
@@ -27,15 +28,29 @@ import { gradesAPI } from "@/features/grades/api/grades.api";
 import { schedulesAPI } from "@/features/schedules/api/schedules.api";
 
 const AddGrade = () => {
-  const [todayClasses, setTodayClasses] = useState([]);
-  const [subjects, setSubjects] = useState([]);
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [loadingStudentId, setLoadingStudentId] = useState(null);
-  const [currentTopic, setCurrentTopic] = useState(null);
-  const [selectedClass, setSelectedClass] = useState("");
-  const [selectedSubjectWithOrder, setSelectedSubjectWithOrder] = useState(""); // Format: "subjectId_order"
-  const [searchQuery, setSearchQuery] = useState("");
+  const {
+    loading,
+    subjects,
+    students,
+    setField,
+    setFields,
+    searchQuery,
+    todayClasses,
+    currentTopic,
+    selectedClass,
+    loadingStudentId,
+    selectedSubjectWithOrder,
+  } = useObjectState({
+    subjects: [],
+    students: [],
+    loading: false,
+    searchQuery: "",
+    todayClasses: [],
+    selectedClass: "",
+    currentTopic: null,
+    loadingStudentId: null,
+    selectedSubjectWithOrder: "",
+  });
 
   // Holiday Info
   const { getEntity } = useObjectStore("holidayCheck");
@@ -47,7 +62,7 @@ const AddGrade = () => {
       .getMyToday()
       .then((res) => {
         const classes = res.data.data.map((schedule) => schedule.class);
-        setTodayClasses(classes);
+        setField("todayClasses", classes);
       })
       .catch((error) => {
         toast.error("Bugungi dars jadvalini yuklashda xatolik");
@@ -62,17 +77,19 @@ const AddGrade = () => {
       "addGrade_selectedSubjectWithOrder",
     );
 
-    if (savedClass) setSelectedClass(savedClass);
+    if (savedClass) setField("selectedClass", savedClass);
     if (savedSubjectWithOrder)
-      setSelectedSubjectWithOrder(savedSubjectWithOrder);
+      setField("selectedSubjectWithOrder", savedSubjectWithOrder);
   }, []);
 
   useEffect(() => {
     if (selectedClass) {
       fetchTeacherSubjects();
-      setSelectedSubjectWithOrder("");
-      setStudents([]);
-      setSearchQuery("");
+      setFields({
+        selectedSubjectWithOrder: "",
+        students: [],
+        searchQuery: "",
+      });
       localStorage.setItem("addGrade_selectedClass", selectedClass);
     }
   }, [selectedClass]);
@@ -80,7 +97,7 @@ const AddGrade = () => {
   useEffect(() => {
     if (selectedClass && selectedSubjectWithOrder) {
       fetchStudentsWithGrades();
-      setSearchQuery("");
+      setField("searchQuery", "");
       localStorage.setItem(
         "addGrade_selectedSubjectWithOrder",
         selectedSubjectWithOrder,
@@ -95,11 +112,11 @@ const AddGrade = () => {
         toast.info(response.data.message);
       }
       const data = response.data.data;
-      setSubjects(data);
+      setField("subjects", data);
 
       // Auto-select first subject
       if (data.length > 0) {
-        setSelectedSubjectWithOrder(`${data[0]._id}_${data[0].order}`);
+        setField("selectedSubjectWithOrder", `${data[0]._id}_${data[0].order}`);
       }
     } catch (error) {
       toast.error(
@@ -115,7 +132,7 @@ const AddGrade = () => {
     // Parse subjectId and lessonOrder from "subjectId_order" format
     const [subjectId, lessonOrder] = selectedSubjectWithOrder.split("_");
 
-    if (showLoader) setLoading(true);
+    if (showLoader) setField("loading", true);
     try {
       const today = new Date().toISOString().split("T")[0];
       const response = await gradesAPI.getStudentsWithGrades({
@@ -124,13 +141,15 @@ const AddGrade = () => {
         lessonOrder: lessonOrder,
         date: today,
       });
-      setStudents(response.data.data);
-      setCurrentTopic(response.data.currentTopic || null);
+      setFields({
+        students: response.data.data,
+        currentTopic: response.data.currentTopic || null,
+      });
     } catch (error) {
       toast.error("O'quvchilarni yuklashda xatolik");
       console.error(error);
     } finally {
-      setLoading(false);
+      setField("loading", false);
     }
   };
 
@@ -140,7 +159,7 @@ const AddGrade = () => {
     const hasGrade = student.grade !== null;
     const [subjectId, lessonOrder] = selectedSubjectWithOrder.split("_");
 
-    setLoadingStudentId(student._id);
+    setField("loadingStudentId", student._id);
     try {
       if (hasGrade) {
         await gradesAPI.update(student.grade._id, {
@@ -163,12 +182,12 @@ const AddGrade = () => {
       toast.error(error.response?.data?.message || "Xatolik yuz berdi");
       console.error(error);
     } finally {
-      setLoadingStudentId(null);
+      setField("loadingStudentId", null);
     }
   };
 
   const handleDeleteGrade = async (student) => {
-    setLoadingStudentId(student._id);
+    setField("loadingStudentId", student._id);
     try {
       await gradesAPI.delete(student.grade._id);
       await fetchStudentsWithGrades(false);
@@ -176,7 +195,7 @@ const AddGrade = () => {
       toast.error(error.response?.data?.message || "Xatolik yuz berdi");
       console.error(error);
     } finally {
-      setLoadingStudentId(null);
+      setField("loadingStudentId", null);
     }
   };
 
@@ -206,16 +225,17 @@ const AddGrade = () => {
   }
 
   return (
-    <div>
-      <h1 className="page-title mb-4">Baho qo'yish</h1>
+    <div className="space-y-4">
+      {/* Title */}
+      <h1 className="page-title">Baho qo'yish</h1>
 
       {/* Filters */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-2 gap-4">
         <Select
           required
           label="Sinf"
           value={selectedClass}
-          onChange={(value) => setSelectedClass(value)}
+          onChange={(value) => setField("selectedClass", value)}
           options={todayClasses.map((cls) => ({
             label: cls.name,
             value: cls._id,
@@ -226,7 +246,7 @@ const AddGrade = () => {
           required
           label="Fan"
           value={selectedSubjectWithOrder}
-          onChange={(value) => setSelectedSubjectWithOrder(value)}
+          onChange={(value) => setField("selectedSubjectWithOrder", value)}
           options={subjects.map((subject) => {
             const displayOrder =
               (subject.startingOrder || 1) + (subject.order || 1) - 1;
@@ -275,7 +295,7 @@ const AddGrade = () => {
                 className="mb-4"
                 value={searchQuery}
                 placeholder="Qidirish..."
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => setField("searchQuery", e.target.value)}
               />
 
               <div className="rounded-lg overflow-x-auto">
