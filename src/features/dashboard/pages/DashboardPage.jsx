@@ -7,34 +7,29 @@ import {
   GraduationCap,
 } from "lucide-react";
 
-// Components
-import Card from "@/shared/components/ui/Card";
+// React
+import { useEffect } from "react";
 
 // Router
 import { Link } from "react-router-dom";
 
-// React
-import { useState, useEffect } from "react";
-
 // Store
 import useAuth from "@/shared/hooks/useAuth";
 
-// Utils
-import { getDayOfWeekUZ } from "@/shared/utils/date.utils";
-
-// Helpers
-import { getRoleLabel } from "@/shared/helpers/role.helpers";
-
-// API
-import { schedulesAPI } from "@/features/schedules/api/schedules.api";
+// Components
+import Card from "@/shared/components/ui/Card";
 
 // Hooks
 import useArrayStore from "@/shared/hooks/useArrayStore";
 import useObjectStore from "@/shared/hooks/useObjectStore";
 
-const Dashboard = () => {
-  const { user } = useAuth();
+// Utils
+import { getDayOfWeekUZ } from "@/shared/utils/date.utils";
 
+// API
+import { schedulesAPI } from "@/features/schedules/api/schedules.api";
+
+const Dashboard = () => {
   // Holiday Info
   const { getEntity } = useObjectStore("holidayCheck");
   const holidayInfo = getEntity("today") || { isHoliday: false, holiday: null };
@@ -68,37 +63,16 @@ const Dashboard = () => {
         </Card>
       )}
 
-      {/* Welcome Section */}
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-gray-900 sm:text-2xl lg:text-3xl">
-          Xush kelibsiz, {user?.firstName}!
-        </h2>
-        <p className="mt-2 text-gray-600">
-          Rolingiz:{" "}
-          <span className="font-medium">{getRoleLabel(user?.role)}</span>
-        </p>
-      </div>
-
       {/* Quick Actions */}
-      <Card className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Tezkor harakatlar
-        </h3>
-
+      <Card className="space-y-4 mb-4" title="Tezkor harakatlar">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {/* My Schedule */}
           <Link
             to="/schedules"
             className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <BookOpen
-              className="size-6 text-indigo-600 mr-3"
-              strokeWidth={1.5}
-            />
-            <div>
-              <p className="font-medium text-gray-900">Dars jadvali</p>
-              <p className="text-sm text-gray-500">Ko'rish</p>
-            </div>
+            <BookOpen className="size-6 text-blue-600 mr-3" strokeWidth={1.5} />
+            <p className="font-medium text-gray-900">Dars jadvali</p>
           </Link>
 
           {/* Grades */}
@@ -107,13 +81,10 @@ const Dashboard = () => {
             className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <ClipboardList
-              className="size-6 text-indigo-600 mr-3"
+              className="size-6 text-blue-600 mr-3"
               strokeWidth={1.5}
             />
-            <div>
-              <p className="font-medium text-gray-900">Baholar jurnali</p>
-              <p className="text-sm text-gray-500">Ko'rish</p>
-            </div>
+            <p className="font-medium text-gray-900">Baholar jurnali</p>
           </Link>
 
           {/* Add Grades */}
@@ -122,13 +93,10 @@ const Dashboard = () => {
             className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <PlusCircle
-              className="size-6 text-indigo-600 mr-3"
+              className="size-6 text-blue-600 mr-3"
               strokeWidth={1.5}
             />
-            <div>
-              <p className="font-medium text-gray-900">Baho qo'yish</p>
-              <p className="text-sm text-gray-500">Boshqarish</p>
-            </div>
+            <p className="font-medium text-gray-900">Baho qo'yish</p>
           </Link>
         </div>
       </Card>
@@ -203,12 +171,7 @@ const MySchedules = () => {
   }
 
   return (
-    <Card>
-      {/* Title */}
-      <h3 className="mb-4 text-lg font-semibold text-gray-900">
-        Bugungi dars jadvali
-      </h3>
-
+    <Card title="Bugungi dars jadvali" className="space-y-4">
       {/* No data */}
       {allLessons.length === 0 && (
         <div className="text-center py-8">
@@ -229,7 +192,7 @@ const MySchedules = () => {
               className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
               {/* Order */}
-              <span className="flex items-center justify-center w-8 h-8 bg-indigo-100 text-indigo-700 font-semibold rounded">
+              <span className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-700 font-semibold rounded">
                 {lesson.displayOrder}
               </span>
 
