@@ -76,6 +76,10 @@ const navItems = [
         title: "Xabarlarim",
         url: "/my-messages",
       },
+      {
+        title: "Topshiriqlarim",
+        url: "/tasks",
+      },
     ],
   },
   {

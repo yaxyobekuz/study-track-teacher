@@ -21,6 +21,10 @@ import SchedulesPage from "@/features/schedules/pages/SchedulesPage";
 // Pages — Messages
 import TeacherMessagesPage from "@/features/messages/pages/TeacherMessagesPage";
 
+// Pages — Tasks
+import MyTasksPage from "@/features/tasks/pages/MyTasksPage";
+import TaskDetailPage from "@/features/tasks/pages/TaskDetailPage";
+
 // Pages — Penalties
 import CreatePenaltyPage from "@/features/penalties/pages/CreatePenaltyPage";
 import MyPenaltiesPage from "@/features/penalties/pages/MyPenaltiesPage";
@@ -52,6 +56,10 @@ const Routes = () => {
           {/* Messages */}
           <Route path="/messages" element={<TeacherMessagesPage />} />
           <Route path="/my-messages" element={<TeacherMessagesPage />} />
+
+          {/* Tasks */}
+          <Route path="/tasks" element={<MyTasksPage />} />
+          <Route path="/tasks/:taskId" element={<TaskDetailPage />} />
 
           {/* Penalties */}
           <Route path="/penalties/create" element={<CreatePenaltyPage />} />
