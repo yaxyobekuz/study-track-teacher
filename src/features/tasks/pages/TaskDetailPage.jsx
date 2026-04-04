@@ -66,7 +66,7 @@ const TaskDetailPage = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center py-16">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
       </div>
     );
   }
@@ -222,7 +222,7 @@ const TaskDetailPage = () => {
               {!showSubmitForm ? (
                 <button
                   onClick={() => setShowSubmitForm(true)}
-                  className="w-full py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-medium"
+                  className="w-full py-2.5 rounded-lg bg-blue-600 text-white text-sm font-medium"
                 >
                   Bajarildi deb belgilash
                 </button>
@@ -235,7 +235,7 @@ const TaskDetailPage = () => {
                       onChange={(e) => setNote(e.target.value)}
                       rows={3}
                       placeholder="Bajarilgan ish haqida..."
-                      className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                      className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                     />
                   </div>
                   <div>
@@ -259,7 +259,7 @@ const TaskDetailPage = () => {
                     <button
                       type="submit"
                       disabled={submitMutation.isPending}
-                      className="flex-1 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium disabled:opacity-60"
+                      className="flex-1 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium disabled:opacity-60"
                     >
                       {submitMutation.isPending ? "Yuborilmoqda..." : "Yuborish"}
                     </button>

@@ -51,7 +51,7 @@ const MyTasksPage = () => {
             setStatusFilter(e.target.value);
             setPage(1);
           }}
-          className="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           {taskStatusOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -107,7 +107,7 @@ const MyTasksPage = () => {
                     <td className="py-2.5 px-3 text-center">
                       <Link
                         to={`/tasks/${task._id}`}
-                        className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                        className="text-xs text-blue-600 hover:text-blue-800 font-medium"
                       >
                         Batafsil
                       </Link>
