@@ -345,7 +345,7 @@ const AddGrade = () => {
                                 {isRowLoading ? (
                                   <div className="flex items-center justify-center w-40 h-10">
                                     <Loader2
-                                      className="size-6 text-indigo-600 animate-spin"
+                                      className="size-6 text-blue-600 animate-spin"
                                       strokeWidth={2}
                                     />
                                   </div>
