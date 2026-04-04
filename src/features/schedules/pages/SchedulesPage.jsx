@@ -168,7 +168,7 @@ const Schedules = () => {
                 <div className="flex items-center gap-3.5">
                   <Calendar
                     strokeWidth={1.5}
-                    className="size-5 text-indigo-600"
+                    className="size-5 text-blue-600"
                   />
                   <h3 className="text-lg font-semibold text-gray-900">
                     {day.label}
@@ -183,7 +183,7 @@ const Schedules = () => {
                       onClick={() =>
                         handleOpenScheduleModal(day.value, schedule)
                       }
-                      className="text-indigo-600 hover:text-indigo-900"
+                      className="text-blue-600 hover:text-blue-900"
                     >
                       {schedule ? (
                         <Edit className="size-5" strokeWidth={1.5} />
