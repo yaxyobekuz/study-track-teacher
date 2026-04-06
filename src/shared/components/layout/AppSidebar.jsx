@@ -1,6 +1,7 @@
 // Icons
 import {
   Home,
+  Clock,
   LogOut,
   BookOpen,
   PanelLeft,
@@ -119,6 +120,21 @@ const navItems = [
       {
         title: "Bergan jarimalarim",
         url: "/penalties/given",
+      },
+    ],
+  },
+  {
+    title: "Davomat",
+    icon: Clock,
+    isActive: false,
+    items: [
+      {
+        title: "Davomat",
+        url: "/attendance",
+      },
+      {
+        title: "Mening davomatim",
+        url: "/attendance/my",
       },
     ],
   },

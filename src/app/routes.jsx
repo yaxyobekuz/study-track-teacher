@@ -30,6 +30,10 @@ import CreatePenaltyPage from "@/features/penalties/pages/CreatePenaltyPage";
 import MyPenaltiesPage from "@/features/penalties/pages/MyPenaltiesPage";
 import GivenPenaltiesPage from "@/features/penalties/pages/GivenPenaltiesPage";
 
+// Pages — Attendance
+import AttendancePage from "@/features/attendance/pages/AttendancePage";
+import MyAttendancePage from "@/features/attendance/pages/MyAttendancePage";
+
 // Router
 import { Routes as RoutesWrapper, Route, Navigate } from "react-router-dom";
 
@@ -65,6 +69,10 @@ const Routes = () => {
           <Route path="/penalties/create" element={<CreatePenaltyPage />} />
           <Route path="/penalties/my" element={<MyPenaltiesPage />} />
           <Route path="/penalties/given" element={<GivenPenaltiesPage />} />
+
+          {/* Attendance */}
+          <Route path="/attendance" element={<AttendancePage />} />
+          <Route path="/attendance/my" element={<MyAttendancePage />} />
         </Route>
       </Route>
 
