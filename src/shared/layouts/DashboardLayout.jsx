@@ -1,3 +1,6 @@
+// Utils
+import { cn } from "../utils/cn";
+
 // React
 import { useEffect } from "react";
 
@@ -12,6 +15,7 @@ import { subjectsAPI } from "@/features/subjects/api/subjects.api";
 
 // Hooks
 import useAuth from "@/shared/hooks/useAuth";
+import usePathSegments from "../hooks/usePathSegments";
 import useArrayStore from "@/shared/hooks/useArrayStore";
 import useObjectStore from "@/shared/hooks/useObjectStore";
 
@@ -28,9 +32,14 @@ import MessageDetailsModal from "@/features/messages/components/MessageDetailsMo
 
 // Blocked page
 import BlockedPage from "@/features/penalties/pages/BlockedPage";
+import AppBottomNavbar from "../components/layout/AppBottomNavbar";
 
 const DashboardLayout = () => {
   actions();
+  const { matchSegment, isHomePage } = usePathSegments();
+
+  const allowedSegments = ["add-grade", "attendance", "tasks"];
+  const isAllowedSegment = allowedSegments.some((seg) => matchSegment(seg));
 
   const { user } = useAuth();
   if (user?.penaltyPoints >= 12) return <BlockedPage />;
@@ -42,9 +51,18 @@ const DashboardLayout = () => {
         <AppSidebar />
         <SidebarInset>
           <AppHeader />
-          <div className="flex flex-1 flex-col gap-4 p-4 md:py-2">
+          <div className="flex flex-1 flex-col gap-4 p-4 pb-24 md:pb-4 md:py-2">
             <Outlet />
           </div>
+
+          <AppBottomNavbar
+            className={cn(
+              "transition-transform duration-300 md:hidden",
+              isAllowedSegment || isHomePage
+                ? "translate-y-0"
+                : "translate-y-full",
+            )}
+          />
         </SidebarInset>
       </SidebarProvider>
 
