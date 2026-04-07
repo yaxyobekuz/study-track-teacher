@@ -5,19 +5,26 @@ import { cn } from "../../utils/cn";
 import { NavLink } from "react-router-dom";
 
 // Icons
-import { Home, User, Coins } from "lucide-react";
+import { Home, PlusCircle, Clock, List } from "lucide-react";
 
-const BottomNavbar = () => {
+const AppBottomNavbar = ({ className = "" }) => {
   const navItems = [
-    { path: "/dashboard", label: "Asosiy", icon: Home },
-    { path: "/transactions", label: "Tangalar", icon: Coins },
-    { path: "/profile", label: "Profil", icon: User },
+    { path: "/", label: "Asosiy", icon: Home },
+    { path: "/add-grade", label: "Baho", icon: PlusCircle },
+    { path: "/attendance", label: "Davomat", icon: Clock },
+    { path: "/tasks", label: "Topshiriqlar", icon: List },
   ];
 
   return (
-    <div className="fixed top-auto inset-0 z-20 flex justify-center pb-4">
-      <div className="container">
-        <nav className="bottom-navigation flex items-center gap-1 p-1 rounded-full bg-white xs:p-1.5">
+    <div
+      className={cn(
+        "flex justify-center fixed inset-x-0 bottom-0 z-20 pb-4",
+        className,
+      )}
+    >
+      <div className="container relative">
+        {/* Nav */}
+        <nav className="relative z-10 bottom-navigation flex items-center p-1 rounded-full bg-white/90 backdrop-blur xs:p-1.5">
           {navItems.map((nav) => (
             <NavLink
               to={nav.path}
@@ -41,7 +48,7 @@ const BottomNavbar = () => {
 
                   <span
                     className={cn(
-                      isActive ? "font-bold xs:font-semibold" : "font-medium",
+                      isActive ? "font-bold" : "font-medium",
                       "text-[10px] xs:text-xs",
                     )}
                   >
@@ -52,9 +59,12 @@ const BottomNavbar = () => {
             </NavLink>
           ))}
         </nav>
+
+        {/* Shadow */}
+        <div className="absolute inset-x-0 -bottom-4 z-0 w-full h-16 bg-gradient-to-b from-transparent to-gray-100" />
       </div>
     </div>
   );
 };
 
-export default BottomNavbar;
+export default AppBottomNavbar;
