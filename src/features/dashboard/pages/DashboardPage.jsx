@@ -1,11 +1,12 @@
 // Icons
 import {
-  Clock,
   BookOpen,
-  PlusCircle,
+  Calendar,
   PartyPopper,
   ClipboardList,
   GraduationCap,
+  MessageCircle,
+  TriangleAlert,
 } from "lucide-react";
 
 // React
@@ -61,8 +62,10 @@ const Dashboard = () => {
         </Card>
       )}
 
+      <MySchedules />
+
       {/* Quick Actions */}
-      <Card className="space-y-4" title="Tezkor harakatlar">
+      <Card className="space-y-4" title="Boshqa harakatlar">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {/* Grades */}
           <Link
@@ -70,36 +73,46 @@ const Dashboard = () => {
             className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <ClipboardList
-              className="size-6 text-blue-600 mr-3"
+              className="size-6 text-primary mr-3"
               strokeWidth={1.5}
             />
             <p className="font-medium text-gray-900">Baholar jurnali</p>
           </Link>
 
-          {/* Add Grades */}
+          {/* Messages */}
           <Link
-            to="/attendance"
+            to="/my-messages"
             className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <Clock className="size-6 text-blue-600 mr-3" strokeWidth={1.5} />
-            <p className="font-medium text-gray-900">Davomat</p>
-          </Link>
-
-          {/* Add Grades */}
-          <Link
-            to="/add-grade"
-            className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <PlusCircle
-              className="size-6 text-blue-600 mr-3"
+            <MessageCircle
+              className="size-6 text-primary mr-3"
               strokeWidth={1.5}
             />
-            <p className="font-medium text-gray-900">Baho qo'yish</p>
+            <p className="font-medium text-gray-900">Xabarlar</p>
+          </Link>
+
+          {/* Schedules */}
+          <Link
+            to="/schedules"
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <Calendar className="size-6 text-primary mr-3" strokeWidth={1.5} />
+            <p className="font-medium text-gray-900">Dars jadvali</p>
+          </Link>
+
+          {/* Penalties */}
+          <Link
+            to="/penalties/create"
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <TriangleAlert
+              className="size-6 text-primary mr-3"
+              strokeWidth={1.5}
+            />
+            <p className="font-medium text-gray-900">Jarima qo'shish</p>
           </Link>
         </div>
       </Card>
-
-      <MySchedules />
     </div>
   );
 };
