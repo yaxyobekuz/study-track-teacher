@@ -1,12 +1,11 @@
 // Icons
 import {
+  Clock,
   BookOpen,
   PlusCircle,
   PartyPopper,
   ClipboardList,
   GraduationCap,
-  Timer,
-  Clock,
 } from "lucide-react";
 
 // React
@@ -14,9 +13,6 @@ import { useEffect } from "react";
 
 // Router
 import { Link } from "react-router-dom";
-
-// Store
-import useAuth from "@/shared/hooks/useAuth";
 
 // Components
 import Card from "@/shared/components/ui/Card";
