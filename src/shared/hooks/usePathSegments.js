@@ -8,8 +8,13 @@ import { useLocation } from "react-router-dom";
 const usePathSegments = () => {
   const location = useLocation();
   const pathSegments = location.pathname.split("/").filter(Boolean) || [];
+  const isHomePage = pathSegments.length === 0;
 
-  return { pathSegments, location };
+  const matchSegment = (segment, index = 0) => {
+    return pathSegments?.[index]?.toLowerCase() === segment?.toLowerCase();
+  };
+
+  return { pathSegments, location, isHomePage, matchSegment };
 };
 
 export default usePathSegments;
