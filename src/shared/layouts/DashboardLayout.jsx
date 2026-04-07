@@ -33,10 +33,7 @@ const DashboardLayout = () => {
   actions();
 
   const { user } = useAuth();
-
-  if (user?.penaltyPoints >= 12) {
-    return <BlockedPage />;
-  }
+  if (user?.penaltyPoints >= 12) return <BlockedPage />;
 
   return (
     <>

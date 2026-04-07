@@ -200,6 +200,9 @@ const Header = () => {
 };
 
 const Main = () => {
+  const isMobile = useIsMobile();
+  const { toggleSidebar, open } = useSidebar();
+
   return (
     <SidebarContent>
       <SidebarGroup>
@@ -235,7 +238,12 @@ const Main = () => {
                     {item.items?.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton className="h-auto py-2" asChild>
-                          <Link to={subItem.url}>{subItem.title}</Link>
+                          <Link
+                            to={subItem.url}
+                            onClick={isMobile ? toggleSidebar : undefined}
+                          >
+                            {subItem.title}
+                          </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}
