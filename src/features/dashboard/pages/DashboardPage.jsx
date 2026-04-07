@@ -5,6 +5,8 @@ import {
   PartyPopper,
   ClipboardList,
   GraduationCap,
+  Timer,
+  Clock,
 } from "lucide-react";
 
 // React
@@ -35,7 +37,7 @@ const Dashboard = () => {
   const holidayInfo = getEntity("today") || { isHoliday: false, holiday: null };
 
   return (
-    <div>
+    <div className="space-y-4">
       {/* Holiday Banner */}
       {holidayInfo.isHoliday && (
         <Card className="mb-6 bg-gradient-to-r from-orange-50 to-amber-50 border-orange-200">
@@ -64,17 +66,8 @@ const Dashboard = () => {
       )}
 
       {/* Quick Actions */}
-      <Card className="space-y-4 mb-4" title="Tezkor harakatlar">
+      <Card className="space-y-4" title="Tezkor harakatlar">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {/* My Schedule */}
-          <Link
-            to="/schedules"
-            className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <BookOpen className="size-6 text-blue-600 mr-3" strokeWidth={1.5} />
-            <p className="font-medium text-gray-900">Dars jadvali</p>
-          </Link>
-
           {/* Grades */}
           <Link
             to="/grades"
@@ -85,6 +78,15 @@ const Dashboard = () => {
               strokeWidth={1.5}
             />
             <p className="font-medium text-gray-900">Baholar jurnali</p>
+          </Link>
+
+          {/* Add Grades */}
+          <Link
+            to="/attendance"
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <Clock className="size-6 text-blue-600 mr-3" strokeWidth={1.5} />
+            <p className="font-medium text-gray-900">Davomat</p>
           </Link>
 
           {/* Add Grades */}
