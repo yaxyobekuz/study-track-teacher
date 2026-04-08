@@ -15,8 +15,7 @@ const MyAttendancePage = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ["attendance", "my", { month, year }],
-    queryFn: () =>
-      attendanceAPI.getMyHistory(month, year).then((r) => r.data),
+    queryFn: () => attendanceAPI.getMyHistory(month, year).then((r) => r.data),
   });
 
   const records = data?.records || [];
@@ -65,7 +64,6 @@ const MyAttendancePage = () => {
         </>
       )}
 
-      {/* Excuse so'rov */}
       <button
         onClick={() => setShowExcuseForm((prev) => !prev)}
         className="w-full rounded-xl border border-dashed border-gray-300 py-3 text-sm text-gray-600 hover:border-gray-400 transition-colors"

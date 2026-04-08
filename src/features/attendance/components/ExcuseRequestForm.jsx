@@ -5,9 +5,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { attendanceAPI } from "../api/attendance.api";
 import { EXCUSE_TYPE_OPTIONS } from "../data/attendance.data";
 
-/**
- * Excuse so'rov yuborish formasi
- */
 const ExcuseRequestForm = ({ onSuccess }) => {
   const [date, setDate] = useState("");
   const [reason, setReason] = useState("");
