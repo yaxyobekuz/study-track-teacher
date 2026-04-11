@@ -1,9 +1,12 @@
-import { STATUS_LABELS, STATUS_COLORS, STATUS_DOT_COLORS } from "../data/attendance.data";
+// Utils
+import { cn } from "@/shared/utils/cn";
 
-/**
- * Oylik davomat kalendar ko'rinishi
- * @param {{ records: Object[], month: number, year: number }} props
- */
+// Components
+import Card from "@/shared/components/ui/Card";
+
+// Data
+import { STATUS_LABELS, STATUS_COLORS } from "../data/attendance.data";
+
 const AttendanceMonthView = ({ records, month, year }) => {
   const daysInMonth = new Date(year, month, 0).getDate();
 
@@ -20,18 +23,21 @@ const AttendanceMonthView = ({ records, month, year }) => {
   const dayLabels = ["Ya", "Du", "Se", "Ch", "Pa", "Ju", "Sh"];
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4">
-      {/* Kun sarlavhalari */}
+    <Card className="rounded-lg !p-0 overflow-hidden">
+      {/* Day labels */}
       <div className="grid grid-cols-7 mb-2">
         {dayLabels.map((d) => (
-          <div key={d} className="text-center text-xs font-medium text-gray-500 py-1">
+          <div
+            key={d}
+            className="flex items-center justify-center h-10 bg-primary text-xs font-medium text-white py-1"
+          >
             {d}
           </div>
         ))}
       </div>
 
-      {/* Kunlar */}
-      <div className="grid grid-cols-7 gap-1">
+      {/* Days */}
+      <div className="grid grid-cols-7 gap-2 p-4 pt-0 md:gap-4">
         {emptyCells.map((_, i) => (
           <div key={`empty-${i}`} />
         ))}
@@ -46,41 +52,19 @@ const AttendanceMonthView = ({ records, month, year }) => {
           return (
             <div
               key={day}
-              className={`relative flex flex-col items-center rounded-lg p-1.5 ${
-                isToday ? "ring-2 ring-blue-400" : ""
-              }`}
-              title={rec ? `${STATUS_LABELS[rec.status]}` : ""}
-            >
-              <span
-                className={`text-sm ${
-                  isToday ? "font-bold text-blue-600" : "text-gray-700"
-                }`}
-              >
-                {day}
-              </span>
-
-              {rec ? (
-                <span
-                  className={`mt-0.5 inline-block size-2 rounded-full ${STATUS_DOT_COLORS[rec.status]}`}
-                />
-              ) : (
-                <span className="mt-0.5 inline-block size-2 rounded-full bg-transparent" />
+              title={rec ? STATUS_LABELS[rec.status] : ""}
+              className={cn(
+                STATUS_COLORS[rec?.status],
+                isToday ? "border-primary" : "border-transparent",
+                "flex items-center justify-center text-center rounded-full border-2 aspect-square xs:py-1 xs:aspect-auto",
               )}
+            >
+              {day}
             </div>
           );
         })}
       </div>
-
-      {/* Izoh */}
-      <div className="flex flex-wrap gap-3 mt-4 pt-3 border-t border-gray-100">
-        {Object.entries(STATUS_LABELS).map(([key, label]) => (
-          <span key={key} className="flex items-center gap-1.5 text-xs text-gray-600">
-            <span className={`inline-block size-2 rounded-full ${STATUS_DOT_COLORS[key]}`} />
-            {label}
-          </span>
-        ))}
-      </div>
-    </div>
+    </Card>
   );
 };
 
