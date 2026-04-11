@@ -12,13 +12,6 @@ export const STATUS_COLORS = {
   excused: "bg-blue-100 text-blue-700",
 };
 
-export const STATUS_DOT_COLORS = {
-  present: "bg-green-500",
-  late: "bg-yellow-500",
-  absent: "bg-red-500",
-  excused: "bg-blue-500",
-};
-
 export const MONTH_OPTIONS = [
   { label: "Yanvar", value: 1 },
   { label: "Fevral", value: 2 },
