@@ -8,6 +8,8 @@ const initialState = {
   // Messages
   sendMessage: initialModalData,
   messageDetails: initialModalData,
+  // Attendance
+  excuseRequest: initialModalData,
 };
 
 export const modalSlice = createSlice({
