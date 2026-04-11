@@ -1,79 +1,88 @@
-import { useState } from "react";
+// Tanstack Query
 import { useQuery } from "@tanstack/react-query";
 
+// API
 import { attendanceAPI } from "../api/attendance.api";
-import MonthSummary from "../components/MonthSummary";
-import AttendanceMonthView from "../components/AttendanceMonthView";
-import ExcuseRequestForm from "../components/ExcuseRequestForm";
+
+// Data
 import { MONTH_OPTIONS } from "../data/attendance.data";
+
+// Hooks
+import useObjectState from "@/shared/hooks/useObjectState";
+
+// Hooks
+import useModal from "@/shared/hooks/useModal";
+
+// Components
+import MonthSummary from "../components/MonthSummary";
+import Button from "@/shared/components/ui/button/Button";
+import ExcuseRequestModal from "../components/ExcuseRequestModal";
+import AttendanceMonthView from "../components/AttendanceMonthView";
+import SelectField from "@/shared/components/ui/select/SelectField";
 
 const MyAttendancePage = () => {
   const now = new Date();
-  const [month, setMonth] = useState(now.getMonth() + 1);
-  const [year, setYear] = useState(now.getFullYear());
-  const [showExcuseForm, setShowExcuseForm] = useState(false);
+  const { state, setField } = useObjectState({
+    month: now.getMonth() + 1,
+    year: now.getFullYear(),
+  });
+  const { openModal } = useModal("excuseRequest");
 
   const { data, isLoading } = useQuery({
-    queryKey: ["attendance", "my", { month, year }],
-    queryFn: () => attendanceAPI.getMyHistory(month, year).then((r) => r.data),
+    queryKey: ["attendance", "my", { month: state.month, year: state.year }],
+    queryFn: () =>
+      attendanceAPI.getMyHistory(state.month, state.year).then((r) => r.data),
   });
 
   const records = data?.records || [];
   const summary = data?.summary;
 
   const currentYear = now.getFullYear();
-  const yearOptions = Array.from({ length: 3 }, (_, i) => currentYear - i);
+  const yearOptions = Array.from({ length: 3 }, (_, i) => ({
+    value: currentYear - i,
+    label: String(currentYear - i),
+  }));
 
   return (
-    <div className="max-w-lg mx-auto space-y-5">
-      <h1 className="text-xl font-semibold text-gray-900">Mening davomatim</h1>
+    <div className="space-y-4">
+      {/* Title */}
+      <h1 className="page-title">Mening davomatim</h1>
 
-      {/* Filtrlar */}
-      <div className="flex gap-3">
-        <select
-          value={month}
-          onChange={(e) => setMonth(Number(e.target.value))}
-          className="flex-1 h-11 rounded-lg border border-gray-300 px-3 text-sm focus:outline-blue-500"
-        >
-          {MONTH_OPTIONS.map((m) => (
-            <option key={m.value} value={m.value}>
-              {m.label}
-            </option>
-          ))}
-        </select>
+      {/* Filters */}
+      <div className="flex gap-4">
+        <SelectField
+          value={state.month}
+          className="max-w-48"
+          options={MONTH_OPTIONS}
+          onChange={(val) => setField("month", val)}
+        />
 
-        <select
-          value={year}
-          onChange={(e) => setYear(Number(e.target.value))}
-          className="w-24 h-11 rounded-lg border border-gray-300 px-3 text-sm focus:outline-blue-500"
-        >
-          {yearOptions.map((y) => (
-            <option key={y} value={y}>
-              {y}
-            </option>
-          ))}
-        </select>
+        <SelectField
+          value={state.year}
+          className="max-w-48"
+          options={yearOptions}
+          onChange={(val) => setField("year", val)}
+        />
       </div>
 
-      {isLoading ? (
-        <div className="py-8 text-center text-gray-500">Yuklanmoqda...</div>
-      ) : (
-        <>
-          {summary && <MonthSummary summary={summary} />}
-          <AttendanceMonthView records={records} month={month} year={year} />
-        </>
-      )}
+      <MonthSummary isLoading={isLoading} summary={summary} />
 
-      <button
-        onClick={() => setShowExcuseForm((prev) => !prev)}
-        className="w-full rounded-xl border border-dashed border-gray-300 py-3 text-sm text-gray-600 hover:border-gray-400 transition-colors"
+      <AttendanceMonthView
+        records={records}
+        year={state.year}
+        month={state.month}
+        isLoading={isLoading}
+      />
+
+      <Button
+        variant="outline"
+        className="w-full"
+        onClick={() => openModal("excuseRequest")}
       >
-        {showExcuseForm ? "Yopish" : "+ Sababli yo'qlik so'rovi"}
-      </button>
+        Uzrli yo'qlik so'rovi
+      </Button>
 
-      {showExcuseForm && (
-        <ExcuseRequestForm onSuccess={() => setShowExcuseForm(false)} />
-      )}
+      <ExcuseRequestModal />
     </div>
   );
 };
