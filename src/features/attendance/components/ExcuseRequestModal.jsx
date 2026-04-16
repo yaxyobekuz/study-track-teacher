@@ -34,7 +34,7 @@ const Content = ({ close }) => {
     if (!date) return toast.warning("Sanani tanlang");
     if (!reason.trim()) return toast.warning("Sabab kiriting");
 
-    const type = new Date(date) > new Date() ? "before" : "after";
+    const type = new Date(date) > new Date() ? "advance" : "after";
 
     setField("loading", true);
     attendanceAPI
