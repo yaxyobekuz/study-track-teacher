@@ -2,7 +2,7 @@
 import { toast } from "sonner";
 
 // React
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 // Icons
 import { AlertTriangle } from "lucide-react";
@@ -31,6 +31,7 @@ const formatTime = (isoString) => {
     minute: "2-digit",
   });
 };
+
 const CheckInOutCard = ({ todayRecord }) => {
   const queryClient = useQueryClient();
   const { loading, gpsAccuracy, gpsError, setField } = useObjectState({
@@ -39,8 +40,23 @@ const CheckInOutCard = ({ todayRecord }) => {
     gpsError: null,
   });
 
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 10000);
+    return () => clearInterval(timer);
+  }, []);
+
   const hasCheckedIn = !!todayRecord?.checkIn;
   const hasCheckedOut = !!todayRecord?.checkOut;
+
+  const checkInTime = todayRecord?.checkIn ? new Date(todayRecord.checkIn) : null;
+  const minutesSinceCheckIn = checkInTime ? (now - checkInTime.getTime()) / 60000 : 0;
+  const canCheckOut = minutesSinceCheckIn >= 5;
+  const remainingSeconds = checkInTime
+    ? Math.max(0, Math.ceil(5 * 60 - (now - checkInTime.getTime()) / 1000))
+    : 0;
 
   const getLocation = () =>
     new Promise((resolve, reject) => {
@@ -82,6 +98,7 @@ const CheckInOutCard = ({ todayRecord }) => {
   };
 
   const handleCheckOut = async () => {
+    setShowConfirm(false);
     setField("loading", true);
     try {
       const location = await getLocation();
@@ -156,11 +173,13 @@ const CheckInOutCard = ({ todayRecord }) => {
         {hasCheckedIn && !hasCheckedOut && (
           <Button
             variant="danger"
-            disabled={loading}
+            disabled={loading || !canCheckOut}
             className="flex-1"
-            onClick={handleCheckOut}
+            onClick={() => setShowConfirm(true)}
           >
-            Men ketdim{loading && "..."}
+            {!canCheckOut
+              ? `Men ketdim (${Math.floor(remainingSeconds / 60)}:${String(remainingSeconds % 60).padStart(2, "0")})`
+              : `Men ketdim${loading ? "..." : ""}`}
           </Button>
         )}
 
@@ -170,6 +189,32 @@ const CheckInOutCard = ({ todayRecord }) => {
           </Button>
         )}
       </div>
+
+      {/* Checkout Confirmation */}
+      {showConfirm && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 space-y-3">
+          <p className="text-sm font-medium text-red-800">
+            Haqiqatan ham ketmoqchimisiz?
+          </p>
+          <div className="flex gap-2">
+            <Button
+              variant="danger"
+              className="flex-1"
+              disabled={loading}
+              onClick={handleCheckOut}
+            >
+              Ha, ketdim{loading && "..."}
+            </Button>
+            <Button
+              variant="secondary"
+              className="flex-1"
+              onClick={() => setShowConfirm(false)}
+            >
+              Bekor qilish
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Late Notification */}
       {todayRecord?.isLate && (

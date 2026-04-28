@@ -1,3 +1,6 @@
+// Hooks
+import useModal from "@/shared/hooks/useModal";
+
 // Tanstack Query
 import { useQuery } from "@tanstack/react-query";
 
@@ -9,9 +12,6 @@ import { MONTH_OPTIONS } from "../data/attendance.data";
 
 // Hooks
 import useObjectState from "@/shared/hooks/useObjectState";
-
-// Hooks
-import useModal from "@/shared/hooks/useModal";
 
 // Components
 import MonthSummary from "../components/MonthSummary";
