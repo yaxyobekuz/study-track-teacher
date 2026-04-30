@@ -27,13 +27,11 @@ const CreatePenaltyPage = () => {
   const {
     userId,
     categoryId,
-    description,
     setField,
     setFields,
   } = useObjectState({
     userId: "",
     categoryId: "",
-    description: "",
   });
 
   const [files, setFiles] = useState(null);
@@ -67,7 +65,6 @@ const CreatePenaltyPage = () => {
             value: c._id,
             points: c.points,
             title: c.title,
-            description: c.description,
           })),
         );
       })
@@ -82,8 +79,6 @@ const CreatePenaltyPage = () => {
     formData.append("userId", userId);
     formData.append("categoryId", categoryId);
 
-    if (description) formData.append("description", description);
-
     if (files) {
       for (const file of files) {
         formData.append("files", file);
@@ -97,7 +92,6 @@ const CreatePenaltyPage = () => {
         setFields({
           userId: "",
           categoryId: "",
-          description: "",
         });
         setFiles(null);
       })
@@ -133,13 +127,6 @@ const CreatePenaltyPage = () => {
             placeholder="Kategoriyani tanlang..."
             onChange={(v) => setField("categoryId", v)}
             options={categories}
-          />
-
-          <Input
-            label="Izoh"
-            type="textarea"
-            value={description}
-            onChange={(v) => setField("description", v)}
           />
 
           <Input
