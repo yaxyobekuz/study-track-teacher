@@ -11,7 +11,7 @@ import { AlertTriangle } from "lucide-react";
 import { attendanceAPI } from "../api/attendance.api";
 
 // Tanstack Query
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 // Components
 import Card from "@/shared/components/ui/Card";
@@ -34,6 +34,12 @@ const formatTime = (isoString) => {
 
 const CheckInOutCard = ({ todayRecord }) => {
   const queryClient = useQueryClient();
+
+  const { data: schedule } = useQuery({
+    queryKey: ["attendance", "my-schedule"],
+    queryFn: () => attendanceAPI.getMySchedule().then((r) => r.data.data),
+  });
+
   const { loading, gpsAccuracy, gpsError, setField } = useObjectState({
     loading: false,
     gpsAccuracy: null,
@@ -122,6 +128,26 @@ const CheckInOutCard = ({ todayRecord }) => {
 
   return (
     <Card className="space-y-4">
+      {/* Work Schedule */}
+      {schedule && (
+        <div className="rounded-xl bg-blue-50 px-4 py-3">
+          {schedule.workStartTime && schedule.workEndTime ? (
+            <p className="text-sm text-blue-800">
+              Ish vaqtingiz:{" "}
+              <span className="font-semibold">
+                {schedule.workStartTime}–{schedule.workEndTime}
+              </span>
+              {" · "}
+              {schedule.isWorkDayToday ? "Bugun ish kuni" : "Bugun dam olish kuni"}
+            </p>
+          ) : (
+            <p className="text-sm text-blue-800">
+              Ish vaqti belgilanmagan
+            </p>
+          )}
+        </div>
+      )}
+
       {/* Today's Status */}
       {todayRecord && (
         <div className="flex items-center gap-4">
