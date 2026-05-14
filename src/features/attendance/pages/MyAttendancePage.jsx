@@ -15,6 +15,7 @@ import useObjectState from "@/shared/hooks/useObjectState";
 
 // Components
 import MonthSummary from "../components/MonthSummary";
+import MyExcusesList from "../components/MyExcusesList";
 import Button from "@/shared/components/ui/button/Button";
 import ExcuseRequestModal from "../components/ExcuseRequestModal";
 import AttendanceMonthView from "../components/AttendanceMonthView";
@@ -81,6 +82,8 @@ const MyAttendancePage = () => {
       >
         Uzrli yo'qlik so'rovi
       </Button>
+
+      <MyExcusesList />
 
       <ExcuseRequestModal />
     </div>

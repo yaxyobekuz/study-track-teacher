@@ -9,4 +9,5 @@ export const attendanceAPI = {
     http.get("/attendance/my", { params: { month, year } }),
   createExcuseRequest: (data) => http.post("/attendance/excuse", data),
   getMyExcuses: (params) => http.get("/attendance/excuse/my", { params }),
+  cancelExcuseRequest: (id) => http.delete(`/attendance/excuse/${id}`),
 };

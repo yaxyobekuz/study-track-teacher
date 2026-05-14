@@ -31,3 +31,20 @@ export const EXCUSE_TYPE_OPTIONS = [
   { label: "Oldindan so'rov", value: "advance" },
   { label: "Keyindan so'rov", value: "after" },
 ];
+
+export const EXCUSE_TYPE_LABELS = {
+  advance: "Oldindan",
+  after: "Keyindan",
+};
+
+export const EXCUSE_STATUS_LABELS = {
+  pending: "Kutilmoqda",
+  approved: "Tasdiqlandi",
+  rejected: "Rad etildi",
+};
+
+export const EXCUSE_STATUS_COLORS = {
+  pending: "bg-yellow-100 text-yellow-700",
+  approved: "bg-green-100 text-green-700",
+  rejected: "bg-red-100 text-red-700",
+};
