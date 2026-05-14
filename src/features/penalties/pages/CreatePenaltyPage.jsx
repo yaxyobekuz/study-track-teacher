@@ -139,7 +139,7 @@ const CreatePenaltyPage = () => {
 
           <Button
             type="submit"
-            variant="primary"
+            variant="default"
             disabled={submitting || !userId}
             className="px-6 text-sm font-medium"
           >

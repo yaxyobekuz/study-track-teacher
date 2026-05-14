@@ -117,7 +117,7 @@ const GivenPenaltiesPage = () => {
           {totalPages > 1 && (
             <div className="flex justify-center gap-2 mt-4 pt-4 border-t">
               <Button
-                variant="neutral"
+                variant="secondary"
                 disabled={page <= 1}
                 onClick={() => setPage((p) => p - 1)}
                 className="text-xs px-3"
@@ -128,7 +128,7 @@ const GivenPenaltiesPage = () => {
                 {page} / {totalPages}
               </span>
               <Button
-                variant="neutral"
+                variant="secondary"
                 disabled={page >= totalPages}
                 onClick={() => setPage((p) => p + 1)}
                 className="text-xs px-3"

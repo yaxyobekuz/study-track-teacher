@@ -243,7 +243,7 @@ const Content = ({ close, ...data }) => {
         <Button
           type="button"
           className="w-full xs:w-32"
-          variant="neutral"
+          variant="secondary"
           onClick={close}
         >
           Yopish

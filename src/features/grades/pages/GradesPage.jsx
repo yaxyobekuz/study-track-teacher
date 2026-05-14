@@ -407,7 +407,7 @@ const Grades = () => {
           {/* Export Button */}
           <Button
             disabled={!filters.classId || !filters.date}
-            variant="primary"
+            variant="default"
             onClick={handleExport}
             className="gap-3.5 px-3.5"
           >

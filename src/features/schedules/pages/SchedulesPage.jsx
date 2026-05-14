@@ -148,7 +148,7 @@ const Schedules = () => {
 
         <Button
           onClick={handleExport}
-          variant="primary"
+          variant="default"
           className="px-3.5"
           disabled={!selectedClass}
         >
