@@ -29,6 +29,7 @@ import AppSidebar from "@/shared/components/layout/AppSidebar";
 
 import SendMessageModal from "@/features/messages/components/SendMessageModal";
 import MessageDetailsModal from "@/features/messages/components/MessageDetailsModal";
+import CancelMessageModal from "@/features/messages/components/CancelMessageModal";
 
 // Blocked page
 import BlockedPage from "@/features/penalties/pages/BlockedPage";
@@ -69,6 +70,7 @@ const DashboardLayout = () => {
       {/* Message Modals */}
       <SendMessageModal />
       <MessageDetailsModal />
+      <CancelMessageModal />
     </>
   );
 };
