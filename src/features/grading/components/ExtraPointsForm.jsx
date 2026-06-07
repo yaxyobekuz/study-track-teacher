@@ -15,25 +15,34 @@ import Button from "@/shared/components/ui/button/Button";
 import InputField from "@/shared/components/ui/input/InputField";
 
 /**
- * Natijaga qo'shimcha ball qo'shish formasi.
+ * Natijaga qo'shimcha ball qo'shish / tahrirlash formasi.
  *
  * @param {object} props
  * @param {string} props.resultId - natija ID
+ * @param {object} [props.entry] - mavjud yozuv (tahrirlash uchun: { _id, amount, reason })
  * @param {Function} props.onSuccess
  */
-const ExtraPointsForm = ({ resultId, onSuccess }) => {
+const ExtraPointsForm = ({ resultId, entry = null, onSuccess }) => {
+  const isEdit = Boolean(entry?._id);
   const queryClient = useQueryClient();
-  const [amount, setAmount] = useState("");
-  const [reason, setReason] = useState("");
+  const [amount, setAmount] = useState(
+    entry ? String(entry.amount) : "",
+  );
+  const [reason, setReason] = useState(entry?.reason || "");
 
   const mutation = useMutation({
-    mutationFn: (data) => testResultsAPI.addExtraPoints(resultId, data),
+    mutationFn: (data) =>
+      isEdit
+        ? testResultsAPI.editExtraPoints(resultId, entry._id, data)
+        : testResultsAPI.addExtraPoints(resultId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["test-result", resultId] });
       queryClient.invalidateQueries({ queryKey: ["test-results", "by-test"] });
-      toast.success("Qo'shimcha ball qo'shildi");
-      setAmount("");
-      setReason("");
+      toast.success(isEdit ? "Qo'shimcha ball yangilandi" : "Qo'shimcha ball qo'shildi");
+      if (!isEdit) {
+        setAmount("");
+        setReason("");
+      }
       onSuccess?.();
     },
     onError: (error) =>
@@ -73,7 +82,11 @@ const ExtraPointsForm = ({ resultId, onSuccess }) => {
         placeholder="Masalan: chiroyli yozgani uchun"
       />
       <Button type="submit" disabled={mutation.isPending} className="w-full">
-        {mutation.isPending ? "Qo'shilmoqda..." : "Qo'shish"}
+        {mutation.isPending
+          ? "Saqlanmoqda..."
+          : isEdit
+            ? "Saqlash"
+            : "Qo'shish"}
       </Button>
     </form>
   );

@@ -10,6 +10,10 @@ export const testResultsAPI = {
     http.patch(`/test-results/${id}/grade`, data),
   addExtraPoints: (id, data) =>
     http.patch(`/test-results/${id}/extra-points`, data),
+  editExtraPoints: (id, entryId, data) =>
+    http.patch(`/test-results/${id}/extra-points/${entryId}`, data),
+  deleteExtraPoints: (id, entryId) =>
+    http.delete(`/test-results/${id}/extra-points/${entryId}`),
 };
 
 // Test sessiyalari - o'qituvchi (test muallifi) va o'quvchi (o'ziniki) uchun.

@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Icons
-import { CheckCircle, Check, X, Plus } from "lucide-react";
+import { CheckCircle, Check, X, Plus, Pencil, Trash2 } from "lucide-react";
 
 // API
 import { testResultsAPI } from "@/features/grading/api/testResults.api";
@@ -29,7 +29,26 @@ import { formatDateUZ } from "@/shared/utils/date.utils";
  */
 const SessionGradingPanel = ({ test, session, resultId }) => {
   const [showExtra, setShowExtra] = useState(false);
+  const [editingExtraId, setEditingExtraId] = useState(null);
   const queryClient = useQueryClient();
+
+  const invalidateResult = () => {
+    queryClient.invalidateQueries({ queryKey: ["test-result", resultId] });
+    queryClient.invalidateQueries({
+      queryKey: ["test-results", "by-test", test._id],
+    });
+  };
+
+  const deleteExtraMutation = useMutation({
+    mutationFn: (entryId) =>
+      testResultsAPI.deleteExtraPoints(resultId, entryId),
+    onSuccess: () => {
+      invalidateResult();
+      toast.success("Qo'shimcha ball o'chirildi");
+    },
+    onError: (error) =>
+      toast.error(error.response?.data?.message || "Xatolik"),
+  });
 
   const { data: result, isLoading } = useQuery({
     queryKey: ["test-result", resultId],
@@ -115,29 +134,73 @@ const SessionGradingPanel = ({ test, session, resultId }) => {
           <p className="text-sm font-medium text-gray-700">
             Qo'shimcha ballar:
           </p>
-          {result.extraPoints.map((ep, i) => (
-            <div
-              key={i}
-              className="flex items-start justify-between gap-3 p-2.5 rounded-lg bg-gray-50"
-            >
-              <div>
-                <p className="text-sm text-gray-900">{ep.reason}</p>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  {ep.addedBy?.firstName} {ep.addedBy?.lastName} ·{" "}
-                  {formatDateUZ(ep.addedAt)}
-                </p>
+          {result.extraPoints.map((ep) =>
+            editingExtraId === ep._id ? (
+              <div key={ep._id} className="p-3 rounded-lg bg-gray-50">
+                <ExtraPointsForm
+                  resultId={resultId}
+                  entry={ep}
+                  onSuccess={() => setEditingExtraId(null)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setEditingExtraId(null)}
+                  className="mt-2 text-xs text-gray-500 hover:text-gray-700"
+                >
+                  Bekor qilish
+                </button>
               </div>
-              <span
-                className={cn(
-                  "font-semibold shrink-0",
-                  ep.amount >= 0 ? "text-green-700" : "text-red-700",
-                )}
+            ) : (
+              <div
+                key={ep._id}
+                className="flex items-start justify-between gap-3 p-2.5 rounded-lg bg-gray-50"
               >
-                {ep.amount >= 0 ? "+" : ""}
-                {ep.amount}
-              </span>
-            </div>
-          ))}
+                <div className="min-w-0">
+                  <p className="text-sm text-gray-900">{ep.reason}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {ep.addedBy?.firstName} {ep.addedBy?.lastName} ·{" "}
+                    {formatDateUZ(ep.addedAt)}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span
+                    className={cn(
+                      "font-semibold",
+                      ep.amount >= 0 ? "text-green-700" : "text-red-700",
+                    )}
+                  >
+                    {ep.amount >= 0 ? "+" : ""}
+                    {ep.amount}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setEditingExtraId(ep._id)}
+                    className="size-7 flex items-center justify-center text-gray-600 hover:bg-gray-200 rounded-md"
+                    title="Tahrirlash"
+                  >
+                    <Pencil size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          "Ushbu qo'shimcha ballni o'chirishni xohlaysizmi?",
+                        )
+                      ) {
+                        deleteExtraMutation.mutate(ep._id);
+                      }
+                    }}
+                    disabled={deleteExtraMutation.isPending}
+                    className="size-7 flex items-center justify-center text-red-600 hover:bg-red-50 rounded-md"
+                    title="O'chirish"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            ),
+          )}
         </div>
       )}
 
