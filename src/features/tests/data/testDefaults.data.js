@@ -59,7 +59,7 @@ export const AI_DEFAULTS = {
   TYPE: "standard",
 };
 
-// File input "accept" — rasm, PDF, Word, matn
+// File input "accept" - rasm, PDF, Word, matn
 export const AI_ACCEPTED_FILES = "image/*,.pdf,.docx,.txt";
 export const AI_MAX_FILES = 10;
 

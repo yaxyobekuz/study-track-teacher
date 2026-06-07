@@ -164,7 +164,7 @@ const TaskDetailPage = () => {
                     ? "Tizim"
                     : entry.changedBy?.lastName
                       ? `${entry.changedBy.firstName} ${entry.changedBy.lastName}`
-                      : entry.changedBy?.firstName || "—";
+                      : entry.changedBy?.firstName || "-";
 
                   return (
                     <div key={idx} className="flex gap-3">

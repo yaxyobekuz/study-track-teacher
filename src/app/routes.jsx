@@ -5,42 +5,42 @@ import DashboardLayout from "@/shared/layouts/DashboardLayout";
 import AuthGuard from "@/shared/components/guards/AuthGuard";
 import GuestGuard from "@/shared/components/guards/GuestGuard";
 
-// Pages — Auth
+// Pages - Auth
 import LoginPage from "@/features/auth/pages/LoginPage";
 
-// Pages — Dashboard
+// Pages - Dashboard
 import DashboardPage from "@/features/dashboard/pages/DashboardPage";
 
-// Pages — Grades
+// Pages - Grades
 import GradesPage from "@/features/grades/pages/GradesPage";
 import AddGradePage from "@/features/grades/pages/AddGradePage";
 
-// Pages — Schedules
+// Pages - Schedules
 import SchedulesPage from "@/features/schedules/pages/SchedulesPage";
 
-// Pages — Messages
+// Pages - Messages
 import TeacherMessagesPage from "@/features/messages/pages/TeacherMessagesPage";
 
-// Pages — Tasks
+// Pages - Tasks
 import MyTasksPage from "@/features/tasks/pages/MyTasksPage";
 import TaskDetailPage from "@/features/tasks/pages/TaskDetailPage";
 
-// Pages — Penalties
+// Pages - Penalties
 import CreatePenaltyPage from "@/features/penalties/pages/CreatePenaltyPage";
 import MyPenaltiesPage from "@/features/penalties/pages/MyPenaltiesPage";
 import GivenPenaltiesPage from "@/features/penalties/pages/GivenPenaltiesPage";
 
-// Pages — Attendance
+// Pages - Attendance
 import AttendancePage from "@/features/attendance/pages/AttendancePage";
 import MyAttendancePage from "@/features/attendance/pages/MyAttendancePage";
 
-// Pages — Tests
+// Pages - Tests
 import TestsPage from "@/features/tests/pages/TestsPage";
 import CreateTestPage from "@/features/tests/pages/CreateTestPage";
 import TestDetailPage from "@/features/tests/pages/TestDetailPage";
 import EditTestPage from "@/features/tests/pages/EditTestPage";
 
-// Pages — Season Rewards
+// Pages - Season Rewards
 import SeasonsListPage from "@/features/season-rewards/pages/SeasonsListPage";
 import SeasonRewardsPage from "@/features/season-rewards/pages/SeasonRewardsPage";
 

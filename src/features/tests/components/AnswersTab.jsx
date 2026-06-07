@@ -28,7 +28,7 @@ import { cn } from "@/shared/utils/cn";
 import { formatDateUZ } from "@/shared/utils/date.utils";
 
 /**
- * Tab 2: Javoblar — o'quvchilar sessiyalari, qatorga bosib inline grading.
+ * Tab 2: Javoblar - o'quvchilar sessiyalari, qatorga bosib inline grading.
  */
 const AnswersTab = ({ test }) => {
   const [openSessionId, setOpenSessionId] = useState(null);

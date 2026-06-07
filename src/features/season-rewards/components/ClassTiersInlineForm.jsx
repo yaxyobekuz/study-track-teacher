@@ -65,7 +65,7 @@ const ClassTiersInlineForm = ({ season, classId, className }) => {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="font-medium text-gray-900">
-          {className} — o'rinlar uchun mukofotlar
+          {className} - o'rinlar uchun mukofotlar
         </h3>
         <Button
           type="button"

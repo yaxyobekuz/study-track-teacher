@@ -21,9 +21,9 @@ import Button from "@/shared/components/ui/button/Button";
 import InputField from "@/shared/components/ui/input/InputField";
 
 /**
- * Test yaratish formasi (V3 — minimal).
+ * Test yaratish formasi (V3 - minimal).
  * Faqat 3 ta maydon: nom, savollar soni, vaqt.
- * Mavsum/fan/sinflar bu yerda yo'q — keyinroq Biriktirish tab orqali biriktiriladi.
+ * Mavsum/fan/sinflar bu yerda yo'q - keyinroq Biriktirish tab orqali biriktiriladi.
  */
 const TestForm = () => {
   const navigate = useNavigate();

@@ -56,7 +56,7 @@ function imageToItems(image) {
 function extractImageState(items, originalImage) {
   const item = items?.[0];
   if (!item) {
-    // Boshida rasm bor edi-yu, endi yo'q — o'chirilgan
+    // Boshida rasm bor edi-yu, endi yo'q - o'chirilgan
     return { file: null, keepExisting: null, removed: Boolean(originalImage) };
   }
   if (item.file) {
@@ -98,7 +98,7 @@ const InlineQuestionEditor = ({
           { text: "", isCorrect: false, imageItems: [], _originalImage: null },
         ],
   );
-  // Savol rasmi — InputImage item massivi (single rejim)
+  // Savol rasmi - InputImage item massivi (single rejim)
   const [questionImageItems, setQuestionImageItems] = useState(
     imageToItems(question?.image),
   );
@@ -154,7 +154,7 @@ const InlineQuestionEditor = ({
       queryClient.invalidateQueries({ queryKey: ["test-questions", testId] });
       toast.success(isNew ? "Savol qo'shildi" : "Savol yangilandi");
       if (isNew) {
-        // "Saqla va keyingisi" yoqilgan bo'lsa — formani tozalab ochiq qoldiramiz
+        // "Saqla va keyingisi" yoqilgan bo'lsa - formani tozalab ochiq qoldiramiz
         if (keepAdding) resetForm();
         onSaved?.(res.data.data);
       } else {
@@ -213,7 +213,7 @@ const InlineQuestionEditor = ({
     );
   };
 
-  // "Saqla va keyingisi" — formani yangi bo'sh savolga tiklash
+  // "Saqla va keyingisi" - formani yangi bo'sh savolga tiklash
   const resetForm = () => {
     setText("");
     setPoints(1);
@@ -224,7 +224,7 @@ const InlineQuestionEditor = ({
     ]);
   };
 
-  // Variant inputida Enter — keyingi variantga o'tish yoki yangi variant qo'shish
+  // Variant inputida Enter - keyingi variantga o'tish yoki yangi variant qo'shish
   const onOptionEnter = (index) => {
     if (index === options.length - 1) {
       if (options.length < 99) addOption();
@@ -385,7 +385,7 @@ const InlineQuestionEditor = ({
 
       {/* Saqlash tugmalari */}
       <div className="flex flex-col gap-3 pt-2 border-t sm:flex-row sm:items-center sm:justify-between">
-        {/* "Saqla va keyingisi" — faqat yangi savol uchun */}
+        {/* "Saqla va keyingisi" - faqat yangi savol uchun */}
         {isNew && onKeepAddingChange ? (
           <label
             htmlFor="keepAdding"

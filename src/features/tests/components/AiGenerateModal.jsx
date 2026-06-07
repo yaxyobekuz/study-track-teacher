@@ -54,7 +54,7 @@ const AiGenerateModal = () => (
   <ModalWrapper
     name={MODAL_NAME}
     title="AI bilan savol generatsiya qilish"
-    description="Mavzu yozing yoki rasm/PDF/Word yuklang — AI savollarni avtomatik tuzadi."
+    description="Mavzu yozing yoki rasm/PDF/Word yuklang - AI savollarni avtomatik tuzadi."
     className="max-w-lg"
   >
     <Content />

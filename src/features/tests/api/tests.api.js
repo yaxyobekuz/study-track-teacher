@@ -1,6 +1,6 @@
 import http from "@/shared/api/http";
 
-// Testlar (V3) — mavsumdan mustaqil, sof savol konteyneri.
+// Testlar (V3) - mavsumdan mustaqil, sof savol konteyneri.
 export const testsAPI = {
   getAll: (params = {}) => http.get("/tests", { params }),
   getOne: (id) => http.get(`/tests/${id}`),

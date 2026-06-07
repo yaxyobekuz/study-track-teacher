@@ -17,7 +17,7 @@ import BindingForm from "./BindingForm";
 import BindingRow from "./BindingRow";
 
 /**
- * Tab "Biriktirish" — testning biriktiruvlari ro'yxati va yangi qo'shish.
+ * Tab "Biriktirish" - testning biriktiruvlari ro'yxati va yangi qo'shish.
  */
 const BindingsTab = ({ test }) => {
   const [showNew, setShowNew] = useState(false);

@@ -1,4 +1,4 @@
-# Claude Code — Teacher Module Rules
+# Claude Code - Teacher Module Rules
 
 > Global rules in root CLAUDE.md also apply.
 

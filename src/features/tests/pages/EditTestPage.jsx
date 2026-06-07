@@ -22,7 +22,7 @@ import Button from "@/shared/components/ui/button/Button";
 import InputField from "@/shared/components/ui/input/InputField";
 
 /**
- * Test tahrirlash sahifasi (V3) — alohida sahifa, popover emas.
+ * Test tahrirlash sahifasi (V3) - alohida sahifa, popover emas.
  * Tahrirlash: nom, savollar soni, vaqt.
  */
 const EditTestPage = () => {

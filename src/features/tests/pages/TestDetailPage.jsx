@@ -41,7 +41,7 @@ import ResultsTab from "../components/ResultsTab";
 import { cn } from "@/shared/utils/cn";
 
 /**
- * Test Detail sahifasi (V3 markaziy sahifa) — 4 tab.
+ * Test Detail sahifasi (V3 markaziy sahifa) - 4 tab.
  * URL: /tests/:id?tab=questions|bindings|answers|results
  */
 const TestDetailPage = () => {
@@ -149,7 +149,7 @@ const Header = ({ test }) => {
 };
 
 /**
- * Tab 1: Savollar — inline editor list + AI generatsiya.
+ * Tab 1: Savollar - inline editor list + AI generatsiya.
  */
 const QuestionsTab = ({ test }) => {
   const [showNew, setShowNew] = useState(false);

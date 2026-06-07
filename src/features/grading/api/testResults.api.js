@@ -1,6 +1,6 @@
 import http from "@/shared/api/http";
 
-// Test natijalari — o'qituvchi (test muallifi) va o'quvchi (o'ziniki) uchun.
+// Test natijalari - o'qituvchi (test muallifi) va o'quvchi (o'ziniki) uchun.
 export const testResultsAPI = {
   getMy: (params = {}) => http.get("/test-results/my", { params }),
   getOne: (id) => http.get(`/test-results/${id}`),
@@ -12,7 +12,7 @@ export const testResultsAPI = {
     http.patch(`/test-results/${id}/extra-points`, data),
 };
 
-// Test sessiyalari — o'qituvchi (test muallifi) va o'quvchi (o'ziniki) uchun.
+// Test sessiyalari - o'qituvchi (test muallifi) va o'quvchi (o'ziniki) uchun.
 export const testSessionsAPI = {
   getByTest: (testId) => http.get(`/test-sessions/by-test/${testId}`),
   reopen: (data) => http.post("/test-sessions/reopen", data),

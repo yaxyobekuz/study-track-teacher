@@ -1,6 +1,6 @@
 import http from "@/shared/api/http";
 
-// Mavsumlar — o'qituvchi va o'quvchi uchun faqat faollarini o'qish kerak.
+// Mavsumlar - o'qituvchi va o'quvchi uchun faqat faollarini o'qish kerak.
 export const testSeasonsAPI = {
   getActive: () => http.get("/test-seasons/active"),
   getStats: (id, params = {}) =>

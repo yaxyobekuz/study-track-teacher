@@ -53,7 +53,7 @@ const fileToItem = (file) => {
  * Bitta rasm preview kartasi (thumbnail + nom + o'chirish/qayta yuklash).
  */
 const ImagePreview = ({ item, disabled, onRemove, onReplace }) => {
-  // Yangi fayl uchun blob URL — render paytida hosil qilinadi
+  // Yangi fayl uchun blob URL - render paytida hosil qilinadi
   const objectUrl = useMemo(
     () => (item.file ? URL.createObjectURL(item.file) : null),
     [item.file],
@@ -130,12 +130,12 @@ const ImagePreview = ({ item, disabled, onRemove, onReplace }) => {
  * Imkoniyatlar:
  * - Bir yoki bir nechta rasm (multiple).
  * - Preview (thumbnail).
- * - Clipboarddan paste (Ctrl+V) — fokus komponent ichida bo'lganda.
+ * - Clipboarddan paste (Ctrl+V) - fokus komponent ichida bo'lganda.
  * - Drag & drop.
  * - Qayta yuklash (almashtirish) va o'chirish.
  * - Bo'sh holatda balandligi odatiy Input bilan bir xil (h-10).
  *
- * Controlled: `value` — ImageItem massivi, `onChange(nextItems)`.
+ * Controlled: `value` - ImageItem massivi, `onChange(nextItems)`.
  *
  * @param {Object} props
  * @param {ImageItem[]} [props.value=[]] - Joriy rasmlar.
@@ -224,7 +224,7 @@ const InputImage = ({
     addItems(imageFiles);
   };
 
-  // Clipboarddan paste (Ctrl+V) — zona ichida fokus bo'lganda
+  // Clipboarddan paste (Ctrl+V) - zona ichida fokus bo'lganda
   useEffect(() => {
     const zone = zoneRef.current;
     if (!zone) return;
@@ -286,7 +286,7 @@ const InputImage = ({
           </div>
         )}
 
-        {/* Bo'sh / qo'shish zonasi — balandligi Input bilan bir xil (h-10) */}
+        {/* Bo'sh / qo'shish zonasi - balandligi Input bilan bir xil (h-10) */}
         {canAddMore && (
           <button
             type="button"

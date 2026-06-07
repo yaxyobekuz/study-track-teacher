@@ -50,12 +50,12 @@ const StudentStatsView = ({ season }) => {
         <Stat
           icon={Trophy}
           label="Umumiy o'rin"
-          value={stats?.rank ? `#${stats.rank}` : "—"}
+          value={stats?.rank ? `#${stats.rank}` : "-"}
         />
         <Stat
           icon={Award}
           label="Sinfdagi o'rin"
-          value={stats?.classRank ? `#${stats.classRank}` : "—"}
+          value={stats?.classRank ? `#${stats.classRank}` : "-"}
         />
         <Stat icon={ListChecks} label="Testlar" value={stats?.resultCount || 0} />
       </div>
@@ -96,7 +96,7 @@ const StudentStatsView = ({ season }) => {
             <div className="flex-1">
               <p className="text-sm text-blue-700">Keyingi daraja</p>
               <p className="font-semibold text-gray-900">
-                {nextAbsoluteTier.name} — {nextAbsoluteTier.coinReward} coin
+                {nextAbsoluteTier.name} - {nextAbsoluteTier.coinReward} coin
               </p>
               <p className="text-xs text-gray-600 mt-0.5">
                 Yana <strong>{nextAbsoluteTier.minScore - totalScore}</strong> ball kerak

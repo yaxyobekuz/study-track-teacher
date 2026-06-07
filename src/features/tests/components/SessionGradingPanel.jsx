@@ -24,7 +24,7 @@ import { cn } from "@/shared/utils/cn";
 import { formatDateUZ } from "@/shared/utils/date.utils";
 
 /**
- * Inline grading paneli — Tab 2 ichida bitta sessiya/natija uchun.
+ * Inline grading paneli - Tab 2 ichida bitta sessiya/natija uchun.
  * Variantli savollar avto-baholangan, ochiq savollar inline baholanadi.
  */
 const SessionGradingPanel = ({ test, session, resultId }) => {
