@@ -2,7 +2,10 @@
 import { useState } from "react";
 
 // Tanstack Query
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+// Toast
+import { toast } from "sonner";
 
 // Router
 import { Link, useParams, useSearchParams } from "react-router-dom";
@@ -155,11 +158,23 @@ const QuestionsTab = ({ test }) => {
   const [showNew, setShowNew] = useState(false);
   // Saqlangach yangi bo'sh savolni ochiq qoldirish ("Saqla va keyingisi")
   const [keepAdding, setKeepAdding] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: questions = [], isLoading } = useQuery({
     queryKey: ["test-questions", test._id],
     queryFn: () =>
       testQuestionsAPI.getAll(test._id).then((res) => res.data.data),
+  });
+
+  const deleteAllMutation = useMutation({
+    mutationFn: () => testQuestionsAPI.deleteAll(test._id),
+    onSuccess: (res) => {
+      const deleted = res.data?.data?.deleted ?? 0;
+      queryClient.invalidateQueries({ queryKey: ["test-questions", test._id] });
+      toast.success(`${deleted} ta savol o'chirildi`);
+    },
+    onError: (error) =>
+      toast.error(error.response?.data?.message || "O'chirilmadi"),
   });
 
   if (isLoading) {
@@ -220,16 +235,37 @@ const QuestionsTab = ({ test }) => {
 
       {/* Pastki harakat paneli (bo'sh bo'lmaganda) */}
       {!isEmpty && questions.length > 0 && !showNew && (
-        <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="space-y-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button
+              variant="outline"
+              onClick={() => setShowNew(true)}
+              className="gap-2 flex-1"
+            >
+              <Plus size={16} />
+              Yangi savol
+            </Button>
+            <AiGenerateButton testId={test._id} className="flex-1" />
+          </div>
           <Button
-            variant="outline"
-            onClick={() => setShowNew(true)}
-            className="gap-2 flex-1"
+            variant="ghost"
+            onClick={() => {
+              if (
+                window.confirm(
+                  "Barcha savollarni o'chirishni xohlaysizmi? Bu amalni ortga qaytarib bo'lmaydi.",
+                )
+              ) {
+                deleteAllMutation.mutate();
+              }
+            }}
+            disabled={deleteAllMutation.isPending}
+            className="gap-2 w-full text-red-600 hover:bg-red-50"
           >
-            <Plus size={16} />
-            Yangi savol
+            <Trash2 size={16} />
+            {deleteAllMutation.isPending
+              ? "O'chirilmoqda..."
+              : "Barcha savollarni o'chirish"}
           </Button>
-          <AiGenerateButton testId={test._id} className="flex-1" />
         </div>
       )}
     </div>
