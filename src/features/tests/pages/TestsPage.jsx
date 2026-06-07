@@ -23,7 +23,7 @@ import InputField from "@/shared/components/ui/input/InputField";
 import { formatDateUZ } from "@/shared/utils/date.utils";
 
 /**
- * Testlar ro'yxati (V3) — mavsumdan mustaqil.
+ * Testlar ro'yxati (V3) - mavsumdan mustaqil.
  * Qatorga bosish → Test Detail sahifasiga.
  */
 const TestsPage = () => {
@@ -46,16 +46,10 @@ const TestsPage = () => {
     <div className="space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Testlar</h1>
-          <p className="text-gray-600 mt-1">
-            Testlaringiz. Qatorga bosib batafsil ko'ring va biriktirishni
-            boshqaring.
-          </p>
-        </div>
+        <h1 className="text-2xl font-semibold text-gray-900">Testlar</h1>
         <Link to="/tests/create">
           <Button className="gap-2">
-            <Plus size={18} />
+            <Plus />
             Yangi test
           </Button>
         </Link>
@@ -64,7 +58,7 @@ const TestsPage = () => {
       {/* Search */}
       <Card>
         <div className="flex items-center gap-2">
-          <Search size={18} className="text-gray-400 shrink-0" />
+          <Search className="text-gray-400 shrink-0" />
           <InputField
             name="search"
             value={search}
@@ -117,10 +111,7 @@ const TestsPage = () => {
                     </p>
                   </div>
 
-                  <ChevronRight
-                    size={20}
-                    className="text-gray-400 shrink-0"
-                  />
+                  <ChevronRight size={20} className="text-gray-400 shrink-0" />
                 </div>
               </Card>
             </Link>
