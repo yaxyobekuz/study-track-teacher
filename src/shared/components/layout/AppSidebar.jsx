@@ -2,7 +2,6 @@
 import {
   Home,
   Clock,
-  Trophy,
   LogOut,
   BookOpen,
   PanelLeft,
@@ -150,14 +149,6 @@ const navItems = [
         title: "Testlar ro'yxati",
         url: "/tests",
       },
-    ],
-  },
-  {
-    title: "Mavsumlar",
-    url: "/seasons",
-    icon: Trophy,
-    isActive: false,
-    items: [
       {
         title: "Reyting va mukofotlar",
         url: "/seasons",
