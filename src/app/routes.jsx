@@ -34,6 +34,16 @@ import GivenPenaltiesPage from "@/features/penalties/pages/GivenPenaltiesPage";
 import AttendancePage from "@/features/attendance/pages/AttendancePage";
 import MyAttendancePage from "@/features/attendance/pages/MyAttendancePage";
 
+// Pages — Tests
+import TestsPage from "@/features/tests/pages/TestsPage";
+import CreateTestPage from "@/features/tests/pages/CreateTestPage";
+import TestDetailPage from "@/features/tests/pages/TestDetailPage";
+import EditTestPage from "@/features/tests/pages/EditTestPage";
+
+// Pages — Season Rewards
+import SeasonsListPage from "@/features/season-rewards/pages/SeasonsListPage";
+import SeasonRewardsPage from "@/features/season-rewards/pages/SeasonRewardsPage";
+
 // Router
 import { Routes as RoutesWrapper, Route, Navigate } from "react-router-dom";
 
@@ -73,6 +83,16 @@ const Routes = () => {
           {/* Attendance */}
           <Route path="/attendance" element={<AttendancePage />} />
           <Route path="/attendance/my" element={<MyAttendancePage />} />
+
+          {/* Tests */}
+          <Route path="/tests" element={<TestsPage />} />
+          <Route path="/tests/create" element={<CreateTestPage />} />
+          <Route path="/tests/:id" element={<TestDetailPage />} />
+          <Route path="/tests/:id/edit" element={<EditTestPage />} />
+
+          {/* Seasons & rewards */}
+          <Route path="/seasons" element={<SeasonsListPage />} />
+          <Route path="/seasons/:id/rewards" element={<SeasonRewardsPage />} />
         </Route>
       </Route>
 

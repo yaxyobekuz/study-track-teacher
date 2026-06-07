@@ -157,8 +157,7 @@ const MySchedules = () => {
     .flatMap((schedule) =>
       schedule.subjects.map((subject, index) => ({
         order: subject.order,
-        displayOrder:
-          (schedule.startingOrder || 1) + (subject.order || index + 1) - 1,
+        displayOrder: subject.order || index + 1,
         subjectName: subject.subject.name,
         className: schedule.class.name,
         startTime: subject.startTime,

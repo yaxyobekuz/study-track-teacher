@@ -248,8 +248,7 @@ const AddGrade = () => {
           value={selectedSubjectWithOrder}
           onChange={(value) => setField("selectedSubjectWithOrder", value)}
           options={subjects.map((subject) => {
-            const displayOrder =
-              (subject.startingOrder || 1) + (subject.order || 1) - 1;
+            const displayOrder = subject.order || 1;
             return {
               label: `${displayOrder}. ${subject.name}`,
               value: `${subject._id}_${subject.order}`,

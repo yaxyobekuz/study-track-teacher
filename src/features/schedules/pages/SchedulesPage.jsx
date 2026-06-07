@@ -209,10 +209,7 @@ const Schedules = () => {
               {schedule && (
                 <div className="space-y-3">
                   {schedule.subjects.map((subj, index) => {
-                    const displayOrder =
-                      (schedule.startingOrder || 1) +
-                      (subj.order || index + 1) -
-                      1;
+                    const displayOrder = subj.order || index + 1;
                     return (
                       <div key={index} className="p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-start justify-between mb-1">

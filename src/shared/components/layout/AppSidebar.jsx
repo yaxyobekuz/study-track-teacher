@@ -2,11 +2,13 @@
 import {
   Home,
   Clock,
+  Trophy,
   LogOut,
   BookOpen,
   PanelLeft,
   TrendingUp,
   ChevronRight,
+  ClipboardList,
   AlertTriangle,
 } from "lucide-react";
 
@@ -135,6 +137,30 @@ const navItems = [
       {
         title: "Mening davomatim",
         url: "/attendance/my",
+      },
+    ],
+  },
+  {
+    title: "Testlar",
+    url: "/tests",
+    icon: ClipboardList,
+    isActive: false,
+    items: [
+      {
+        title: "Testlar ro'yxati",
+        url: "/tests",
+      },
+    ],
+  },
+  {
+    title: "Mavsumlar",
+    url: "/seasons",
+    icon: Trophy,
+    isActive: false,
+    items: [
+      {
+        title: "Reyting va mukofotlar",
+        url: "/seasons",
       },
     ],
   },

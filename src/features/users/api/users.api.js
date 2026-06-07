@@ -2,8 +2,10 @@ import http from "@/shared/api/http";
 
 export const usersAPI = {
   getAll: (params) => http.get("/users", { params }),
+  getAllShort: () => http.get("/users/all-short"),
   getStudents: (params) => http.get("/users/students", { params }),
   getStats: () => http.get("/users/stats"),
+  getById: (id) => http.get(`/users/${id}`),
   create: (data) => http.post("/users", data),
   update: (id, data) => http.put(`/users/${id}`, data),
   delete: (id) => http.delete(`/users/${id}`),
