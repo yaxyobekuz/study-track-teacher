@@ -43,12 +43,12 @@ export const AI_DIFFICULTY_OPTIONS = [
 
 export const AI_SOURCE_TABS = {
   PROMPT: "prompt",
-  FILES: "files",
+  IMAGES: "images",
 };
 
 export const AI_SOURCE_TAB_LABELS = {
   prompt: "Matn orqali",
-  files: "Fayl orqali",
+  images: "Rasm orqali",
 };
 
 export const AI_DEFAULTS = {
@@ -59,18 +59,6 @@ export const AI_DEFAULTS = {
   TYPE: "standard",
 };
 
-// File input "accept" - rasm, PDF, Word, matn
-export const AI_ACCEPTED_FILES = "image/*,.pdf,.docx,.txt";
+// File input "accept" - faqat rasm
+export const AI_ACCEPTED_FILES = "image/*";
 export const AI_MAX_FILES = 10;
-
-export const BINDING_STATUS_LABELS = {
-  draft: "Tayyorlanmoqda",
-  published: "E'lon qilingan",
-  closed: "Yopilgan",
-};
-
-export const BINDING_STATUS_COLORS = {
-  draft: "bg-gray-100 text-gray-700",
-  published: "bg-green-100 text-green-700",
-  closed: "bg-red-100 text-red-700",
-};

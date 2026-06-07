@@ -21,6 +21,7 @@ export const testQuestionsAPI = {
       headers: { "Content-Type": "multipart/form-data" },
     }),
   delete: (id) => http.delete(`/questions/${id}`),
+  deleteAll: (testId) => http.delete(`/tests/${testId}/questions`),
   reorder: (testId, orderedIds) =>
     http.patch(`/tests/${testId}/questions/reorder`, { orderedIds }),
 };
@@ -38,8 +39,6 @@ export const testBindingsAPI = {
   getForTest: (testId) => http.get(`/tests/${testId}/bindings`),
   create: (testId, data) => http.post(`/tests/${testId}/bindings`, data),
   update: (id, data) => http.put(`/bindings/${id}`, data),
-  publish: (id) => http.patch(`/bindings/${id}/publish`),
-  close: (id) => http.patch(`/bindings/${id}/close`),
   delete: (id) => http.delete(`/bindings/${id}`),
   reopen: (id, studentId) =>
     http.post(`/bindings/${id}/reopen`, { studentId }),

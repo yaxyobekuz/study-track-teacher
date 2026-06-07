@@ -8,23 +8,15 @@ import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Icons
-import { Send, Lock, Edit, Trash2, Loader2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 
 // API
 import { testBindingsAPI } from "../api/tests.api";
 
-// Data
-import {
-  BINDING_STATUS_LABELS,
-  BINDING_STATUS_COLORS,
-} from "../data/testDefaults.data";
-
 // Components
-import Button from "@/shared/components/ui/button/Button";
 import BindingForm from "./BindingForm";
 
 // Utils
-import { cn } from "@/shared/utils/cn";
 import { formatDateUZ } from "@/shared/utils/date.utils";
 
 /**
@@ -33,24 +25,6 @@ import { formatDateUZ } from "@/shared/utils/date.utils";
 const BindingRow = ({ binding, testId }) => {
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
-
-  const publishMutation = useMutation({
-    mutationFn: () => testBindingsAPI.publish(binding._id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["test-bindings", testId] });
-      toast.success("Biriktiruv e'lon qilindi");
-    },
-    onError: (e) => toast.error(e.response?.data?.message || "Xatolik"),
-  });
-
-  const closeMutation = useMutation({
-    mutationFn: () => testBindingsAPI.close(binding._id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["test-bindings", testId] });
-      toast.success("Biriktiruv yopildi");
-    },
-    onError: (e) => toast.error(e.response?.data?.message || "Xatolik"),
-  });
 
   const deleteMutation = useMutation({
     mutationFn: () => testBindingsAPI.delete(binding._id),
@@ -84,14 +58,6 @@ const BindingRow = ({ binding, testId }) => {
             </span>
             <span className="text-gray-400">·</span>
             <span className="text-gray-700">{binding.subject?.name}</span>
-            <span
-              className={cn(
-                "px-2 py-0.5 rounded-md text-xs font-medium",
-                BINDING_STATUS_COLORS[binding.status] || "bg-gray-100",
-              )}
-            >
-              {BINDING_STATUS_LABELS[binding.status]}
-            </span>
           </div>
 
           <div className="flex items-center gap-1.5 flex-wrap">
@@ -115,39 +81,6 @@ const BindingRow = ({ binding, testId }) => {
         </div>
 
         <div className="flex items-center gap-2">
-          {binding.status === "draft" && (
-            <Button
-              size="sm"
-              onClick={() => publishMutation.mutate()}
-              disabled={publishMutation.isPending}
-              className="gap-1.5"
-            >
-              {publishMutation.isPending ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : (
-                <Send size={14} />
-              )}
-              E'lon qilish
-            </Button>
-          )}
-
-          {binding.status === "published" && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => closeMutation.mutate()}
-              disabled={closeMutation.isPending}
-              className="gap-1.5"
-            >
-              {closeMutation.isPending ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : (
-                <Lock size={14} />
-              )}
-              Yopish
-            </Button>
-          )}
-
           <button
             type="button"
             onClick={() => setIsEditing(true)}

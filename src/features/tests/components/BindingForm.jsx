@@ -99,6 +99,20 @@ const BindingForm = ({ testId, binding = null, onSaved, onCancel }) => {
     }
   }, [subject, availableClasses]);
 
+  // Qulaylik uchun: yangi biriktirishda Mavsum default birinchi qiymat
+  useEffect(() => {
+    if (!isEdit && !season && seasons.length > 0) {
+      setSeason(seasons[0]._id);
+    }
+  }, [isEdit, season, seasons]);
+
+  // Qulaylik uchun: yangi biriktirishda Fan default birinchi qiymat
+  useEffect(() => {
+    if (!isEdit && !subject && subjectOptions.length > 0) {
+      setSubject(subjectOptions[0].value);
+    }
+  }, [isEdit, subject, subjectOptions]);
+
   const seasonOptions = seasons.map((s) => ({ label: s.name, value: s._id }));
 
   const toggleClass = (id) => {
@@ -146,7 +160,6 @@ const BindingForm = ({ testId, binding = null, onSaved, onCancel }) => {
           options={seasonOptions}
           placeholder="Mavsumni tanlang"
           triggerClassName="w-full"
-          disabled={isEdit && binding?.status !== "draft"}
         />
         <SelectField
           name="subject"
@@ -157,7 +170,7 @@ const BindingForm = ({ testId, binding = null, onSaved, onCancel }) => {
           options={subjectOptions}
           placeholder={season ? "Fanni tanlang" : "Avval mavsum"}
           triggerClassName="w-full"
-          disabled={!season || (isEdit && binding?.status !== "draft")}
+          disabled={!season}
         />
       </div>
 

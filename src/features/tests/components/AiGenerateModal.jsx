@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Icons
-import { Sparkles, Upload, X, FileText, Image as ImageIcon } from "lucide-react";
+import { Sparkles, Upload, X, Image as ImageIcon } from "lucide-react";
 
 // API
 import { testAiAPI } from "../api/tests.api";
@@ -54,7 +54,7 @@ const AiGenerateModal = () => (
   <ModalWrapper
     name={MODAL_NAME}
     title="AI bilan savol generatsiya qilish"
-    description="Mavzu yozing yoki rasm/PDF/Word yuklang - AI savollarni avtomatik tuzadi."
+    description="Mavzu yozing yoki rasm yuklang - AI savollarni avtomatik tuzadi."
     className="max-w-lg"
   >
     <Content />
@@ -81,7 +81,7 @@ const Content = ({ close, isLoading, setIsLoading, testId }) => {
       formData.append("count", String(count));
       formData.append("difficulty", difficulty);
       formData.append("type", type);
-      if (source === AI_SOURCE_TABS.FILES) {
+      if (source === AI_SOURCE_TABS.IMAGES) {
         files.forEach((f) => formData.append("files", f));
       }
       return testAiAPI.generate(testId, formData);
@@ -136,8 +136,8 @@ const Content = ({ close, isLoading, setIsLoading, testId }) => {
       toast.error("Mavzu yoki ko'rsatma kiriting");
       return;
     }
-    if (source === AI_SOURCE_TABS.FILES && files.length === 0) {
-      toast.error("Kamida bitta fayl yuklang");
+    if (source === AI_SOURCE_TABS.IMAGES && files.length === 0) {
+      toast.error("Kamida bitta rasm yuklang");
       return;
     }
     mutation.mutate();
@@ -175,8 +175,8 @@ const Content = ({ close, isLoading, setIsLoading, testId }) => {
         inputClassName="min-h-24"
       />
 
-      {/* Fayl yuklash zonasi */}
-      {source === AI_SOURCE_TABS.FILES && (
+      {/* Rasm yuklash zonasi */}
+      {source === AI_SOURCE_TABS.IMAGES && (
         <div className="space-y-2">
           <div
             onDragEnter={(e) => {
@@ -199,11 +199,11 @@ const Content = ({ close, isLoading, setIsLoading, testId }) => {
           >
             <Upload className="mx-auto h-9 w-9 text-gray-400 mb-2" strokeWidth={1.5} />
             <p className="text-sm text-gray-600">
-              Fayllarni bu yerga tashlang yoki{" "}
+              Rasmlarni bu yerga tashlang yoki{" "}
               <span className="font-medium text-blue-600">tanlash uchun bosing</span>
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              Rasm, PDF, Word yoki matn · ko'pi bilan {AI_MAX_FILES} ta
+              Rasm · ko'pi bilan {AI_MAX_FILES} ta
             </p>
           </div>
 
@@ -219,17 +219,12 @@ const Content = ({ close, isLoading, setIsLoading, testId }) => {
           {files.length > 0 && (
             <ul className="space-y-2">
               {files.map((file, index) => {
-                const isImage = file.type.startsWith("image/");
                 return (
                   <li
                     key={index}
                     className="flex items-center gap-2 p-2 rounded-lg bg-gray-50 border"
                   >
-                    {isImage ? (
-                      <ImageIcon size={16} className="text-blue-600 shrink-0" />
-                    ) : (
-                      <FileText size={16} className="text-emerald-600 shrink-0" />
-                    )}
+                    <ImageIcon size={16} className="text-blue-600 shrink-0" />
                     <span className="text-sm text-gray-800 flex-1 truncate">
                       {file.name}
                     </span>
