@@ -84,35 +84,30 @@ const TestsPage = () => {
           </p>
         </Card>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {tests.map((test) => (
-            <Link key={test._id} to={`/tests/${test._id}`}>
-              <Card className="transition-shadow hover:shadow-md">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex-1 min-w-0 space-y-1">
-                    <h3 className="font-semibold text-gray-900">
-                      {test.title}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {test.questionCount} savol · {test.timeLimitMinutes}{" "}
-                      daqiqa
-                      {test.questionCountActual !== undefined && (
-                        <>
-                          {" · "}
-                          {test.questionCountActual} ta savol qo'shilgan
-                        </>
-                      )}
-                      {test.bindingCount > 0 && (
-                        <> · {test.bindingCount} ta biriktiruv</>
-                      )}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {formatDateUZ(test.createdAt)}
-                    </p>
-                  </div>
-
-                  <ChevronRight size={20} className="text-gray-400 shrink-0" />
+            <Link className="block" key={test._id} to={`/tests/${test._id}`}>
+              <Card className="flex items-center justify-between gap-3">
+                <div className="flex-1 min-w-0 space-y-1">
+                  <h3 className="font-semibold text-gray-900">{test.title}</h3>
+                  <p className="text-sm text-gray-600">
+                    {test.questionCount} savol · {test.timeLimitMinutes} daqiqa
+                    {test.questionCountActual !== undefined && (
+                      <>
+                        {" · "}
+                        {test.questionCountActual} ta savol qo'shilgan
+                      </>
+                    )}
+                    {test.bindingCount > 0 && (
+                      <> · {test.bindingCount} ta biriktiruv</>
+                    )}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {formatDateUZ(test.createdAt)}
+                  </p>
                 </div>
+
+                <ChevronRight size={20} className="text-gray-400 shrink-0" />
               </Card>
             </Link>
           ))}
