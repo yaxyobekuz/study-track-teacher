@@ -5,7 +5,7 @@
  * Aks holda `openModal("...")` ishlamaydi (modal ochilmaydi), chunki
  * Redux slice faqat shu ro'yxatdagi modallar uchun boshlang'ich holat yaratadi.
  *
- * Nom — `openModal(name)`, `closeModal(name)`, `useModal(name)` va
+ * Nom - `openModal(name)`, `closeModal(name)`, `useModal(name)` va
  * `<ResponsiveModal name="..." />` da ishlatiladigan kalit bilan bir xil bo'lishi kerak.
  */
 export const MODAL_NAMES = [
