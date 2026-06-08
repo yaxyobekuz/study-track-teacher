@@ -4,9 +4,6 @@ import { useMemo, useState } from "react";
 // Tanstack Query
 import { useQuery } from "@tanstack/react-query";
 
-// Icons
-import { BarChart3 } from "lucide-react";
-
 // API
 import { testSeasonsAPI } from "@/features/tests/api/testSeasons.api";
 import { teacherAssignmentsAPI } from "@/features/assignments/api/teacherAssignments.api";
@@ -14,6 +11,11 @@ import { teacherAssignmentsAPI } from "@/features/assignments/api/teacherAssignm
 // Components
 import Card from "@/shared/components/ui/Card";
 import SelectField from "@/shared/components/ui/select/SelectField";
+
+// Utils
+import { formatScore } from "@/shared/utils/formatScore";
+
+const SCHOOL = "__school__";
 
 /**
  * O'qituvchi uchun mavsum statistikasi va sinf darajalari boshqaruvi.
@@ -28,7 +30,7 @@ const TeacherStatsView = ({ season, user }) => {
         .then((res) => res.data.data),
   });
 
-  // Unique sinflar
+  // Maktab (umumiy) + biriktirilgan sinflar
   const classOptions = useMemo(() => {
     const map = new Map();
     for (const a of assignments) {
@@ -36,32 +38,24 @@ const TeacherStatsView = ({ season, user }) => {
         map.set(a.class._id, { label: a.class.name, value: a.class._id });
       }
     }
-    return [...map.values()];
+    return [
+      { label: "Maktab (umumiy)", value: SCHOOL },
+      ...map.values(),
+    ];
   }, [assignments]);
 
-  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedClass, setSelectedClass] = useState(SCHOOL);
+  const isSchool = selectedClass === SCHOOL;
 
   const { data: classStats = [], isLoading } = useQuery({
     queryKey: ["season-class-stats", season._id, selectedClass],
     queryFn: () =>
-      testSeasonsAPI
-        .getClassStats(season._id, selectedClass)
-        .then((res) => res.data.data),
+      (isSchool
+        ? testSeasonsAPI.getStats(season._id)
+        : testSeasonsAPI.getClassStats(season._id, selectedClass)
+      ).then((res) => res.data.data),
     enabled: Boolean(selectedClass),
   });
-
-  if (classOptions.length === 0) {
-    return (
-      <Card>
-        <div className="flex flex-col items-center py-10 text-center">
-          <BarChart3 size={40} className="text-gray-300" />
-          <p className="mt-3 text-gray-600">
-            Ushbu mavsumda sizga biriktirilgan sinflar yo'q.
-          </p>
-        </div>
-      </Card>
-    );
-  }
 
   return (
     <div className="space-y-4">
@@ -82,13 +76,7 @@ const TeacherStatsView = ({ season, user }) => {
       </Card>
 
       {/* Stats jadvali */}
-      {!selectedClass ? (
-        <Card>
-          <p className="text-center text-gray-500 py-10">
-            Sinfni tanlang
-          </p>
-        </Card>
-      ) : isLoading ? (
+      {isLoading ? (
         <Card>
           <p className="text-center text-gray-500 py-10">Yuklanmoqda...</p>
         </Card>
@@ -104,8 +92,9 @@ const TeacherStatsView = ({ season, user }) => {
                 <tr className="border-b text-left text-gray-600">
                   <th className="py-2 px-3 font-medium w-12">#</th>
                   <th className="py-2 px-3 font-medium">O'quvchi</th>
-                  <th className="py-2 px-3 font-medium">Testlar</th>
-                  <th className="py-2 px-3 font-medium">Umumiy ball</th>
+                  <th className="py-2 px-3 font-medium">Topshirgan</th>
+                  <th className="py-2 px-3 font-medium">Biriktirilgan</th>
+                  <th className="py-2 px-3 font-medium">O'rtacha ball</th>
                 </tr>
               </thead>
               <tbody>
@@ -114,15 +103,20 @@ const TeacherStatsView = ({ season, user }) => {
                     key={r.student._id}
                     className="border-b hover:bg-gray-50"
                   >
-                    <td className="py-2.5 px-3 text-gray-500">{r.classRank}</td>
+                    <td className="py-2.5 px-3 text-gray-500">
+                      {isSchool ? r.rank : r.classRank}
+                    </td>
                     <td className="py-2.5 px-3 font-medium text-gray-900">
                       {r.student.firstName} {r.student.lastName}
                     </td>
                     <td className="py-2.5 px-3 text-gray-600">
                       {r.resultCount}
                     </td>
+                    <td className="py-2.5 px-3 text-gray-600">
+                      {r.assignedCount}
+                    </td>
                     <td className="py-2.5 px-3 font-semibold text-blue-700">
-                      {r.totalScore}
+                      {formatScore(r.averageScore)}
                     </td>
                   </tr>
                 ))}

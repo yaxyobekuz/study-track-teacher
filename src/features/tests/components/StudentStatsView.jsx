@@ -12,9 +12,10 @@ import Card from "@/shared/components/ui/Card";
 
 // Utils
 import { cn } from "@/shared/utils/cn";
+import { formatScore } from "@/shared/utils/formatScore";
 
 /**
- * O'quvchining mavsum statistikasi: ball, o'rin, sinf o'rni, va mukofotlar.
+ * O'quvchining mavsum statistikasi: o'rtacha ball, o'rin, sinf o'rni, mukofotlar.
  */
 const StudentStatsView = ({ season }) => {
   const { data: stats, isLoading } = useQuery({
@@ -31,22 +32,27 @@ const StudentStatsView = ({ season }) => {
     );
   }
 
-  const totalScore = stats?.totalScore || 0;
+  const averageScore = stats?.averageScore || 0;
 
-  // Mavjud darajalar bo'yicha qaysisiga to'g'ri kelishi
+  // Mavjud darajalar o'rtacha ballga nisbatan tekshiriladi
   const absTiers = [...(season.absoluteTiers || [])].sort(
     (a, b) => b.minScore - a.minScore,
   );
-  const matchedAbsoluteTier = absTiers.find((t) => totalScore >= t.minScore);
+  const matchedAbsoluteTier = absTiers.find((t) => averageScore >= t.minScore);
   const nextAbsoluteTier = [...absTiers]
     .reverse()
-    .find((t) => totalScore < t.minScore);
+    .find((t) => averageScore < t.minScore);
 
   return (
     <div className="space-y-5">
       {/* Asosiy ko'rsatkichlar */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat icon={ListChecks} label="Umumiy ball" value={totalScore} highlight />
+        <Stat
+          icon={ListChecks}
+          label="O'rtacha ball"
+          value={formatScore(averageScore)}
+          highlight
+        />
         <Stat
           icon={Trophy}
           label="Umumiy o'rin"
@@ -57,7 +63,11 @@ const StudentStatsView = ({ season }) => {
           label="Sinfdagi o'rin"
           value={stats?.classRank ? `#${stats.classRank}` : "-"}
         />
-        <Stat icon={ListChecks} label="Testlar" value={stats?.resultCount || 0} />
+        <Stat
+          icon={ListChecks}
+          label="Topshirgan / Biriktirilgan"
+          value={`${stats?.resultCount || 0} / ${stats?.assignedCount || 0}`}
+        />
       </div>
 
       {/* Joriy daraja */}
@@ -99,7 +109,11 @@ const StudentStatsView = ({ season }) => {
                 {nextAbsoluteTier.name} - {nextAbsoluteTier.coinReward} coin
               </p>
               <p className="text-xs text-gray-600 mt-0.5">
-                Yana <strong>{nextAbsoluteTier.minScore - totalScore}</strong> ball kerak
+                Yana{" "}
+                <strong>
+                  {formatScore(nextAbsoluteTier.minScore - averageScore)}
+                </strong>{" "}
+                ball kerak
               </p>
             </div>
           </div>
@@ -113,7 +127,7 @@ const StudentStatsView = ({ season }) => {
             {[...(season.absoluteTiers || [])]
               .sort((a, b) => b.minScore - a.minScore)
               .map((tier, idx) => {
-                const reached = totalScore >= tier.minScore;
+                const reached = averageScore >= tier.minScore;
                 return (
                   <div
                     key={idx}
@@ -132,7 +146,7 @@ const StudentStatsView = ({ season }) => {
                         {tier.name}
                       </p>
                       <p className="text-xs text-gray-600">
-                        {tier.minScore} ball'dan boshlab
+                        {formatScore(tier.minScore)} ball'dan boshlab
                       </p>
                     </div>
                     <span className="font-semibold text-amber-600">
