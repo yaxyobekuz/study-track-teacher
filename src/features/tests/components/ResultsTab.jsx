@@ -23,6 +23,7 @@ import Pagination from "@/shared/components/ui/Pagination";
 // Utils
 import { cn } from "@/shared/utils/cn";
 import { formatDateUZ } from "@/shared/utils/date.utils";
+import { formatScore } from "@/shared/utils/formatScore";
 
 /**
  * Tab 3: Natijalar - jadval, ball bo'yicha sortable.
@@ -104,7 +105,13 @@ const ResultsTab = ({ test }) => {
                     #{r.session?.attemptNumber || 1}
                   </td>
                   <td className="py-2.5 px-3 font-semibold text-blue-700">
-                    {r.finalScore}
+                    {formatScore(r.finalScore)}
+                    {r.maxScore != null && (
+                      <span className="font-normal text-gray-400">
+                        {" "}
+                        / {formatScore(r.maxScore)}
+                      </span>
+                    )}
                   </td>
                   <td className="py-2.5 px-3">
                     <span

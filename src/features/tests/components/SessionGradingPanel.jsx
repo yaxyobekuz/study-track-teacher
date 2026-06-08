@@ -22,6 +22,7 @@ import ExtraPointsForm from "@/features/grading/components/ExtraPointsForm";
 // Utils
 import { cn } from "@/shared/utils/cn";
 import { formatDateUZ } from "@/shared/utils/date.utils";
+import { formatScore } from "@/shared/utils/formatScore";
 
 /**
  * Inline grading paneli - Tab 2 ichida bitta sessiya/natija uchun.
@@ -86,12 +87,14 @@ const SessionGradingPanel = ({ test, session, resultId }) => {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <StatBox
           label="Yakuniy ball"
-          value={`${result.finalScore} / ${maxPossible}`}
+          value={`${formatScore(result.finalScore)} / ${formatScore(
+            result.maxScore ?? maxPossible,
+          )}`}
           highlight
         />
-        <StatBox label="Avtomatik" value={result.autoGradedScore} />
-        <StatBox label="Qo'lda" value={result.manualGradedScore} />
-        <StatBox label="Qo'shimcha" value={extraSum} />
+        <StatBox label="Avtomatik" value={formatScore(result.autoGradedScore)} />
+        <StatBox label="Qo'lda" value={formatScore(result.manualGradedScore)} />
+        <StatBox label="Qo'shimcha" value={formatScore(extraSum)} />
       </div>
 
       <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -295,7 +298,8 @@ const QuestionAnswerBlock = ({
           {isStandard ? "Variantli" : "Ochiq"}
         </span>
         <span className="text-xs text-gray-500">
-          {perQuestion?.awardedPoints ?? 0} / {question.points} ball
+          {formatScore(perQuestion?.awardedPoints ?? 0)} /{" "}
+          {formatScore(question.points)} ball
         </span>
       </div>
 
@@ -377,9 +381,10 @@ const QuestionAnswerBlock = ({
             <InputField
               type="number"
               name={`points-${index}`}
-              label={`Ball (0–${question.points})`}
+              label={`Ball (0–${formatScore(question.points)})`}
               min={0}
               max={question.points}
+              step="0.01"
               value={awardedPoints}
               onChange={(e) => setAwardedPoints(e.target.value)}
             />

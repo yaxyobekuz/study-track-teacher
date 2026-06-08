@@ -19,6 +19,9 @@ import {
   RESULT_STATUS_COLORS,
 } from "@/features/grading/data/resultStatuses.data";
 
+// Utils
+import { formatScore } from "@/shared/utils/formatScore";
+
 // Components
 import Card from "@/shared/components/ui/Card";
 import SessionGradingPanel from "./SessionGradingPanel";
@@ -131,7 +134,7 @@ const AnswersTab = ({ test }) => {
                         )}
                       >
                         {RESULT_STATUS_LABELS[result.status]} ·{" "}
-                        {result.finalScore} ball
+                        {formatScore(result.finalScore)} ball
                       </span>
                     )}
                   </div>
