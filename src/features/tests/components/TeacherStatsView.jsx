@@ -64,11 +64,14 @@ const TeacherStatsView = ({ season, user }) => {
         <div className="flex items-end gap-3 flex-wrap">
           <div className="flex-1 min-w-48">
             <SelectField
+              searchable
               label="Sinf"
               value={selectedClass}
               onChange={setSelectedClass}
               options={classOptions}
               placeholder="Sinfni tanlang"
+              searchPlaceholder="Sinfni qidirish..."
+              emptyText="Sinf topilmadi"
               triggerClassName="w-full"
             />
           </div>
