@@ -39,6 +39,7 @@ import TestsPage from "@/features/tests/pages/TestsPage";
 import CreateTestPage from "@/features/tests/pages/CreateTestPage";
 import TestDetailPage from "@/features/tests/pages/TestDetailPage";
 import EditTestPage from "@/features/tests/pages/EditTestPage";
+import SessionAnswersPage from "@/features/tests/pages/SessionAnswersPage";
 
 // Pages - Season Rewards
 import SeasonsListPage from "@/features/tests/pages/SeasonsListPage";
@@ -89,6 +90,10 @@ const Routes = () => {
           <Route path="/tests/create" element={<CreateTestPage />} />
           <Route path="/tests/:id" element={<TestDetailPage />} />
           <Route path="/tests/:id/edit" element={<EditTestPage />} />
+          <Route
+            path="/tests/:id/answers/:resultId"
+            element={<SessionAnswersPage />}
+          />
 
           {/* Seasons & rewards */}
           <Route path="/seasons" element={<SeasonsListPage />} />
