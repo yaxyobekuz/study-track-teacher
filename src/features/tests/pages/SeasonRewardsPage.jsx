@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 // API
-import { testSeasonsAPI } from "@/features/test-seasons/api/testSeasons.api";
+import { testSeasonsAPI } from "@/features/tests/api/testSeasons.api";
 import { authAPI } from "@/features/auth/api/auth.api";
 import { teacherAssignmentsAPI } from "@/features/assignments/api/teacherAssignments.api";
 

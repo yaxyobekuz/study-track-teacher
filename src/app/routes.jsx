@@ -41,8 +41,8 @@ import TestDetailPage from "@/features/tests/pages/TestDetailPage";
 import EditTestPage from "@/features/tests/pages/EditTestPage";
 
 // Pages - Season Rewards
-import SeasonsListPage from "@/features/season-rewards/pages/SeasonsListPage";
-import SeasonRewardsPage from "@/features/season-rewards/pages/SeasonRewardsPage";
+import SeasonsListPage from "@/features/tests/pages/SeasonsListPage";
+import SeasonRewardsPage from "@/features/tests/pages/SeasonRewardsPage";
 
 // Router
 import { Routes as RoutesWrapper, Route, Navigate } from "react-router-dom";

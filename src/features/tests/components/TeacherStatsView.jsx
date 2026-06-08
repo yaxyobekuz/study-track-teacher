@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BarChart3, Settings2 } from "lucide-react";
 
 // API
-import { testSeasonsAPI } from "@/features/test-seasons/api/testSeasons.api";
+import { testSeasonsAPI } from "@/features/tests/api/testSeasons.api";
 import { teacherAssignmentsAPI } from "@/features/assignments/api/teacherAssignments.api";
 
 // Components

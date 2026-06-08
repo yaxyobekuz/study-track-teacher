@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Trophy, Award, Coins, ListChecks } from "lucide-react";
 
 // API
-import { testSeasonsAPI } from "@/features/test-seasons/api/testSeasons.api";
+import { testSeasonsAPI } from "@/features/tests/api/testSeasons.api";
 
 // Components
 import Card from "@/shared/components/ui/Card";

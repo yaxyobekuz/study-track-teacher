@@ -11,7 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, Save } from "lucide-react";
 
 // API
-import { testSeasonsAPI } from "@/features/test-seasons/api/testSeasons.api";
+import { testSeasonsAPI } from "@/features/tests/api/testSeasons.api";
 
 // Components
 import Button from "@/shared/components/ui/button/Button";

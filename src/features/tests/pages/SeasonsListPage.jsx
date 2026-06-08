@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import { Award, ChevronRight, Calendar } from "lucide-react";
 
 // API
-import { testSeasonsAPI } from "@/features/test-seasons/api/testSeasons.api";
+import { testSeasonsAPI } from "@/features/tests/api/testSeasons.api";
 
 // Components
 import Card from "@/shared/components/ui/Card";
