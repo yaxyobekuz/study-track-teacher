@@ -18,6 +18,9 @@ import {
   QUESTION_TYPE_OPTIONS,
   QUESTION_TYPE_LABELS,
   QUESTION_TYPE_COLORS,
+  QUESTION_DIFFICULTY_OPTIONS,
+  QUESTION_DIFFICULTY_LABELS,
+  QUESTION_DIFFICULTY_COLORS,
 } from "../data/testDefaults.data";
 
 // Components
@@ -81,7 +84,9 @@ const InlineQuestionEditor = ({
   const [isOpen, setIsOpen] = useState(defaultOpen || isNew);
   const [type, setType] = useState(question?.type || "standard");
   const [text, setText] = useState(question?.text || "");
-  const [points, setPoints] = useState(question?.points ?? 1);
+  const [difficulty, setDifficulty] = useState(
+    question?.difficulty || "medium",
+  );
   const [options, setOptions] = useState(
     question?.options?.length > 0
       ? question.options.map((o) => ({
@@ -113,7 +118,7 @@ const InlineQuestionEditor = ({
 
       formData.append("type", type);
       formData.append("text", text);
-      formData.append("points", String(points));
+      formData.append("difficulty", difficulty);
 
       // Savol rasmi
       const qImg = extractImageState(questionImageItems, question?.image);
@@ -216,7 +221,7 @@ const InlineQuestionEditor = ({
   // "Saqla va keyingisi" - formani yangi bo'sh savolga tiklash
   const resetForm = () => {
     setText("");
-    setPoints(1);
+    setDifficulty("medium");
     setQuestionImageItems([]);
     setOptions([
       { text: "", isCorrect: true, imageItems: [], _originalImage: null },
@@ -266,8 +271,13 @@ const InlineQuestionEditor = ({
           {QUESTION_TYPE_LABELS[question.type]}
         </span>
 
-        <span className="text-sm font-medium text-gray-700 shrink-0">
-          {question.points} ball
+        <span
+          className={cn(
+            "px-2 py-0.5 rounded-md text-xs font-medium shrink-0",
+            QUESTION_DIFFICULTY_COLORS[question.difficulty || "medium"],
+          )}
+        >
+          {QUESTION_DIFFICULTY_LABELS[question.difficulty || "medium"]}
         </span>
 
         <ChevronDown size={20} className="text-gray-400 shrink-0" />
@@ -329,13 +339,13 @@ const InlineQuestionEditor = ({
           options={QUESTION_TYPE_OPTIONS}
           triggerClassName="w-full"
         />
-        <InputField
-          type="number"
-          name="points"
-          label="Ball"
-          min={0}
-          value={points}
-          onChange={(e) => setPoints(Number(e.target.value))}
+        <SelectField
+          name="difficulty"
+          label="Murakkablik darajasi"
+          value={difficulty}
+          onChange={(v) => setDifficulty(v)}
+          options={QUESTION_DIFFICULTY_OPTIONS}
+          triggerClassName="w-full"
         />
       </div>
 

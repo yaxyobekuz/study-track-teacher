@@ -20,6 +20,25 @@ export const QUESTION_TYPE_COLORS = {
   open: "bg-emerald-100 text-emerald-700",
 };
 
+// Savol qiyinlik darajalari (ball avtomatik shu daraja asosida taqsimlanadi)
+export const QUESTION_DIFFICULTY_OPTIONS = [
+  { label: "Oson", value: "easy" },
+  { label: "O'rta", value: "medium" },
+  { label: "Qiyin", value: "hard" },
+];
+
+export const QUESTION_DIFFICULTY_LABELS = {
+  easy: "Oson",
+  medium: "O'rta",
+  hard: "Qiyin",
+};
+
+export const QUESTION_DIFFICULTY_COLORS = {
+  easy: "bg-emerald-100 text-emerald-700",
+  medium: "bg-amber-100 text-amber-700",
+  hard: "bg-red-100 text-red-700",
+};
+
 export const TEST_TABS = {
   QUESTIONS: "questions",
   BINDINGS: "bindings",
