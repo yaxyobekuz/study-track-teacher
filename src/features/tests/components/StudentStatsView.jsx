@@ -43,9 +43,10 @@ const StudentStatsView = ({ season }) => {
   const schoolTiers = [...(season.schoolTiers || [])].sort(
     (a, b) => a.position - b.position,
   );
-  const myClassTiers = (season.classTiers || [])
-    .filter((ct) => myClassId && ct.class?.toString() === myClassId.toString())
-    .sort((a, b) => a.position - b.position);
+  // Sinf darajalari umumiy - har sinfga qo'llanadi
+  const classTiers = [...(season.classTiers || [])].sort(
+    (a, b) => a.position - b.position,
+  );
 
   return (
     <div className="space-y-5">
@@ -82,7 +83,7 @@ const StudentStatsView = ({ season }) => {
       />
       <RewardsCard
         title="Sinf bo'yicha mukofotlar"
-        tiers={myClassTiers}
+        tiers={classTiers}
         myPosition={stats?.classRank}
       />
 
