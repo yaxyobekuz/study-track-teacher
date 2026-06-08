@@ -8,7 +8,5 @@ export const testSeasonsAPI = {
   getClassStats: (id, classId) =>
     http.get(`/test-seasons/${id}/class/${classId}/stats`),
   getMyStats: (id) => http.get(`/test-seasons/${id}/my-stats`),
-  setClassTiers: (id, classId, tiers) =>
-    http.put(`/test-seasons/${id}/class/${classId}/tiers`, { tiers }),
   getOne: (id) => http.get(`/test-seasons/${id}`).catch(() => null),
 };

@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 // Icons
-import { BarChart3, Settings2 } from "lucide-react";
+import { BarChart3 } from "lucide-react";
 
 // API
 import { testSeasonsAPI } from "@/features/tests/api/testSeasons.api";
@@ -13,12 +13,7 @@ import { teacherAssignmentsAPI } from "@/features/assignments/api/teacherAssignm
 
 // Components
 import Card from "@/shared/components/ui/Card";
-import Button from "@/shared/components/ui/button/Button";
 import SelectField from "@/shared/components/ui/select/SelectField";
-import ClassTiersInlineForm from "./ClassTiersInlineForm";
-
-// Utils
-import { cn } from "@/shared/utils/cn";
 
 /**
  * O'qituvchi uchun mavsum statistikasi va sinf darajalari boshqaruvi.
@@ -45,7 +40,6 @@ const TeacherStatsView = ({ season, user }) => {
   }, [assignments]);
 
   const [selectedClass, setSelectedClass] = useState("");
-  const [showTiers, setShowTiers] = useState(false);
 
   const { data: classStats = [], isLoading } = useQuery({
     queryKey: ["season-class-stats", season._id, selectedClass],
@@ -84,32 +78,8 @@ const TeacherStatsView = ({ season, user }) => {
               triggerClassName="w-full"
             />
           </div>
-          {selectedClass && (
-            <Button
-              variant="outline"
-              onClick={() => setShowTiers(!showTiers)}
-              className="gap-2"
-            >
-              <Settings2 size={16} />
-              {showTiers ? "Yashirish" : "O'rinlar"}
-            </Button>
-          )}
         </div>
       </Card>
-
-      {/* Sinf tier konfiguratsiyasi */}
-      {selectedClass && showTiers && (
-        <Card>
-          <ClassTiersInlineForm
-            season={season}
-            classId={selectedClass}
-            className={
-              classOptions.find((o) => o.value === selectedClass)?.label ||
-              "Sinf"
-            }
-          />
-        </Card>
-      )}
 
       {/* Stats jadvali */}
       {!selectedClass ? (
