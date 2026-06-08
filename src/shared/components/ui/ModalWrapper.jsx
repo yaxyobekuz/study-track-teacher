@@ -2,7 +2,7 @@
 import { cn } from "@/shared/utils/cn";
 
 // React
-import { cloneElement, useState } from "react";
+import { cloneElement, useRef, useState } from "react";
 
 // Hooks
 import useModal from "@/shared/hooks/useModal";
@@ -28,11 +28,20 @@ const ModalWrapper = ({
   const { closeModal, isOpen, data } = useModal(name);
   const [isLoading, setIsLoading] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 480px)");
-  const hanldeCloseModal = (data) => !isLoading && closeModal(name, data);
+
+  // Ref orqali eng so'nggi loading qiymatini o'qiymiz, aks holda close
+  // funksiyasi eski render closure'idagi (stale) isLoading'ni ko'rib qoladi.
+  const isLoadingRef = useRef(false);
+  const setLoading = (value) => {
+    isLoadingRef.current = value;
+    setIsLoading(value);
+  };
+  const hanldeCloseModal = (data) =>
+    !isLoadingRef.current && closeModal(name, data);
 
   const body = cloneElement(children, {
     isLoading,
-    setIsLoading,
+    setIsLoading: setLoading,
     close: hanldeCloseModal,
     ...(data || {}),
   });

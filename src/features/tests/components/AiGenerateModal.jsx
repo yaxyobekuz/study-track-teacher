@@ -91,10 +91,8 @@ const Content = ({ close, isLoading, setIsLoading, testId }) => {
       const created = res.data?.data?.created ?? 0;
       queryClient.invalidateQueries({ queryKey: ["test-questions", testId] });
       toast.success(`${created} ta savol qo'shildi`);
-      // Avval loadingni o'chiramiz, keyingi frame'da modal yopiladi
-      // (ModalWrapper close guard'i isLoading=false bo'lishini kutadi)
       setIsLoading(false);
-      requestAnimationFrame(() => close?.({ generatedAt: Date.now() }));
+      close?.({ generatedAt: Date.now() });
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Generatsiya qilinmadi");
