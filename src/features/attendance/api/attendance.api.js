@@ -10,4 +10,6 @@ export const attendanceAPI = {
   createExcuseRequest: (data) => http.post("/attendance/excuse", data),
   getMyExcuses: (params) => http.get("/attendance/excuse/my", { params }),
   cancelExcuseRequest: (id) => http.delete(`/attendance/excuse/${id}`),
+  // O'z roliga tegishli "Kelmaslik sabablari"
+  getAbsenceReasons: () => http.get("/absence-reasons/applicable"),
 };

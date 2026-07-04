@@ -89,7 +89,11 @@ const MyExcusesList = () => {
               </span>
             </div>
 
-            <p className="text-sm text-gray-600">{ex.reason}</p>
+            <p className="text-sm font-medium text-gray-700">
+              {ex.absenceReason?.title || "-"}
+            </p>
+
+            {ex.reason && <p className="text-sm text-gray-500">{ex.reason}</p>}
 
             {ex.status === "rejected" && ex.rejectionReason && (
               <p className="text-xs text-red-600">
