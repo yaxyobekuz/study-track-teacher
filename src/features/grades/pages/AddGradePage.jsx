@@ -7,6 +7,9 @@ import { cn } from "@/shared/utils/cn";
 // React
 import { useEffect } from "react";
 
+// TanStack Query
+import { useQuery } from "@tanstack/react-query";
+
 // Components
 import Card from "@/shared/components/ui/Card";
 import Input from "@/shared/components/ui/input/Input";
@@ -14,7 +17,6 @@ import Select from "@/shared/components/ui/select/Select";
 import Button from "@/shared/components/ui/button/Button";
 
 // Hooks
-import useObjectStore from "@/shared/hooks/useObjectStore";
 import useObjectState from "@/shared/hooks/useObjectState";
 
 // Icons
@@ -23,52 +25,66 @@ import { CalendarOff, Trash2, Loader2 } from "lucide-react";
 // Helpers
 import { getGradeColor } from "@/shared/helpers/grade.helpers";
 
-// API
-import { gradesAPI } from "@/features/grades/api/grades.api";
-import { schedulesAPI } from "@/features/schedules/api/schedules.api";
+// Queries
+import { gradesQueries } from "@/features/grades/queries/grades.queries";
+import {
+  useCreateGrade,
+  useUpdateGrade,
+  useDeleteGrade,
+} from "@/features/grades/queries/grades.mutations";
+import { useTodayHoliday } from "@/features/holidays/queries/holidays.queries";
 
 const AddGrade = () => {
   const {
-    loading,
-    subjects,
-    students,
     setField,
     setFields,
     searchQuery,
-    todayClasses,
-    currentTopic,
     selectedClass,
     loadingStudentId,
     selectedSubjectWithOrder,
   } = useObjectState({
-    subjects: [],
-    students: [],
-    loading: false,
     searchQuery: "",
-    todayClasses: [],
     selectedClass: "",
-    currentTopic: null,
     loadingStudentId: null,
     selectedSubjectWithOrder: "",
   });
 
   // Holiday Info
-  const { getEntity } = useObjectStore("holidayCheck");
-  const holidayInfo = getEntity("today") || { isHoliday: false, holiday: null };
+  const { data: holidayInfo = { isHoliday: false, holiday: null } } =
+    useTodayHoliday();
 
-  // Fetch today's classes from schedule
-  useEffect(() => {
-    schedulesAPI
-      .getMyToday()
-      .then((res) => {
-        const classes = res.data.data.map((schedule) => schedule.class);
-        setField("todayClasses", classes);
-      })
-      .catch((error) => {
-        toast.error("Bugungi dars jadvalini yuklashda xatolik");
-        console.error(error);
-      });
-  }, []);
+  // Today's classes from the teacher's schedule
+  const { data: todayClasses = [] } = useQuery(gradesQueries.myTodayClasses());
+
+  // Subjects the teacher teaches in the selected class
+  const { data: teacherSubjectsData } = useQuery(
+    gradesQueries.teacherSubjects(selectedClass),
+  );
+  const subjects = teacherSubjectsData?.data ?? [];
+
+  // Parse subjectId and lessonOrder from "subjectId_order" format
+  const [subjectId, lessonOrder] = selectedSubjectWithOrder.split("_");
+
+  // Students of the class with their grade for the chosen subject/lessonOrder
+  const {
+    data: studentsData,
+    isLoading: loading,
+    isFetching: studentsFetching,
+  } = useQuery(
+    gradesQueries.studentsWithGrades({
+      classId: selectedClass,
+      subjectId,
+      lessonOrder,
+      date: new Date().toISOString().split("T")[0],
+    }),
+  );
+  const students = studentsData?.data ?? [];
+  const currentTopic = studentsData?.currentTopic ?? null;
+
+  // Mutations
+  const { mutate: createGrade } = useCreateGrade();
+  const { mutate: updateGrade } = useUpdateGrade();
+  const { mutate: deleteGrade } = useDeleteGrade();
 
   // Load saved selections from localStorage
   useEffect(() => {
@@ -80,123 +96,102 @@ const AddGrade = () => {
     if (savedClass) setField("selectedClass", savedClass);
     if (savedSubjectWithOrder)
       setField("selectedSubjectWithOrder", savedSubjectWithOrder);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Persist the selected class when it changes
   useEffect(() => {
     if (selectedClass) {
-      fetchTeacherSubjects();
-      setFields({
-        selectedSubjectWithOrder: "",
-        students: [],
-        searchQuery: "",
-      });
       localStorage.setItem("addGrade_selectedClass", selectedClass);
     }
   }, [selectedClass]);
 
+  // Persist the selected subject when it changes
   useEffect(() => {
     if (selectedClass && selectedSubjectWithOrder) {
-      fetchStudentsWithGrades();
-      setField("searchQuery", "");
       localStorage.setItem(
         "addGrade_selectedSubjectWithOrder",
         selectedSubjectWithOrder,
       );
     }
-  }, [selectedClass, selectedSubjectWithOrder]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSubjectWithOrder]);
 
-  const fetchTeacherSubjects = async () => {
-    try {
-      const response = await gradesAPI.getTeacherSubjects(selectedClass);
-      if (response.data.message && response.data.data.length === 0) {
-        toast.info(response.data.message);
-      }
-      const data = response.data.data;
-      setField("subjects", data);
+  // React to the teacher's subjects for the selected class
+  useEffect(() => {
+    if (!teacherSubjectsData) return;
 
-      // Auto-select first subject
-      if (data.length > 0) {
-        setField("selectedSubjectWithOrder", `${data[0].id}_${data[0].order}`);
-      }
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Fanlarni yuklashda xatolik",
+    if (teacherSubjectsData.message && subjects.length === 0) {
+      toast.info(teacherSubjectsData.message);
+    }
+
+    // Auto-select the first subject when none is selected
+    if (subjects.length > 0 && !selectedSubjectWithOrder) {
+      setField(
+        "selectedSubjectWithOrder",
+        `${subjects[0].id}_${subjects[0].order}`,
       );
-      console.error(error);
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [teacherSubjectsData]);
 
-  const fetchStudentsWithGrades = async (showLoader = true) => {
-    if (!selectedSubjectWithOrder) return;
-
-    // Parse subjectId and lessonOrder from "subjectId_order" format
-    const [subjectId, lessonOrder] = selectedSubjectWithOrder.split("_");
-
-    if (showLoader) setField("loading", true);
-    try {
-      const today = new Date().toISOString().split("T")[0];
-      const response = await gradesAPI.getStudentsWithGrades({
-        classId: selectedClass,
-        subjectId: subjectId,
-        lessonOrder: lessonOrder,
-        date: today,
-      });
-      setFields({
-        students: response.data.data,
-        currentTopic: response.data.currentTopic || null,
-      });
-    } catch (error) {
-      toast.error("O'quvchilarni yuklashda xatolik");
-      console.error(error);
-    } finally {
-      setField("loading", false);
+  // Keep the row spinner up until the post-write refetch settles, mirroring the
+  // old "await fetchStudentsWithGrades()" behavior.
+  useEffect(() => {
+    if (loadingStudentId !== null && !studentsFetching) {
+      setField("loadingStudentId", null);
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [studentsFetching]);
 
-  const handleGradeChange = async (student, gradeValue) => {
+  const handleGradeChange = (student, gradeValue) => {
     if (gradeValue === "") return;
 
     const hasGrade = student.grade !== null;
-    const [subjectId, lessonOrder] = selectedSubjectWithOrder.split("_");
 
     setField("loadingStudentId", student.id);
-    try {
-      if (hasGrade) {
-        await gradesAPI.update(student.grade.id, {
-          grade: parseInt(gradeValue),
-          comment: student.grade.comment || "",
-        });
-      } else {
-        await gradesAPI.create({
+
+    const onError = (error) => {
+      toast.error(error.response?.data?.message || "Xatolik yuz berdi");
+      console.error(error);
+      setField("loadingStudentId", null);
+    };
+
+    if (hasGrade) {
+      updateGrade(
+        {
+          id: student.grade.id,
+          data: {
+            grade: parseInt(gradeValue),
+            comment: student.grade.comment || "",
+          },
+        },
+        { onError },
+      );
+    } else {
+      createGrade(
+        {
           studentId: student.id,
           subjectId,
           classId: selectedClass,
           lessonOrder: parseInt(lessonOrder),
           grade: parseInt(gradeValue),
           comment: "",
-        });
-      }
-
-      await fetchStudentsWithGrades(false);
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Xatolik yuz berdi");
-      console.error(error);
-    } finally {
-      setField("loadingStudentId", null);
+        },
+        { onError },
+      );
     }
   };
 
-  const handleDeleteGrade = async (student) => {
+  const handleDeleteGrade = (student) => {
     setField("loadingStudentId", student.id);
-    try {
-      await gradesAPI.delete(student.grade.id);
-      await fetchStudentsWithGrades(false);
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Xatolik yuz berdi");
-      console.error(error);
-    } finally {
-      setField("loadingStudentId", null);
-    }
+    deleteGrade(student.grade.id, {
+      onError: (error) => {
+        toast.error(error.response?.data?.message || "Xatolik yuz berdi");
+        console.error(error);
+        setField("loadingStudentId", null);
+      },
+    });
   };
 
   if (holidayInfo.isHoliday) {
@@ -235,7 +230,13 @@ const AddGrade = () => {
           required
           label="Sinf"
           value={selectedClass}
-          onChange={(value) => setField("selectedClass", value)}
+          onChange={(value) =>
+            setFields({
+              selectedClass: value,
+              selectedSubjectWithOrder: "",
+              searchQuery: "",
+            })
+          }
           options={todayClasses.map((cls) => ({
             label: cls.name,
             value: cls.id,
@@ -246,7 +247,9 @@ const AddGrade = () => {
           required
           label="Fan"
           value={selectedSubjectWithOrder}
-          onChange={(value) => setField("selectedSubjectWithOrder", value)}
+          onChange={(value) =>
+            setFields({ selectedSubjectWithOrder: value, searchQuery: "" })
+          }
           options={subjects.map((subject) => {
             const displayOrder = subject.order || 1;
             return {

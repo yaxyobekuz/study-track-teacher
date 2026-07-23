@@ -2,7 +2,7 @@
 import { days } from "@/shared/data/days.data";
 
 // React
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 // Store
 import useAuth from "@/shared/hooks/useAuth";
@@ -17,7 +17,8 @@ import Button from "@/shared/components/form/button";
 
 // Hooks
 import useModal from "@/shared/hooks/useModal";
-import useArrayStore from "@/shared/hooks/useArrayStore";
+import { useClasses } from "@/features/classes/queries/classes.queries";
+import { useClassSchedule } from "@/features/schedules/queries/schedules.queries";
 
 // Icons
 import { Plus, Edit, Trash2, Calendar, Download } from "lucide-react";
@@ -26,49 +27,12 @@ const Schedules = () => {
   const { user } = useAuth();
   const { openModal } = useModal();
   const isOwner = user?.role === "owner";
-  const [selectedClass, setSelectedClass] = useState("");
-  const collectionName = "schedules-" + selectedClass;
+  // Empty string means "no explicit choice yet" → fall back to the first class.
+  const [chosenClass, setChosenClass] = useState("");
 
-  const {
-    isLoading,
-    initialize,
-    hasCollection,
-    setCollection,
-    getCollectionData,
-    isCollectionLoading,
-    setCollectionErrorState,
-    setCollectionLoadingState,
-  } = useArrayStore(collectionName);
-  const classes = getCollectionData("classes");
-  const schedules = getCollectionData(collectionName);
-  const classesLoading = isCollectionLoading("classes");
-
-  useEffect(() => {
-    if (!hasCollection()) initialize(false, collectionName);
-  }, [initialize, hasCollection]);
-
-  useEffect(() => {
-    if (classes.length > 0 && !selectedClass) {
-      setSelectedClass(classes[0].id);
-    }
-  }, [classes, selectedClass]);
-
-  useEffect(() => {
-    if (selectedClass && !schedules?.length) fetchSchedules();
-  }, [selectedClass, schedules?.length, classesLoading]);
-
-  const fetchSchedules = () => {
-    setCollectionLoadingState(true);
-
-    schedulesAPI
-      .getByClass(selectedClass)
-      .then((res) => {
-        setCollection(res.data.data);
-      })
-      .catch(() => {
-        setCollectionErrorState(true);
-      });
-  };
+  const { data: classes = [], isLoading: classesLoading } = useClasses();
+  const selectedClass = chosenClass || classes[0]?.id || "";
+  const { data: schedules = [] } = useClassSchedule(selectedClass);
 
   const getScheduleForDay = (day) => {
     return schedules.find((s) => s.day === day);
@@ -119,7 +83,7 @@ const Schedules = () => {
     });
   };
 
-  if (isLoading) {
+  if (classesLoading) {
     return (
       <div className="">
         <div className="flex items-center justify-between gap-3 mb-6 animate-pulse">
@@ -142,7 +106,7 @@ const Schedules = () => {
         <Select
           className="w-32"
           value={selectedClass}
-          onChange={(v) => setSelectedClass(v)}
+          onChange={(v) => setChosenClass(v)}
           options={classes.map((cls) => ({ label: cls.name, value: cls.id }))}
         />
 

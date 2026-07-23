@@ -1,10 +1,16 @@
 // Toast
 import { toast } from "sonner";
 
+// TanStack Query
+import { useQuery } from "@tanstack/react-query";
+
 // API
-import { messagesAPI } from "@/features/messages/api/messages.api";
-import { classesAPI } from "@/features/classes/api/classes.api";
 import { usersAPI } from "@/features/users/api/users.api";
+
+// Queries & Mutations
+import { useSendMessage } from "@/features/messages/queries/messages.mutations";
+import { useClasses } from "@/features/classes/queries/classes.queries";
+import { usersKeys } from "@/features/users/queries/users.queries";
 
 // Store
 import useAuth from "@/shared/hooks/useAuth";
@@ -15,11 +21,10 @@ import Button from "@/shared/components/form/button";
 import ResponsiveModal from "@/shared/components/ui/ResponsiveModal";
 
 // Hooks
-import useArrayStore from "@/shared/hooks/useArrayStore";
 import useObjectState from "@/shared/hooks/useObjectState";
 
 // React
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 
 // Icons
 import { Upload, X } from "lucide-react";
@@ -32,12 +37,8 @@ const SendMessageModal = () => (
 
 const Content = ({ close, isLoading, setIsLoading }) => {
   const { user: currentUser } = useAuth();
-  const { invalidateCache } = useArrayStore("messages");
-  const { invalidateCache: invalidateTeacherMessages } =
-    useArrayStore("teacherMessages");
+  const { mutate: sendMessage } = useSendMessage();
 
-  const [classes, setClasses] = useState([]);
-  const [students, setStudents] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -64,36 +65,21 @@ const Content = ({ close, isLoading, setIsLoading }) => {
           { value: "student", label: "O'quvchiga" },
         ];
 
-  // Load classes
-  useEffect(() => {
-    classesAPI
-      .getAll()
-      .then((res) => {
-        setClasses(res.data.data || []);
-      })
-      .catch(() => {
-        toast.error("Sinflarni yuklashda xato");
-      });
-  }, []);
+  // Classes for the picker (shared reference list)
+  const { data: classes = [] } = useClasses();
 
-  // Load students when class or recipientType changes
-  useEffect(() => {
-    if (state.recipientType === "student") {
-      const params = { role: "student", limit: 200 };
-      if (state.classId) {
-        params.class = state.classId;
-      }
+  // Students for the picker — only when targeting a student, scoped by the
+  // selected class. Kept as its own query (the shared all-short list has no
+  // class association and no fullName, so it can't drive this picker).
+  const studentsParams = { role: "student", limit: 200 };
+  if (state.classId) studentsParams.class = state.classId;
 
-      usersAPI
-        .getAll(params)
-        .then((res) => {
-          setStudents(res.data.data || []);
-        })
-        .catch(() => {
-          toast.error("O'quvchilarni yuklashda xato");
-        });
-    }
-  }, [state.recipientType, state.classId]);
+  const { data: students = [] } = useQuery({
+    queryKey: [...usersKeys.list(studentsParams), "message-recipients"],
+    queryFn: () => usersAPI.getAll(studentsParams).then((r) => r.data.data),
+    enabled: state.recipientType === "student",
+    staleTime: 5 * 60 * 1000,
+  });
 
   // Handle file selection
   const handleFileChange = (e) => {
@@ -156,21 +142,19 @@ const Content = ({ close, isLoading, setIsLoading }) => {
       data.file = selectedFile;
     }
 
-    messagesAPI
-      .send(data)
-      .then(() => {
+    sendMessage(data, {
+      onSuccess: () => {
         close();
-        invalidateCache();
-        invalidateTeacherMessages();
         toast.success("Xabar navbatga qo'shildi va tez orada yuboriladi");
-      })
-      .catch((err) => {
+      },
+      onError: (err) => {
         toast.error(err.response?.data?.message || "Xatolik yuz berdi");
-      })
-      .finally(() => {
+      },
+      onSettled: () => {
         isSubmittingRef.current = false;
         setIsLoading(false);
-      });
+      },
+    });
   };
 
   return (

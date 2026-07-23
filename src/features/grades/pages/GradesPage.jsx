@@ -11,6 +11,9 @@ import {
 // React
 import { useState, useEffect } from "react";
 
+// TanStack Query
+import { useQuery } from "@tanstack/react-query";
+
 // Icons
 import { Eye, Calendar, Download } from "lucide-react";
 
@@ -19,15 +22,13 @@ import Card from "@/shared/components/ui/Card";
 import Input from "@/shared/components/form/input";
 import Select from "@/shared/components/form/select";
 
-// Utils
-import { getDayOfWeekUZ } from "@/shared/utils/date.utils";
-
-// Hooks
-import useArrayStore from "@/shared/hooks/useArrayStore";
+// Queries
+import { gradesQueries } from "@/features/grades/queries/grades.queries";
+import { useClasses } from "@/features/classes/queries/classes.queries";
+import { useSubjects } from "@/features/subjects/queries/subjects.queries";
 
 // API
 import { gradesAPI } from "@/features/grades/api/grades.api";
-import { schedulesAPI } from "@/features/schedules/api/schedules.api";
 import Button from "@/shared/components/form/button";
 import { useNavigate } from "react-router-dom";
 
@@ -45,26 +46,21 @@ const Grades = () => {
     };
   };
 
-  const {
-    initialize,
-    hasCollection,
-    setCollection,
-    getCollectionData,
-    isCollectionLoading,
-    setCollectionLoadingState,
-  } = useArrayStore();
   const [filters, setFilters] = useState(getSavedFilters());
 
-  // Classes and subjects data
-  const classes = getCollectionData("classes");
-  const subjects = getCollectionData("subjects");
-  // Students data
-  const studentsCollectionName = `students-${filters.classId}-${filters.date}`;
-  const students = getCollectionData(studentsCollectionName);
-  const isLoading = isCollectionLoading(studentsCollectionName);
-  // Today's subjects data
-  const todaySubjectsCollectionName = `subjects-${filters.classId}-${filters.date}`;
-  const todaySubjects = getCollectionData(todaySubjectsCollectionName);
+  // Classes and subjects reference data
+  const { data: classes = [] } = useClasses();
+  const { data: subjects = [] } = useSubjects();
+
+  // Students with their grades for the selected class/date
+  const { data: students = [], isLoading } = useQuery(
+    gradesQueries.classDate(filters.classId, filters.date),
+  );
+
+  // Subjects scheduled for the selected class/date (table columns)
+  const { data: todaySubjects = [] } = useQuery(
+    gradesQueries.scheduleSubjects(filters.classId, filters.date),
+  );
 
   // Save filters to localStorage whenever they change
   useEffect(() => {
@@ -74,67 +70,6 @@ const Grades = () => {
   }, [filters]);
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Initialize collections (pagination = false)
-    if (!hasCollection(studentsCollectionName))
-      initialize(false, studentsCollectionName);
-    if (!hasCollection(todaySubjectsCollectionName))
-      initialize(false, todaySubjectsCollectionName);
-
-    // Fetch grades and today's subjects
-    if (
-      filters.classId &&
-      filters.date &&
-      !students?.length &&
-      !todaySubjects?.length
-    ) {
-      fetchGradesByClass();
-      fetchTodaySubjects();
-    }
-  }, [filters.classId, filters.date]);
-
-  const fetchTodaySubjects = () => {
-    const dayName = getDayOfWeekUZ(filters.date);
-    if (dayName === "yakshanba") {
-      return setCollection([], null, todaySubjectsCollectionName);
-    }
-
-    schedulesAPI
-      .getByDay(filters.classId, dayName)
-      .then((response) => {
-        if (response.data.data && response.data.data.subjects) {
-          // Include all subjects with their order (even if fan bir necha marta bo'lsa)
-          const scheduleSubjects = response.data.data.subjects
-            .filter((s) => s.subject)
-            .map((s) => ({ ...s.subject, lessonOrder: s.order }))
-            .sort((a, b) => a.lessonOrder - b.lessonOrder);
-
-          setCollection(scheduleSubjects, null, todaySubjectsCollectionName);
-        } else {
-          setCollection([], null, todaySubjectsCollectionName);
-        }
-      })
-      .catch(() => setCollection([], true, todaySubjectsCollectionName));
-  };
-
-  const fetchGradesByClass = () => {
-    setCollectionLoadingState(true, studentsCollectionName);
-
-    gradesAPI
-      .getByClassAndDate(filters.classId, filters.date)
-      .then((response) => {
-        // Backend now returns students with grades array
-        // No need to group manually
-        const studentsWithGrades = response.data.data || [];
-
-        setCollection(studentsWithGrades, null, studentsCollectionName);
-      })
-      .catch(() => {
-        toast.error("Baholarni yuklashda xatolik");
-        setCollection([], true, studentsCollectionName);
-      });
-  };
 
   const handleExport = async () => {
     try {

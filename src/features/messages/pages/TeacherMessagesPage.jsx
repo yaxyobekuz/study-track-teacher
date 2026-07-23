@@ -1,16 +1,15 @@
-// Toast
-import { toast } from "sonner";
+// TanStack Query
+import { useQuery } from "@tanstack/react-query";
 
-// API
-import { messagesAPI } from "@/features/messages/api/messages.api";
-import { classesAPI } from "@/features/classes/api/classes.api";
+// Queries
+import { messagesQueries } from "@/features/messages/queries/messages.queries";
+import { useClasses } from "@/features/classes/queries/classes.queries";
 
 // Router
 import { useSearchParams } from "react-router-dom";
 
 // Hooks
 import useModal from "@/shared/hooks/useModal";
-import useArrayStore from "@/shared/hooks/useArrayStore";
 
 // Components
 import Card from "@/shared/components/ui/Card";
@@ -19,7 +18,7 @@ import Select from "@/shared/components/form/select";
 import Pagination from "@/shared/components/ui/Pagination";
 
 // React
-import { useEffect, useCallback, useState } from "react";
+import { useCallback } from "react";
 
 // Icons
 import { Plus, Eye, Ban } from "lucide-react";
@@ -41,8 +40,8 @@ const TeacherMessages = () => {
   const recipientTypeFilter = searchParams.get("recipientType") || "";
   const classIdFilter = searchParams.get("classId") || "";
 
-  // State for classes
-  const [classes, setClasses] = useState([]);
+  // Reference data for filter
+  const { data: classes = [] } = useClasses();
 
   // Handle recipient type filter change
   const handleRecipientTypeChange = useCallback(
@@ -74,51 +73,17 @@ const TeacherMessages = () => {
     [searchParams, setSearchParams],
   );
 
-  const {
-    setPage,
-    initialize,
-    getMetadata,
-    getPageData,
-    hasCollection,
-    setPageErrorState,
-    setPageLoadingState,
-  } = useArrayStore("teacherMessages");
+  // Build the list query params from the URL
+  const listParams = { page: currentPage, limit: 20 };
+  if (recipientTypeFilter) listParams.recipientType = recipientTypeFilter;
+  if (classIdFilter) listParams.classId = classIdFilter;
 
-  // Initialize collection on mount
-  useEffect(() => {
-    if (!hasCollection()) initialize(true); // pagination = true
-  }, [hasCollection, initialize]);
-
-  const metadata = getMetadata();
-  const pageData = getPageData(currentPage);
-
-  const messages = pageData?.data || [];
-  const hasError = pageData?.error || null;
-  const isLoading = pageData?.isLoading || false;
-  const hasNextPage = pageData?.hasNextPage ?? false;
-  const hasPrevPage = pageData?.hasPrevPage ?? false;
-
-  // Load messages for current page
-  const fetchMessages = useCallback(
-    (page, recipientType, classId) => {
-      setPageLoadingState(page, true);
-      const params = { page, limit: 20 };
-      if (recipientType) params.recipientType = recipientType;
-      if (classId) params.classId = classId;
-
-      messagesAPI
-        .getAll(params)
-        .then((res) => {
-          const { data, pagination } = res.data;
-          setPage(page, data, null, pagination);
-        })
-        .catch(({ message }) => {
-          toast.error(message || "Nimadir xato ketdi");
-          setPageErrorState(page, message || "Nimadir xato ketdi");
-        });
-    },
-    [setPageLoadingState, setPage, setPageErrorState],
+  const { data, isLoading, isError } = useQuery(
+    messagesQueries.teacherList(listParams),
   );
+
+  const messages = data?.data ?? [];
+  const pagination = data?.pagination;
 
   // Navigate to page
   const goToPage = useCallback(
@@ -130,23 +95,6 @@ const TeacherMessages = () => {
     },
     [searchParams, setSearchParams],
   );
-
-  // Load messages when page or filters change
-  useEffect(() => {
-    fetchMessages(currentPage, recipientTypeFilter, classIdFilter);
-  }, [currentPage, recipientTypeFilter, classIdFilter, messages?.length]);
-
-  // Load classes for filter
-  useEffect(() => {
-    classesAPI
-      .getAll()
-      .then((res) => {
-        setClasses(res.data.data || []);
-      })
-      .catch(() => {
-        toast.error("Sinflarni yuklashda xato");
-      });
-  }, []);
 
   // Get recipient type label
   const getRecipientTypeLabel = (type) => {
@@ -327,32 +275,32 @@ const TeacherMessages = () => {
         </div>
 
         {/* Desktop Pagination Controls */}
-        {!isLoading && !hasError && messages.length > 0 && (
+        {!isLoading && !isError && messages.length > 0 && (
           <Pagination
             maxPageButtons={5}
             showPageNumbers={true}
             onPageChange={goToPage}
             currentPage={currentPage}
-            hasNextPage={hasNextPage}
-            hasPrevPage={hasPrevPage}
+            hasNextPage={pagination?.hasNextPage ?? false}
+            hasPrevPage={pagination?.hasPrevPage ?? false}
             className="pt-6 max-md:hidden"
-            totalPages={metadata?.totalPages || 1}
+            totalPages={pagination?.totalPages || 1}
           />
         )}
       </Card>
 
       {/* Mobile Pagination Controls */}
-      {!isLoading && !hasError && messages.length > 0 && (
+      {!isLoading && !isError && messages.length > 0 && (
         <div className="overflow-x-auto pb-1.5">
           <Pagination
             maxPageButtons={5}
             showPageNumbers={true}
             onPageChange={goToPage}
             currentPage={currentPage}
-            hasNextPage={hasNextPage}
-            hasPrevPage={hasPrevPage}
+            hasNextPage={pagination?.hasNextPage ?? false}
+            hasPrevPage={pagination?.hasPrevPage ?? false}
             className="pt-6 min-w-max md:hidden"
-            totalPages={metadata?.totalPages || 1}
+            totalPages={pagination?.totalPages || 1}
           />
         </div>
       )}

@@ -9,18 +9,17 @@ import {
   TriangleAlert,
 } from "lucide-react";
 
-// React
-import { useEffect } from "react";
-
 // Router
 import { Link } from "react-router-dom";
+
+// TanStack Query
+import { useQuery } from "@tanstack/react-query";
 
 // Components
 import Card from "@/shared/components/ui/Card";
 
-// Hooks
-import useArrayStore from "@/shared/hooks/useArrayStore";
-import useObjectStore from "@/shared/hooks/useObjectStore";
+// Queries
+import { useTodayHoliday } from "@/features/holidays/queries/holidays.queries";
 
 // Utils
 import { getDayOfWeekUZ } from "@/shared/utils/date.utils";
@@ -30,8 +29,8 @@ import { schedulesAPI } from "@/features/schedules/api/schedules.api";
 
 const Dashboard = () => {
   // Holiday Info
-  const { getEntity } = useObjectStore("holidayCheck");
-  const holidayInfo = getEntity("today") || { isHoliday: false, holiday: null };
+  const { data: holidayInfo = { isHoliday: false, holiday: null } } =
+    useTodayHoliday();
 
   return (
     <div className="space-y-4">
@@ -121,37 +120,10 @@ const MySchedules = () => {
   const today = new Date();
   const dayName = getDayOfWeekUZ(today);
 
-  const {
-    initialize,
-    hasCollection,
-    setCollection,
-    getCollectionData,
-    isCollectionLoading,
-    setCollectionErrorState,
-    setCollectionLoadingState,
-  } = useArrayStore("schedules-today");
-
-  const schedules = getCollectionData() || [];
-  const loading = isCollectionLoading();
-
-  function fetchTodaySchedule() {
-    setCollectionLoadingState(true);
-
-    schedulesAPI
-      .getMyToday()
-      .then((res) => setCollection(res.data.data, null))
-      .catch(() => setCollectionErrorState(true));
-  }
-
-  useEffect(() => {
-    if (!hasCollection()) initialize(false);
-  }, [initialize, hasCollection]);
-
-  useEffect(() => {
-    if (!schedules.length) {
-      fetchTodaySchedule();
-    }
-  }, [schedules.length]);
+  const { data: schedules = [], isLoading: loading } = useQuery({
+    queryKey: ["schedules", "today", "mine"],
+    queryFn: () => schedulesAPI.getMyToday().then((r) => r.data.data),
+  });
 
   const allLessons = schedules
     .flatMap((schedule) =>
