@@ -79,7 +79,7 @@ const InlineQuestionEditor = ({
   keepAdding = false,
   onKeepAddingChange,
 }) => {
-  const isNew = !question?._id;
+  const isNew = !question?.id;
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(defaultOpen || isNew);
   const [type, setType] = useState(question?.type || "standard");
@@ -90,7 +90,7 @@ const InlineQuestionEditor = ({
   const [options, setOptions] = useState(
     question?.options?.length > 0
       ? question.options.map((o) => ({
-          _id: o._id,
+          id: o.id,
           text: o.text || "",
           isCorrect: Boolean(o.isCorrect),
           // Rasm InputImage item massivi sifatida (0 yoki 1 ta)
@@ -153,7 +153,7 @@ const InlineQuestionEditor = ({
 
       return isNew
         ? testQuestionsAPI.create(testId, formData)
-        : testQuestionsAPI.update(question._id, formData);
+        : testQuestionsAPI.update(question.id, formData);
     },
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ["test-questions", testId] });
@@ -174,7 +174,7 @@ const InlineQuestionEditor = ({
 
   // O'chirish mutation
   const deleteMutation = useMutation({
-    mutationFn: () => testQuestionsAPI.delete(question._id),
+    mutationFn: () => testQuestionsAPI.delete(question.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["test-questions", testId] });
       toast.success("Savol o'chirildi");

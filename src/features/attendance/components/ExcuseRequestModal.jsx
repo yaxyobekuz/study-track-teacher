@@ -38,7 +38,7 @@ const Content = ({ close }) => {
     queryFn: () => attendanceAPI.getAbsenceReasons().then((r) => r.data.data),
   });
 
-  const reasonOptions = reasons.map((r) => ({ label: r.title, value: r._id }));
+  const reasonOptions = reasons.map((r) => ({ label: r.title, value: r.id }));
 
   const handleSubmit = (e) => {
     e.preventDefault();

@@ -224,7 +224,7 @@ const Content = ({ close, isLoading, setIsLoading }) => {
             }
           }}
           options={classes.map((c) => ({
-            value: c._id,
+            value: c.id,
             label: c.name,
           }))}
         />
@@ -240,7 +240,7 @@ const Content = ({ close, isLoading, setIsLoading }) => {
           value={state.studentId}
           onChange={(v) => setField("studentId", v)}
           options={students.map((s) => ({
-            value: s._id,
+            value: s.id,
             label: s.fullName,
           }))}
         />

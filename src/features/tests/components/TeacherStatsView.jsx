@@ -23,10 +23,10 @@ const SCHOOL = "__school__";
 const TeacherStatsView = ({ season, user }) => {
   // O'qituvchining shu mavsumdagi biriktiruvlari
   const { data: assignments = [] } = useQuery({
-    queryKey: ["teacher-assignments", "my", season._id],
+    queryKey: ["teacher-assignments", "my", season.id],
     queryFn: () =>
       teacherAssignmentsAPI
-        .getMy({ season: season._id })
+        .getMy({ season: season.id })
         .then((res) => res.data.data),
   });
 
@@ -34,8 +34,8 @@ const TeacherStatsView = ({ season, user }) => {
   const classOptions = useMemo(() => {
     const map = new Map();
     for (const a of assignments) {
-      if (a.class && !map.has(a.class._id)) {
-        map.set(a.class._id, { label: a.class.name, value: a.class._id });
+      if (a.class && !map.has(a.class.id)) {
+        map.set(a.class.id, { label: a.class.name, value: a.class.id });
       }
     }
     return [
@@ -48,11 +48,11 @@ const TeacherStatsView = ({ season, user }) => {
   const isSchool = selectedClass === SCHOOL;
 
   const { data: classStats = [], isLoading } = useQuery({
-    queryKey: ["season-class-stats", season._id, selectedClass],
+    queryKey: ["season-class-stats", season.id, selectedClass],
     queryFn: () =>
       (isSchool
-        ? testSeasonsAPI.getStats(season._id)
-        : testSeasonsAPI.getClassStats(season._id, selectedClass)
+        ? testSeasonsAPI.getStats(season.id)
+        : testSeasonsAPI.getClassStats(season.id, selectedClass)
       ).then((res) => res.data.data),
     enabled: Boolean(selectedClass),
   });
@@ -103,7 +103,7 @@ const TeacherStatsView = ({ season, user }) => {
               <tbody>
                 {classStats.map((r) => (
                   <tr
-                    key={r.student._id}
+                    key={r.student.id}
                     className="border-b hover:bg-gray-50"
                   >
                     <td className="py-2.5 px-3 text-gray-500">

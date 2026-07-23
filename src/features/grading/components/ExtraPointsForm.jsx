@@ -19,11 +19,11 @@ import InputField from "@/shared/components/ui/input/InputField";
  *
  * @param {object} props
  * @param {string} props.resultId - natija ID
- * @param {object} [props.entry] - mavjud yozuv (tahrirlash uchun: { _id, amount, reason })
+ * @param {object} [props.entry] - mavjud yozuv (tahrirlash uchun: { id, amount, reason })
  * @param {Function} props.onSuccess
  */
 const ExtraPointsForm = ({ resultId, entry = null, onSuccess }) => {
-  const isEdit = Boolean(entry?._id);
+  const isEdit = Boolean(entry?.id);
   const queryClient = useQueryClient();
   const [amount, setAmount] = useState(
     entry ? String(entry.amount) : "",
@@ -33,7 +33,7 @@ const ExtraPointsForm = ({ resultId, entry = null, onSuccess }) => {
   const mutation = useMutation({
     mutationFn: (data) =>
       isEdit
-        ? testResultsAPI.editExtraPoints(resultId, entry._id, data)
+        ? testResultsAPI.editExtraPoints(resultId, entry.id, data)
         : testResultsAPI.addExtraPoints(resultId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["test-result", resultId] });

@@ -83,7 +83,7 @@ const MyTasksPage = () => {
               <tbody>
                 {tasks.map((task) => (
                   <tr
-                    key={task._id}
+                    key={task.id}
                     className="border-b border-gray-50 hover:bg-gray-50/50"
                   >
                     <td className="py-2.5 px-3">
@@ -106,7 +106,7 @@ const MyTasksPage = () => {
                     </td>
                     <td className="py-2.5 px-3 text-center">
                       <Link
-                        to={`/tasks/${task._id}`}
+                        to={`/tasks/${task.id}`}
                         className="text-xs text-blue-600 hover:text-blue-800 font-medium"
                       >
                         Batafsil

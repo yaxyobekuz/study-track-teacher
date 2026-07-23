@@ -49,7 +49,7 @@ const Schedules = () => {
 
   useEffect(() => {
     if (classes.length > 0 && !selectedClass) {
-      setSelectedClass(classes[0]._id);
+      setSelectedClass(classes[0].id);
     }
   }, [classes, selectedClass]);
 
@@ -85,7 +85,7 @@ const Schedules = () => {
       link.href = url;
 
       const className =
-        classes.find((cls) => cls._id === selectedClass)?.name || "sinf";
+        classes.find((cls) => cls.id === selectedClass)?.name || "sinf";
       link.setAttribute(
         "download",
         `dars_jadvali_${className}_${new Date().toISOString().split("T")[0]}.xlsx`,
@@ -143,7 +143,7 @@ const Schedules = () => {
           className="w-32"
           value={selectedClass}
           onChange={(v) => setSelectedClass(v)}
-          options={classes.map((cls) => ({ label: cls.name, value: cls._id }))}
+          options={classes.map((cls) => ({ label: cls.name, value: cls.id }))}
         />
 
         <Button

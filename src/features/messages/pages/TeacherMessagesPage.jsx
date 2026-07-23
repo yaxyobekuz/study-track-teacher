@@ -199,7 +199,7 @@ const TeacherMessages = () => {
           options={[
             { value: "all", label: "Barcha sinflar" },
             ...classes.map((c) => ({
-              value: c._id,
+              value: c.id,
               label: c.name,
             })),
           ]}
@@ -238,7 +238,7 @@ const TeacherMessages = () => {
                 </tr>
               ) : (
                 messages.map((message) => (
-                  <tr key={message._id} className="hover:bg-gray-50">
+                  <tr key={message.id} className="hover:bg-gray-50">
                     {/* Message Text */}
                     <td className="px-6 py-4">
                       <div className="text-sm text-gray-900 max-w-xs truncate">

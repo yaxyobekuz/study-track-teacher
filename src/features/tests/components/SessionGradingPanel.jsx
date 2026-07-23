@@ -36,7 +36,7 @@ const SessionGradingPanel = ({ test, session, resultId }) => {
   const invalidateResult = () => {
     queryClient.invalidateQueries({ queryKey: ["test-result", resultId] });
     queryClient.invalidateQueries({
-      queryKey: ["test-results", "by-test", test._id],
+      queryKey: ["test-results", "by-test", test.id],
     });
   };
 
@@ -124,7 +124,7 @@ const SessionGradingPanel = ({ test, session, resultId }) => {
                 queryKey: ["test-result", resultId],
               });
               queryClient.invalidateQueries({
-                queryKey: ["test-results", "by-test", test._id],
+                queryKey: ["test-results", "by-test", test.id],
               });
             }}
           />
@@ -138,8 +138,8 @@ const SessionGradingPanel = ({ test, session, resultId }) => {
             Qo'shimcha ballar:
           </p>
           {result.extraPoints.map((ep) =>
-            editingExtraId === ep._id ? (
-              <div key={ep._id} className="p-3 rounded-lg bg-gray-50">
+            editingExtraId === ep.id ? (
+              <div key={ep.id} className="p-3 rounded-lg bg-gray-50">
                 <ExtraPointsForm
                   resultId={resultId}
                   entry={ep}
@@ -155,7 +155,7 @@ const SessionGradingPanel = ({ test, session, resultId }) => {
               </div>
             ) : (
               <div
-                key={ep._id}
+                key={ep.id}
                 className="flex items-start justify-between gap-3 p-2.5 rounded-lg bg-gray-50"
               >
                 <div className="min-w-0">
@@ -177,7 +177,7 @@ const SessionGradingPanel = ({ test, session, resultId }) => {
                   </span>
                   <button
                     type="button"
-                    onClick={() => setEditingExtraId(ep._id)}
+                    onClick={() => setEditingExtraId(ep.id)}
                     className="size-7 flex items-center justify-center text-gray-600 hover:bg-gray-200 rounded-md"
                     title="Tahrirlash"
                   >
@@ -191,7 +191,7 @@ const SessionGradingPanel = ({ test, session, resultId }) => {
                           "Ushbu qo'shimcha ballni o'chirishni xohlaysizmi?",
                         )
                       ) {
-                        deleteExtraMutation.mutate(ep._id);
+                        deleteExtraMutation.mutate(ep.id);
                       }
                     }}
                     disabled={deleteExtraMutation.isPending}
@@ -228,7 +228,7 @@ const SessionGradingPanel = ({ test, session, resultId }) => {
                   queryKey: ["test-result", resultId],
                 });
                 queryClient.invalidateQueries({
-                  queryKey: ["test-results", "by-test", test._id],
+                  queryKey: ["test-results", "by-test", test.id],
                 });
               }}
             />

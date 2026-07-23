@@ -69,7 +69,7 @@ const MyExcusesList = () => {
 
         {excuses.map((ex) => (
           <div
-            key={ex._id}
+            key={ex.id}
             className="rounded-xl border border-gray-100 p-3 space-y-1.5"
           >
             <div className="flex items-center justify-between gap-2">
@@ -105,10 +105,10 @@ const MyExcusesList = () => {
               <Button
                 size="sm"
                 variant="danger"
-                disabled={cancelingId === ex._id}
-                onClick={() => handleCancel(ex._id)}
+                disabled={cancelingId === ex.id}
+                onClick={() => handleCancel(ex.id)}
               >
-                Bekor qilish{cancelingId === ex._id && "..."}
+                Bekor qilish{cancelingId === ex.id && "..."}
               </Button>
             )}
           </div>

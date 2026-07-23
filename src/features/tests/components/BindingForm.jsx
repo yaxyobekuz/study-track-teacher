@@ -32,13 +32,13 @@ import { cn } from "@/shared/utils/cn";
  * @param {Function} props.onCancel - bekor qilish
  */
 const BindingForm = ({ testId, binding = null, onSaved, onCancel }) => {
-  const isEdit = Boolean(binding?._id);
+  const isEdit = Boolean(binding?.id);
   const queryClient = useQueryClient();
 
-  const [season, setSeason] = useState(binding?.season?._id || binding?.season || "");
-  const [subject, setSubject] = useState(binding?.subject?._id || binding?.subject || "");
+  const [season, setSeason] = useState(binding?.season?.id || binding?.season || "");
+  const [subject, setSubject] = useState(binding?.subject?.id || binding?.subject || "");
   const [classIds, setClassIds] = useState(
-    (binding?.classes || []).map((c) => c._id?.toString() || c.toString()),
+    (binding?.classes || []).map((c) => c.id?.toString() || c.toString()),
   );
 
   // Faol mavsumlar
@@ -61,10 +61,10 @@ const BindingForm = ({ testId, binding = null, onSaved, onCancel }) => {
   const subjectOptions = useMemo(() => {
     const map = new Map();
     for (const a of assignments) {
-      if (a.subject && !map.has(a.subject._id)) {
-        map.set(a.subject._id, {
+      if (a.subject && !map.has(a.subject.id)) {
+        map.set(a.subject.id, {
           label: a.subject.name,
-          value: a.subject._id,
+          value: a.subject.id,
         });
       }
     }
@@ -77,12 +77,12 @@ const BindingForm = ({ testId, binding = null, onSaved, onCancel }) => {
     const map = new Map();
     for (const a of assignments) {
       if (
-        a.subject?._id?.toString() === subject?.toString() &&
+        a.subject?.id?.toString() === subject?.toString() &&
         a.class &&
-        !map.has(a.class._id)
+        !map.has(a.class.id)
       ) {
-        map.set(a.class._id.toString(), {
-          _id: a.class._id.toString(),
+        map.set(a.class.id.toString(), {
+          id: a.class.id.toString(),
           name: a.class.name,
         });
       }
@@ -94,7 +94,7 @@ const BindingForm = ({ testId, binding = null, onSaved, onCancel }) => {
   useEffect(() => {
     if (subject) {
       setClassIds((ids) =>
-        ids.filter((id) => availableClasses.some((c) => c._id === id)),
+        ids.filter((id) => availableClasses.some((c) => c.id === id)),
       );
     }
   }, [subject, availableClasses]);
@@ -102,7 +102,7 @@ const BindingForm = ({ testId, binding = null, onSaved, onCancel }) => {
   // Qulaylik uchun: yangi biriktirishda Mavsum default birinchi qiymat
   useEffect(() => {
     if (!isEdit && !season && seasons.length > 0) {
-      setSeason(seasons[0]._id);
+      setSeason(seasons[0].id);
     }
   }, [isEdit, season, seasons]);
 
@@ -113,7 +113,7 @@ const BindingForm = ({ testId, binding = null, onSaved, onCancel }) => {
     }
   }, [isEdit, subject, subjectOptions]);
 
-  const seasonOptions = seasons.map((s) => ({ label: s.name, value: s._id }));
+  const seasonOptions = seasons.map((s) => ({ label: s.name, value: s.id }));
 
   const toggleClass = (id) => {
     setClassIds((prev) =>
@@ -125,7 +125,7 @@ const BindingForm = ({ testId, binding = null, onSaved, onCancel }) => {
     mutationFn: () => {
       const payload = { season, subject, classes: classIds };
       return isEdit
-        ? testBindingsAPI.update(binding._id, payload)
+        ? testBindingsAPI.update(binding.id, payload)
         : testBindingsAPI.create(testId, payload);
     },
     onSuccess: (res) => {
@@ -187,12 +187,12 @@ const BindingForm = ({ testId, binding = null, onSaved, onCancel }) => {
         ) : (
           <div className="flex flex-wrap gap-2">
             {availableClasses.map((c) => {
-              const isSelected = classIds.includes(c._id);
+              const isSelected = classIds.includes(c.id);
               return (
                 <button
-                  key={c._id}
+                  key={c.id}
                   type="button"
-                  onClick={() => toggleClass(c._id)}
+                  onClick={() => toggleClass(c.id)}
                   className={cn(
                     "px-3 py-1.5 rounded-md text-sm font-medium border transition-colors",
                     isSelected

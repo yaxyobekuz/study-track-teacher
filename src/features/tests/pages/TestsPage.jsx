@@ -86,7 +86,7 @@ const TestsPage = () => {
       ) : (
         <div className="space-y-4">
           {tests.map((test) => (
-            <Link className="block" key={test._id} to={`/tests/${test._id}`}>
+            <Link className="block" key={test.id} to={`/tests/${test.id}`}>
               <Card className="flex items-center justify-between gap-3">
                 <div className="flex-1 min-w-0 space-y-1">
                   <h3 className="font-semibold text-gray-900">{test.title}</h3>

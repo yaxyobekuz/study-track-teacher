@@ -27,7 +27,7 @@ const BindingRow = ({ binding, testId }) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const deleteMutation = useMutation({
-    mutationFn: () => testBindingsAPI.delete(binding._id),
+    mutationFn: () => testBindingsAPI.delete(binding.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["test-bindings", testId] });
       toast.success("Biriktiruv o'chirildi");
@@ -66,7 +66,7 @@ const BindingRow = ({ binding, testId }) => {
             ) : (
               binding.classes.map((c) => (
                 <span
-                  key={c._id || c}
+                  key={c.id || c}
                   className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 text-xs font-medium"
                 >
                   {c.name || "Sinf"}

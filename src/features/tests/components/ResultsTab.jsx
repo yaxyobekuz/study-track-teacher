@@ -33,10 +33,10 @@ const ResultsTab = ({ test }) => {
   const [sortDesc, setSortDesc] = useState(true);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["test-results", "by-test", test._id, { page }],
+    queryKey: ["test-results", "by-test", test.id, { page }],
     queryFn: () =>
       testResultsAPI
-        .getByTest(test._id, { page, limit: 30 })
+        .getByTest(test.id, { page, limit: 30 })
         .then((res) => res.data),
     keepPreviousData: true,
   });
@@ -94,7 +94,7 @@ const ResultsTab = ({ test }) => {
             <tbody>
               {sorted.map((r, idx) => (
                 <tr
-                  key={r._id}
+                  key={r.id}
                   className="border-b border-gray-100 hover:bg-gray-50"
                 >
                   <td className="py-2.5 px-3 text-gray-500">{idx + 1}</td>

@@ -35,24 +35,24 @@ const AnswersTab = ({ test }) => {
   const navigate = useNavigate();
 
   const { data: sessions = [], isLoading } = useQuery({
-    queryKey: ["test-sessions", "by-test", test._id],
+    queryKey: ["test-sessions", "by-test", test.id],
     queryFn: () =>
-      testSessionsAPI.getByTest(test._id).then((res) => res.data.data),
+      testSessionsAPI.getByTest(test.id).then((res) => res.data.data),
   });
 
   // Natijalar mapping - session.id → result
   const { data: results = [] } = useQuery({
-    queryKey: ["test-results", "by-test", test._id],
+    queryKey: ["test-results", "by-test", test.id],
     queryFn: () =>
       testResultsAPI
-        .getByTest(test._id, { limit: 200 })
+        .getByTest(test.id, { limit: 200 })
         .then((res) => res.data.data),
   });
 
   const resultBySession = new Map();
   for (const r of results) {
     if (r.session) {
-      const sid = typeof r.session === "string" ? r.session : r.session._id;
+      const sid = typeof r.session === "string" ? r.session : r.session.id;
       resultBySession.set(sid?.toString(), r);
     }
   }
@@ -81,11 +81,11 @@ const AnswersTab = ({ test }) => {
   return (
     <div className="space-y-2">
       {sessions.map((s) => {
-        const result = resultBySession.get(s._id.toString());
+        const result = resultBySession.get(s.id.toString());
         const canOpen = Boolean(result);
         return (
           <Card
-            key={s._id}
+            key={s.id}
             className={cn(
               "transition-shadow",
               canOpen ? "cursor-pointer hover:shadow-sm" : "opacity-80",
@@ -96,7 +96,7 @@ const AnswersTab = ({ test }) => {
               className="p-4"
               onClick={
                 canOpen
-                  ? () => navigate(`/tests/${test._id}/answers/${result._id}`)
+                  ? () => navigate(`/tests/${test.id}/answers/${result.id}`)
                   : undefined
               }
             >

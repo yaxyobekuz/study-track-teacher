@@ -42,7 +42,7 @@ const TestForm = () => {
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ["tests"] });
       toast.success("Test yaratildi");
-      navigate(`/tests/${res.data.data._id}`);
+      navigate(`/tests/${res.data.data.id}`);
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Xatolik yuz berdi");

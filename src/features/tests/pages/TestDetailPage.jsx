@@ -141,7 +141,7 @@ const Header = ({ test }) => {
         </p>
       </div>
 
-      <Link to={`/tests/${test._id}/edit`}>
+      <Link to={`/tests/${test.id}/edit`}>
         <Button variant="outline" className="gap-2">
           <Edit size={16} />
           Tahrirlash
@@ -161,16 +161,16 @@ const QuestionsTab = ({ test }) => {
   const queryClient = useQueryClient();
 
   const { data: questions = [], isLoading } = useQuery({
-    queryKey: ["test-questions", test._id],
+    queryKey: ["test-questions", test.id],
     queryFn: () =>
-      testQuestionsAPI.getAll(test._id).then((res) => res.data.data),
+      testQuestionsAPI.getAll(test.id).then((res) => res.data.data),
   });
 
   const deleteAllMutation = useMutation({
-    mutationFn: () => testQuestionsAPI.deleteAll(test._id),
+    mutationFn: () => testQuestionsAPI.deleteAll(test.id),
     onSuccess: (res) => {
       const deleted = res.data?.data?.deleted ?? 0;
-      queryClient.invalidateQueries({ queryKey: ["test-questions", test._id] });
+      queryClient.invalidateQueries({ queryKey: ["test-questions", test.id] });
       toast.success(`${deleted} ta savol o'chirildi`);
     },
     onError: (error) =>
@@ -209,20 +209,20 @@ const QuestionsTab = ({ test }) => {
                 <Plus size={16} />
                 Yangi savol
               </Button>
-              <AiGenerateButton testId={test._id} />
+              <AiGenerateButton testId={test.id} />
             </div>
           </div>
         </Card>
       )}
 
       {questions.map((q) => (
-        <InlineQuestionEditor key={q._id} question={q} testId={test._id} />
+        <InlineQuestionEditor key={q.id} question={q} testId={test.id} />
       ))}
 
       {showNew && (
         <InlineQuestionEditor
           question={null}
-          testId={test._id}
+          testId={test.id}
           defaultOpen
           keepAdding={keepAdding}
           onKeepAddingChange={setKeepAdding}
@@ -245,7 +245,7 @@ const QuestionsTab = ({ test }) => {
               <Plus size={16} />
               Yangi savol
             </Button>
-            <AiGenerateButton testId={test._id} className="flex-1" />
+            <AiGenerateButton testId={test.id} className="flex-1" />
           </div>
           <Button
             variant="ghost"

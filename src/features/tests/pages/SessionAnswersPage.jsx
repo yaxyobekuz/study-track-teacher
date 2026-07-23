@@ -105,7 +105,7 @@ const SessionAnswersPage = () => {
 
       {/* Batafsil javoblar va baholash */}
       <SessionGradingPanel
-        test={{ _id: testId }}
+        test={{ id: testId }}
         session={session}
         resultId={resultId}
       />

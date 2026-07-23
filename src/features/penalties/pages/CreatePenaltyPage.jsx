@@ -46,7 +46,7 @@ const CreatePenaltyPage = () => {
         setStudents(
           data.map((s) => ({
             label: `${s.firstName}${s.lastName ? ` ${s.lastName}` : ""} (${s.username})`,
-            value: s._id,
+            value: s.id,
           })),
         );
       })
@@ -62,7 +62,7 @@ const CreatePenaltyPage = () => {
         setCategories(
           (res.data.data || []).map((c) => ({
             label: `${c.title} (${c.points} ball)`,
-            value: c._id,
+            value: c.id,
             points: c.points,
             title: c.title,
           })),

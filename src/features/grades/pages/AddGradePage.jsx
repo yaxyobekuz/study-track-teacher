@@ -116,7 +116,7 @@ const AddGrade = () => {
 
       // Auto-select first subject
       if (data.length > 0) {
-        setField("selectedSubjectWithOrder", `${data[0]._id}_${data[0].order}`);
+        setField("selectedSubjectWithOrder", `${data[0].id}_${data[0].order}`);
       }
     } catch (error) {
       toast.error(
@@ -159,16 +159,16 @@ const AddGrade = () => {
     const hasGrade = student.grade !== null;
     const [subjectId, lessonOrder] = selectedSubjectWithOrder.split("_");
 
-    setField("loadingStudentId", student._id);
+    setField("loadingStudentId", student.id);
     try {
       if (hasGrade) {
-        await gradesAPI.update(student.grade._id, {
+        await gradesAPI.update(student.grade.id, {
           grade: parseInt(gradeValue),
           comment: student.grade.comment || "",
         });
       } else {
         await gradesAPI.create({
-          studentId: student._id,
+          studentId: student.id,
           subjectId,
           classId: selectedClass,
           lessonOrder: parseInt(lessonOrder),
@@ -187,9 +187,9 @@ const AddGrade = () => {
   };
 
   const handleDeleteGrade = async (student) => {
-    setField("loadingStudentId", student._id);
+    setField("loadingStudentId", student.id);
     try {
-      await gradesAPI.delete(student.grade._id);
+      await gradesAPI.delete(student.grade.id);
       await fetchStudentsWithGrades(false);
     } catch (error) {
       toast.error(error.response?.data?.message || "Xatolik yuz berdi");
@@ -238,7 +238,7 @@ const AddGrade = () => {
           onChange={(value) => setField("selectedClass", value)}
           options={todayClasses.map((cls) => ({
             label: cls.name,
-            value: cls._id,
+            value: cls.id,
           }))}
         />
 
@@ -251,7 +251,7 @@ const AddGrade = () => {
             const displayOrder = subject.order || 1;
             return {
               label: `${displayOrder}. ${subject.name}`,
-              value: `${subject._id}_${subject.order}`,
+              value: `${subject.id}_${subject.order}`,
             };
           })}
         />
@@ -321,10 +321,10 @@ const AddGrade = () => {
                       })
                       .map((student, index) => {
                         const hasGrade = student.grade !== null;
-                        const isRowLoading = loadingStudentId === student._id;
+                        const isRowLoading = loadingStudentId === student.id;
 
                         return (
-                          <tr key={student._id} className="hover:bg-gray-50">
+                          <tr key={student.id} className="hover:bg-gray-50">
                             {/* Index */}
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 max-sm:hidden">
                               {index + 1}

@@ -23,9 +23,9 @@ const BindingsTab = ({ test }) => {
   const [showNew, setShowNew] = useState(false);
 
   const { data: bindings = [], isLoading } = useQuery({
-    queryKey: ["test-bindings", test._id],
+    queryKey: ["test-bindings", test.id],
     queryFn: () =>
-      testBindingsAPI.getForTest(test._id).then((res) => res.data.data),
+      testBindingsAPI.getForTest(test.id).then((res) => res.data.data),
   });
 
   if (isLoading) {
@@ -55,13 +55,13 @@ const BindingsTab = ({ test }) => {
       )}
 
       {bindings.map((b) => (
-        <BindingRow key={b._id} binding={b} testId={test._id} />
+        <BindingRow key={b.id} binding={b} testId={test.id} />
       ))}
 
       {showNew && (
         <Card>
           <BindingForm
-            testId={test._id}
+            testId={test.id}
             onSaved={() => setShowNew(false)}
             onCancel={() => setShowNew(false)}
           />
