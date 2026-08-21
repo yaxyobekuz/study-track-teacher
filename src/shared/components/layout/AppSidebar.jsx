@@ -62,6 +62,9 @@ import { authAPI } from "@/features/auth/api/auth.api";
 // Hooks
 import { useIsMobile } from "@/shared/hooks/useMobile";
 
+// Filial yorlig'i
+import BranchLabel from "@/shared/components/layout/BranchLabel";
+
 // Navigation items
 const navItems = [
   {
@@ -209,6 +212,11 @@ const Header = () => {
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
+
+      {/* Filial — o'qituvchi qaysi filialda ishlayotganini ko'rib turishi
+          kerak: ekrandagi sinflar, o'quvchilar va baholar o'sha filialga
+          tegishli. Almashtirish YO'Q — bir xodim bitta filialda ishlaydi. */}
+      <BranchLabel />
 
       {/* Collapse Button */}
       {!open && <SidebarTrigger className="size-8" />}
