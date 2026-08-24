@@ -24,13 +24,10 @@ import useObjectState from "@/shared/hooks/useObjectState";
 // Data
 import { STATUS_LABELS, STATUS_COLORS } from "../data/attendance.data";
 
-const formatTime = (isoString) => {
-  if (!isoString) return "--:--";
-  return new Date(isoString).toLocaleTimeString("uz-UZ", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
+// Utils
+import { formatTimeUz } from "@/shared/utils/date.utils";
+
+const formatTime = (isoString) => formatTimeUz(isoString, "--:--");
 
 const CheckInOutCard = ({ todayRecord }) => {
   const queryClient = useQueryClient();
