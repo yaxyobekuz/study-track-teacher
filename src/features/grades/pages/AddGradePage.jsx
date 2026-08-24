@@ -294,6 +294,7 @@ const AddGrade = () => {
           {students.length > 0 && !loading && (
             <>
               <Input
+                type="search"
                 className="mb-4"
                 value={searchQuery}
                 placeholder="Qidirish..."

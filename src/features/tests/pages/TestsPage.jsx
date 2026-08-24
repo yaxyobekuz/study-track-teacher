@@ -60,6 +60,7 @@ const TestsPage = () => {
         <div className="flex items-center gap-2">
           <Search className="text-gray-400 shrink-0" />
           <InputField
+            type="search"
             name="search"
             value={search}
             onChange={(e) => {
