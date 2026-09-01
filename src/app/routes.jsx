@@ -34,6 +34,9 @@ import GivenPenaltiesPage from "@/features/penalties/pages/GivenPenaltiesPage";
 import AttendancePage from "@/features/attendance/pages/AttendancePage";
 import MyAttendancePage from "@/features/attendance/pages/MyAttendancePage";
 
+// Pages - Payroll requests (Oylik zayavkalari)
+import PayrollRequestsPage from "@/features/payroll-requests/pages/PayrollRequestsPage";
+
 // Pages - Tests
 import TestsPage from "@/features/tests/pages/TestsPage";
 import CreateTestPage from "@/features/tests/pages/CreateTestPage";
@@ -84,6 +87,9 @@ const Routes = () => {
           {/* Attendance */}
           <Route path="/attendance" element={<AttendancePage />} />
           <Route path="/attendance/my" element={<MyAttendancePage />} />
+
+          {/* Payroll requests (Oylik zayavkalari) */}
+          <Route path="/salary-requests" element={<PayrollRequestsPage />} />
 
           {/* Tests */}
           <Route path="/tests" element={<TestsPage />} />

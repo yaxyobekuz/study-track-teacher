@@ -17,6 +17,9 @@ export const MODAL_NAMES = [
   // Davomat (Attendance)
   "excuseRequest",
 
+  // Oylik zayavkalari (Payroll requests)
+  "payrollRequest",
+
   // Testlar (Tests)
   "aiGenerate",
 
