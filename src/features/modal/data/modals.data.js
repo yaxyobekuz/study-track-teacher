@@ -24,4 +24,22 @@ export const MODAL_NAMES = [
   "createSchedule",
   "editSchedule",
   "deleteSchedule",
+
+  // Inventar (moddiy-texnik baza) — admin panel bilan bir xil nomlar
+  "inventoryCategory",
+  "inventoryItem",
+  "inventoryLocation",
+  "inventoryAddStock",
+  "inventoryRepair",
+  "inventoryWriteOff",
+  "inventoryAdjust",
+  "inventoryTransfer",
+  "inventoryOpenCheck",
+  "inventoryDamage",
+  "inventoryCharge",
+  "inventoryWaive",
+  "inventoryCancelDamage",
+  "inventoryCancelCharge",
+  "inventoryDamagePayment",
+  "inventoryVoidPayment",
 ];

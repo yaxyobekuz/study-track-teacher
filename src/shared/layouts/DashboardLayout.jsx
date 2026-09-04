@@ -15,6 +15,7 @@ import {
 } from "@/shared/components/shadcn/sidebar";
 import AppHeader from "@/shared/components/layout/AppHeader";
 import AppSidebar from "@/shared/components/layout/AppSidebar";
+import PermissionGuard from "@/shared/components/guards/PermissionGuard";
 
 import SendMessageModal from "@/features/messages/components/SendMessageModal";
 import MessageDetailsModal from "@/features/messages/components/MessageDetailsModal";
@@ -41,7 +42,11 @@ const DashboardLayout = () => {
         <SidebarInset>
           <AppHeader />
           <div className="flex flex-1 flex-col gap-4 p-4 pb-24 md:pb-4 md:py-2">
-            <Outlet />
+            {/* Ruxsat bilan ochiladigan bo'limlarni (inventar) to'g'ridan-to'g'ri
+                URL orqali kirishdan himoya qiladi; qolgan sahifalarga tegmaydi */}
+            <PermissionGuard>
+              <Outlet />
+            </PermissionGuard>
           </div>
 
           <AppBottomNavbar
