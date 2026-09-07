@@ -9,6 +9,9 @@ const http = axios.create({
   baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
+    // Qaysi panel — faollik va xavfsizlik bo'limlari shu sarlavha bilan
+    // kanalni aniqlaydi (User-Agent panellarni ajrata olmaydi).
+    "X-Client": "teacher",
   },
 });
 
