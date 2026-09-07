@@ -136,6 +136,20 @@ const CheckInOutCard = ({ todayRecord }) => {
               </span>
               {" · "}
               {schedule.isWorkDayToday ? "Bugun ish kuni" : "Bugun dam olish kuni"}
+              {schedule.source === "schedule" && (
+                <span className="block text-xs text-blue-600">
+                  Dars jadvalingiz bo'yicha
+                </span>
+              )}
+            </p>
+          ) : schedule.source === "schedule" ? (
+            /* Dars jadvalidan ishlaydigan xodim: vaqt yo'qligi "sozlanmagan"
+               EMAS, "bugun dars yo'q" degani. Ikkalasi bir xil matn bilan
+               ko'rsatilsa, o'qituvchi ish vaqtim yo'qolibdi deb o'ylardi. */
+            <p className="text-sm text-blue-800">
+              {schedule.scheduleMissing
+                ? "Dars jadvalida darsingiz yo'q — ish vaqti aniqlanmagan"
+                : "Bugun darsingiz yo'q"}
             </p>
           ) : (
             <p className="text-sm text-blue-800">
