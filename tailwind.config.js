@@ -64,6 +64,71 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
+
+      /**
+       * HARAKAT — "Ledger" dizayn tili (dars soatlari va maosh paneli).
+       *
+       * ⚠️ ADMIN PANELIDAGI BILAN AYNAN BIR XIL QIYMATLAR. Ikkala panelda
+       * bir xil ekran bor ("dars soatim") va harakat tezligi farq qilsa,
+       * bir odam ikki panelda ikki xil mahsulot ko'rgan bo'lardi.
+       * Nusxa ATAYLAB: panellar alohida repo, umumiy config yo'q.
+       *
+       * ⚠️ FAQAT `motion-safe:` bilan ishlatiladi — `prefers-reduced-motion`
+       * yoqilgan foydalanuvchida hech narsa qimirlamaydi.
+       *
+       * ⚠️ UZLUKSIZ HARAKAT IKKITA: `tide` (hero foni) va `pulse-ring`
+       * (jonli nuqta). Uchinchisi qo'shilmaydi — uchta mustaqil takroriy
+       * harakat ekranni "reklama banneri" qilib qo'yardi.
+       *
+       * `flow-dash` bu panelda hozircha ishlatilmaydi (oqim sxemasi faqat
+       * admin panelida), lekin ro'yxatda turadi: ikki konfiguratsiya
+       * bir-biridan ajralib ketmasligi kerak. Ishlatilmagan animatsiya
+       * chiqadigan CSS'ga bir bayt ham qo'shmaydi.
+       */
+      transitionTimingFunction: {
+        "out-quint": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "in-out-sine": "cubic-bezier(0.37, 0, 0.63, 1)",
+      },
+      keyframes: {
+        post: {
+          "0%": { opacity: "0", transform: "translateY(11px)" },
+          "55%": { opacity: "1" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "rail-draw": {
+          "0%": { transform: "scaleY(0)" },
+          "100%": { transform: "scaleY(1)" },
+        },
+        "flow-dash": {
+          "0%": { strokeDashoffset: "28" },
+          "100%": { strokeDashoffset: "0" },
+        },
+        tide: {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+        breathe: {
+          "0%, 100%": { opacity: "0.45" },
+          "50%": { opacity: "1" },
+        },
+        "pulse-ring": {
+          "0%": { opacity: "0.45", transform: "scale(1)" },
+          "100%": { opacity: "0", transform: "scale(2.4)" },
+        },
+        "grow-x": {
+          "0%": { transform: "scaleX(0)" },
+          "100%": { transform: "scaleX(1)" },
+        },
+      },
+      animation: {
+        post: "post 620ms cubic-bezier(0.22, 1, 0.36, 1) both",
+        "rail-draw": "rail-draw 520ms cubic-bezier(0.22, 1, 0.36, 1) both",
+        "flow-dash": "flow-dash 1.5s linear infinite",
+        tide: "tide 14s cubic-bezier(0.37, 0, 0.63, 1) infinite",
+        breathe: "breathe 3.2s cubic-bezier(0.37, 0, 0.63, 1) infinite",
+        "pulse-ring": "pulse-ring 2.6s cubic-bezier(0.37, 0, 0.63, 1) infinite",
+        "grow-x": "grow-x 800ms cubic-bezier(0.22, 1, 0.36, 1) both",
+      },
     },
     screens: {
       xs: "480px",

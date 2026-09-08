@@ -1,5 +1,5 @@
 // TanStack Query
-import { queryOptions } from "@tanstack/react-query";
+import { queryOptions, keepPreviousData } from "@tanstack/react-query";
 
 // Shared
 import { createQueryKeys } from "@/shared/lib/query";
@@ -29,5 +29,29 @@ export const profileQueries = {
     queryOptions({
       queryKey: [...profileKeys.all, "payroll"],
       queryFn: () => profileAPI.getPayroll().then((r) => r.data.data),
+    }),
+
+  /**
+   * Dars soatim → shartnoma sharti, soat, jonli maosh, kesimlar, tarix.
+   *
+   * `params.month` berilmasa server joriy oyni oladi — oy tanlagich
+   * bo'sh qiymat bilan ham ishlashi uchun.
+   */
+  hours: (params) =>
+    queryOptions({
+      queryKey: [...profileKeys.all, "hours", params],
+      queryFn: () => profileAPI.getHours(params).then((r) => r.data.data),
+      // ⚠️ Oy almashtirilganda ekran BO'SHAB QOLMASLIGI kerak: `params`
+      // queryKey ichida, ya'ni har o'q bosilishi yangi so'rov. Ilgarigi
+      // ma'lumot turmasa, butun tab skeletga tushib, sarlavhadagi oy nomi
+      // ham yo'qolardi.
+      placeholderData: keepPreviousData,
+    }),
+
+  /** O'rinbosarlik → `{ given, taken, ongoing }`. */
+  substitutions: () =>
+    queryOptions({
+      queryKey: [...profileKeys.all, "substitutions"],
+      queryFn: () => profileAPI.getSubstitutions().then((r) => r.data.data),
     }),
 };

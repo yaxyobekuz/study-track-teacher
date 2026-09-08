@@ -8,6 +8,7 @@ import ProfileHeader from "../components/ProfileHeader";
 import ProfileMainTab from "../components/ProfileMainTab";
 import ProfilePayrollTab from "../components/ProfilePayrollTab";
 import ProfileWorkloadTab from "../components/ProfileWorkloadTab";
+import ProfileHoursTab from "../components/hours/ProfileHoursTab";
 
 // Hooks
 import useAuth from "@/shared/hooks/useAuth";
@@ -69,6 +70,8 @@ const ProfilePage = () => {
       )}
 
       {tab === "workload" && <ProfileWorkloadTab />}
+
+      {tab === "hours" && <ProfileHoursTab />}
 
       {tab === "payroll" && <ProfilePayrollTab />}
     </div>

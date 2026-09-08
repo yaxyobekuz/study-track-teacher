@@ -34,6 +34,14 @@ import { days } from "@/shared/data/days.data";
 export const PROFILE_TABS = [
   { value: "main", label: "Asosiy" },
   { value: "workload", label: "Dars jadvali", roles: ["teacher"] },
+  // ⚠️ BIRINCHI O'RINGA QO'YILMAYDI: ro'yxatdagi birinchi tab `?tab=`
+  // parametrisiz ochiladi va u "Asosiy" bo'lib qolishi kerak.
+  //
+  // "Oylik" tabidan FARQI: u yerda MUHRLANGAN majburiyatlar jadvali
+  // (qancha hisoblandi, qancha to'landi), bu yerda esa JONLI hisob —
+  // qancha soat o'tdi va shu soat qanchaga aylanmoqda. Ikkalasi bir
+  // savolga javob bermaydi, shuning uchun birlashtirilmadi.
+  { value: "hours", label: "Dars soatlarim", roles: ["teacher"] },
   { value: "payroll", label: "Oylik" },
 ];
 

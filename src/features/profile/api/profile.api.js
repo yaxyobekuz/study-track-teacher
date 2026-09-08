@@ -16,4 +16,18 @@ export const profileAPI = {
   getSalary: () => http.get("/payroll/salaries/my"),
   /** Oylik majburiyatlarim: har oy hisoblangani, to'langani, qoldiq. */
   getPayroll: () => http.get("/payroll/my"),
+
+  /**
+   * DARS SOATIM — jonli hisob: shartnoma sharti, o'tilgan va rejalashtirilgan
+   * soat, hozirgacha yig'ilgan maosh, sinf kesimi va o'rinbosarlik.
+   *
+   * ⚠️ Ruxsat kaliti YO'Q: identifikator tokendan olinadi, ya'ni odam faqat
+   * O'ZINIKINI ko'radi. `payroll.hours` talab qilinsa, o'qituvchi o'z
+   * soatini ko'rish uchun butun shtatning vedomostiga huquq olishi kerak
+   * bo'lardi.
+   */
+  getHours: (params) => http.get("/lesson-hours/my", { params }),
+
+  /** O'rinbosarlik: men bergan va men olgan darslar. */
+  getSubstitutions: () => http.get("/lesson-hours/my/substitutions"),
 };
