@@ -3,6 +3,7 @@ import {
   Home,
   Clock,
   Boxes,
+  Wallet,
   LogOut,
   BookOpen,
   PanelLeft,
@@ -145,6 +146,17 @@ const navItems = [
       {
         title: "Mening davomatim",
         url: "/attendance/my",
+      },
+    ],
+  },
+  {
+    title: "Oylik",
+    icon: Wallet,
+    isActive: false,
+    items: [
+      {
+        title: "Oylik so'rovlari",
+        url: "/salary-requests",
       },
     ],
   },

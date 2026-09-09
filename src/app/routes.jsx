@@ -48,6 +48,9 @@ import SeasonRewardsPage from "@/features/tests/pages/SeasonRewardsPage";
 // Pages - Profile
 import ProfilePage from "@/features/profile/pages/ProfilePage";
 
+// Pages - Salary requests (Oylik so'rovlari)
+import SalaryRequestsPage from "@/features/salary-requests/pages/SalaryRequestsPage";
+
 // Pages - Inventar (moddiy-texnik baza) — ruxsat bilan ochiladi
 import InventoryLayout from "@/features/inventory/layouts/InventoryLayout";
 import InventoryIndex from "@/features/inventory/layouts/InventoryIndex";
@@ -116,6 +119,9 @@ const Routes = () => {
 
           {/* Profile — o'z ma'lumotlarim, dars jadvalim, oyligim */}
           <Route path="/profile" element={<ProfilePage />} />
+
+          {/* Oylik so'rovlari — oylik/stavka ko'rib chiqish arizasi */}
+          <Route path="/salary-requests" element={<SalaryRequestsPage />} />
 
           {/* INVENTAR — admin panel bergan ruxsat bilan ochiladi
               (`PermissionGuard` yo'lni, `Can` esa tugmalarni tekshiradi).
