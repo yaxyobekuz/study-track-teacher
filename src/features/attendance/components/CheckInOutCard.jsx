@@ -19,10 +19,16 @@ import GeolocationStatus from "./GeolocationStatus";
 import Button from "@/shared/components/ui/button/Button";
 
 // Hooks
+import useGeolocation from "@/shared/hooks/useGeolocation";
 import useObjectState from "@/shared/hooks/useObjectState";
 
 // Data
-import { STATUS_LABELS, STATUS_COLORS } from "../data/attendance.data";
+import {
+  STATUS_LABELS,
+  STATUS_COLORS,
+  LOCATION_STATUS_LABELS,
+  worstLocationStatus,
+} from "../data/attendance.data";
 
 // Utils
 import { formatTimeUz } from "@/shared/utils/date.utils";
@@ -37,14 +43,21 @@ const CheckInOutCard = ({ todayRecord }) => {
     queryFn: () => attendanceAPI.getMySchedule().then((r) => r.data.data),
   });
 
-  const { loading, gpsAccuracy, gpsError, setField } = useObjectState({
-    loading: false,
-    gpsAccuracy: null,
-    gpsError: null,
-  });
+  const { loading, setField } = useObjectState({ loading: false });
+
+  // Joylashuv — yagona hook (`useGeolocation`): kuzatuv bilan eng aniq
+  // natijani tanlaydi va HECH QACHON xato tashlamaydi.
+  const {
+    accuracy: gpsAccuracy,
+    error: gpsError,
+    loading: gpsLoading,
+    request: requestLocation,
+  } = useGeolocation();
 
   const [showConfirm, setShowConfirm] = useState(false);
-  const [now, setNow] = useState(Date.now());
+  // Lazy initializer — komponent har qayta render bo'lganda Date.now()
+  // qayta chaqirilmasligi uchun (react-hooks/purity).
+  const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 10000);
@@ -61,40 +74,25 @@ const CheckInOutCard = ({ todayRecord }) => {
     ? Math.max(0, Math.ceil(5 * 60 - (now - checkInTime.getTime()) / 1000))
     : 0;
 
-  const getLocation = () =>
-    new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setField("gpsAccuracy", pos.coords.accuracy);
-          setField("gpsError", null);
-
-          resolve({
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-            accuracy: pos.coords.accuracy,
-          });
-        },
-        (err) => {
-          setField("gpsError", err.message);
-          reject(err);
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
-      );
-    });
-
+  /**
+   * ⚠️ JOYLASHUV OLINMASA HAM QAYD ETILADI. Ilgari GPS xatosi butun
+   * so'rovni to'xtatardi va xodim davomatdan umuman o'tolmasdi —
+   * noutbukda yoki bino ichida bu har kuni takrorlanardi. Endi server
+   * joylashuvni "berilmagan" deb yozadi, rahbar esa buni ko'radi.
+   */
   const handleCheckIn = async () => {
     setField("loading", true);
     try {
-      const location = await getLocation();
-      await attendanceAPI.checkIn(location);
+      const location = await requestLocation();
+      await attendanceAPI.checkIn(location || {});
       queryClient.invalidateQueries({ queryKey: ["attendance", "today"] });
-      toast.success("Kelganlik qayd etildi");
+      toast.success(
+        location
+          ? "Kelganlik qayd etildi"
+          : "Kelganlik qayd etildi — joylashuvsiz",
+      );
     } catch (err) {
-      if (err.code) {
-        toast.error("GPS-ni yoqing va ruxsat bering");
-      } else {
-        toast.error(err.response?.data?.message || "Xatolik yuz berdi");
-      }
+      toast.error(err.response?.data?.message || "Xatolik yuz berdi");
     } finally {
       setField("loading", false);
     }
@@ -104,24 +102,27 @@ const CheckInOutCard = ({ todayRecord }) => {
     setShowConfirm(false);
     setField("loading", true);
     try {
-      const location = await getLocation();
-      await attendanceAPI.checkOut(location);
+      const location = await requestLocation();
+      await attendanceAPI.checkOut(location || {});
       queryClient.invalidateQueries({ queryKey: ["attendance", "today"] });
-      toast.success("Ketganlik qayd etildi");
+      toast.success(
+        location
+          ? "Ketganlik qayd etildi"
+          : "Ketganlik qayd etildi — joylashuvsiz",
+      );
     } catch (err) {
-      if (err.code) {
-        toast.error("GPS-ni yoqing va ruxsat bering");
-      } else {
-        toast.error(err.response?.data?.message || "Xatolik yuz berdi");
-      }
+      toast.error(err.response?.data?.message || "Xatolik yuz berdi");
     } finally {
       setField("loading", false);
     }
   };
 
+  // Joylashuvni OLDINDAN so'raymiz: tugma bosilgan paytda ruxsat oynasi
+  // chiqsa, xodim "bosdim-ku, nega hech narsa bo'lmadi?" deb ikkinchi
+  // marta bosardi.
   useEffect(() => {
-    getLocation();
-  }, []);
+    requestLocation();
+  }, [requestLocation]);
 
   return (
     <Card className="space-y-4">
@@ -170,10 +171,14 @@ const CheckInOutCard = ({ todayRecord }) => {
             {STATUS_LABELS[todayRecord.status]}
           </span>
 
-          {todayRecord.outOfOffice && (
+          {/* ⚠️ Sabab OCHIQ aytiladi: "ofisdan tashqarida" bilan "joylashuv
+              berilmagan" ikki xil holat va xodim qaysi biri ekanini bilsa
+              gina tuzata oladi (GPS-ni yoqish, ruxsat berish). */}
+          {todayRecord.locationWarning && (
             <span className="flex items-center gap-1.5 text-sm text-orange-600">
               <AlertTriangle className="size-4" strokeWidth={1.5} />
-              Ofisdan tashqaridasiz
+              {LOCATION_STATUS_LABELS[worstLocationStatus(todayRecord)] ||
+                "Ofisdan tashqarida qayd etilgan"}
             </span>
           )}
         </div>
@@ -197,7 +202,11 @@ const CheckInOutCard = ({ todayRecord }) => {
       </div>
 
       {/* GPS status */}
-      <GeolocationStatus accuracy={gpsAccuracy} error={gpsError} />
+      <GeolocationStatus
+        accuracy={gpsAccuracy}
+        error={gpsError}
+        loading={gpsLoading}
+      />
 
       {/* Buttons */}
       <div className="flex flex-col gap-4 sm:flex-row">
