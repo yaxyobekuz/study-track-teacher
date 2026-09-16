@@ -6,6 +6,7 @@ import {
   Clock,
   BadgePercent,
   GraduationCap,
+  MinusCircle,
 } from "lucide-react";
 
 // Components
@@ -65,6 +66,8 @@ const MySalaryCard = () => {
   if (Number(c.fixedAmount) > 0) parts.push(`Fiksa ${formatMoney(c.fixedAmount)}`);
   if (Number(c.allowanceAmount) > 0) parts.push(`Ustama ${formatMoney(c.allowanceAmount)}`);
 
+  const deductions = (c.deductions ?? []).filter((d) => Number(d.amount) > 0);
+
   return (
     <Card title={`Mening oyligim — ${data.monthLabel}`} icon={<Wallet className="size-5 text-indigo-600" />}>
       <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -77,6 +80,18 @@ const MySalaryCard = () => {
           bg="bg-indigo-50 text-indigo-600"
           tone="text-gray-900"
         />
+
+        {/* Ushlab qolindi — sababi bilan (batafsil: Profil → Oylik) */}
+        {Number(c.deductionAmount) > 0 && (
+          <StatTile
+            icon={MinusCircle}
+            label="Oylikdan ushlab qolindi"
+            value={`− ${formatMoney(c.deductionAmount)}`}
+            sub={deductions.map((d) => d.reason).join(", ") || null}
+            bg="bg-red-50 text-red-600"
+            tone="text-red-600"
+          />
+        )}
 
         {/* Bu oy uchun olingani / qolgani */}
         <StatTile
@@ -144,6 +159,23 @@ const MySalaryCard = () => {
           />
         )}
       </div>
+
+      {/* Ushlab qolish sabablari — izohi bilan */}
+      {deductions.length > 0 && (
+        <ul className="mt-3 space-y-2">
+          {deductions.map((d) => (
+            <li key={d.id} className="rounded-xl bg-red-50/60 px-4 py-3">
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-sm font-medium text-gray-900">{d.reason}</p>
+                <span className="shrink-0 text-sm font-semibold text-red-600">
+                  − {formatMoney(d.amount)}
+                </span>
+              </div>
+              {d.note && <p className="mt-0.5 whitespace-pre-line text-xs text-gray-600">{d.note}</p>}
+            </li>
+          ))}
+        </ul>
+      )}
 
       {!data.isSealed && (
         <p className="mt-3 text-xs text-gray-400">

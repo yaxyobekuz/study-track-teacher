@@ -31,6 +31,13 @@ export const profileQueries = {
       queryFn: () => profileAPI.getPayroll().then((r) => r.data.data),
     }),
 
+  /** Ushlab qolishlarim → `{ items, totals: { withheld, currentMonth } }`. */
+  deductions: () =>
+    queryOptions({
+      queryKey: [...profileKeys.all, "deductions"],
+      queryFn: () => profileAPI.getDeductions().then((r) => r.data.data),
+    }),
+
   /**
    * Dars soatim → shartnoma sharti, soat, jonli maosh, kesimlar, tarix.
    *

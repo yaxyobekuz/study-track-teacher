@@ -8,6 +8,7 @@ import {
   CalendarDays,
   ChevronLeft,
   ChevronRight,
+  CircleSlash,
   LayoutGrid,
   Repeat2,
   Wallet,
@@ -35,6 +36,7 @@ import {
   formatHourNumber,
   gridDelay,
 } from "../../data/ledger.tokens";
+import { MISSED_LESSONS_HINT } from "../../data/profile.data";
 import { profileQueries } from "../../queries/profile.queries";
 
 /**
@@ -145,6 +147,12 @@ const ProfileHoursTab = () => {
 
         <WeekPanel data={data} isLoading={isLoading} isError={isError} delay={gridDelay(1)} />
       </div>
+
+      {/* O'tilmagan darslar — faqat bo'lsa: "nega soatim kam" degan savolga
+          o'qituvchining o'zi javob topishi kerak, boshliqdan so'ramasdan */}
+      {data?.missedLessons?.length > 0 && (
+        <MissedLessonsPanel data={data} delay={gridDelay(2)} />
+      )}
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <ClassBreakdown {...state} delay={gridDelay(2)} />
@@ -289,6 +297,48 @@ const ClassBreakdown = ({ data, isLoading, isError, delay }) => {
     </HoursPanel>
   );
 };
+
+/* ─────────────────────── O'TILMAGAN DARSLAR ─────────────────────── */
+
+/**
+ * ⚠️ SANA VA SABAB MATNI SERVERDAN (`dateLabel`, `reasonLabel`): sana
+ * `@db.Date`, brauzerda `new Date` bilan o'qilsa kun siljirdi.
+ */
+const MissedLessonsPanel = ({ data, delay }) => (
+  <HoursPanel
+    title={`O'tilmagan darslar · ${data.missedLessons.length}`}
+    hint={MISSED_LESSONS_HINT.panel}
+    icon={CircleSlash}
+    tone="given"
+    delay={delay}
+  >
+    <ul className="max-h-[260px] space-y-1.5 overflow-y-auto pr-1">
+      {data.missedLessons.map((row) => (
+        <li
+          key={`${row.dateLabel}-${row.classId}-${row.lessonOrder}`}
+          className={cn(SURFACE.tile, "flex items-center gap-3 py-2.5")}
+        >
+          <div className="min-w-0 flex-1">
+            <p className={cn(T.td, "truncate")}>
+              <span className="font-medium text-slate-900">{row.dateLabel}</span>
+              {` · ${row.className}, ${row.lessonOrder}-dars · ${row.subjectName}`}
+            </p>
+            {row.autoMarked && (
+              <p className={cn(T.meta, "mt-0.5 truncate")}>{MISSED_LESSONS_HINT.auto}</p>
+            )}
+          </div>
+          <span className={cn(CHIP, "shrink-0 bg-rose-50 text-rose-700")}>
+            {row.reasonLabel}
+          </span>
+        </li>
+      ))}
+    </ul>
+
+    {data.isCurrentMonth && (
+      <p className={cn(T.hint, "mt-3")}>{MISSED_LESSONS_HINT.today}</p>
+    )}
+  </HoursPanel>
+);
 
 /* ─────────────────────── O'RINBOSARLIK ─────────────────────── */
 

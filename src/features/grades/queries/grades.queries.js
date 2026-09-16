@@ -26,11 +26,13 @@ const scheduleSubjectsKey = (classId, date) => [
   classId,
   date,
 ];
-const teacherSubjectsKey = (classId) => [
+const teacherSubjectsKey = (classId, date) => [
   ...gradesKeys.all,
   "teacher-subjects",
   classId,
+  date ?? "today",
 ];
+const myAccessKey = [...gradesKeys.all, "my-access"];
 const studentsWithGradesKey = (params) => [
   ...gradesKeys.all,
   "students-with-grades",
@@ -81,13 +83,32 @@ export const gradesQueries = {
           .then((r) => r.data.data.map((schedule) => schedule.class)),
     }),
 
-  /** Subjects the current teacher teaches in a class (with lesson order). */
-  teacherSubjects: (classId) =>
+  /**
+   * Subjects the current teacher teaches in a class (with lesson order).
+   * `date` — ochib berilgan o'tgan kun ("YYYY-MM-DD"); bo'lmasa bugun.
+   */
+  teacherSubjects: (classId, date) =>
     queryOptions({
-      queryKey: teacherSubjectsKey(classId),
+      queryKey: teacherSubjectsKey(classId, date),
       queryFn: () =>
-        gradesAPI.getTeacherSubjects(classId).then((r) => r.data),
+        gradesAPI.getTeacherSubjects(classId, date).then((r) => r.data),
       enabled: Boolean(classId),
+    }),
+
+  /**
+   * Baho qo'yish huquqi → `{ presence, unlocks, days }`.
+   *
+   * ⚠️ `gradesKeys.all` ostida: baho qo'yilgach ochiq kundagi "baho
+   * qo'yilmagan darslar" ro'yxati ham yangilanadi. "Men keldim" bosilgani
+   * va oyna muddati tugashi boshqa sahifada bo'ladi — daqiqada bir va har
+   * ochilganda qayta so'raladi.
+   */
+  myAccess: () =>
+    queryOptions({
+      queryKey: myAccessKey,
+      queryFn: () => gradesAPI.getMyAccess().then((r) => r.data.data),
+      refetchInterval: 60 * 1000,
+      refetchOnMount: "always",
     }),
 
   /**

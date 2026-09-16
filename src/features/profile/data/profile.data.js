@@ -155,11 +155,23 @@ export const PAYROLL_RULE_COLUMNS = [
 
 export const PAYROLL_ENTRY_COLUMNS = [
   "Oy",
+  { label: "Ushlab qolindi", align: "right" },
   { label: "Hisoblangan", align: "right" },
   { label: "To'langan", align: "right" },
   { label: "Qoldiq", align: "right" },
   "Holat",
 ];
+
+/**
+ * Ushlab qolish qiymati matni: "10% oylikdan", "4 dars soati", "500 000 so'm".
+ * Foiz — YALPI oylikdan (server `computeDeductions`).
+ */
+export const formatDeductionValue = (type, value) =>
+  type === "percent"
+    ? `${Number(value)}% oylikdan`
+    : type === "hours"
+      ? `${Number(value)} dars soati`
+      : formatMoney(value);
 
 /** Majburiyat holati uchun badge (admin paneldagi bilan bir xil ranglar). */
 export const ENTRY_STATUS_META = {
@@ -224,4 +236,18 @@ export const buildPayrollTiles = ({ salary, entries }) => {
         : "To'lanmagan oylik yo'q",
     },
   ];
+};
+
+// ─────────────────────────────────────────────
+// O'tilmagan darslar (Dars soatlarim)
+// ─────────────────────────────────────────────
+
+/**
+ * Qoida matni — server `judgeLesson` (`helpers/lessonHours.js`) va admin
+ * panelidagi vedomost bilan AYNI. Sabab yorliqlari serverdan keladi.
+ */
+export const MISSED_LESSONS_HINT = {
+  panel: "Kelmagan kun yoki baho qo'yilmagan dars — soati oylikka yozilmagan",
+  today: "Bugungi darslar ertaga tekshiriladi.",
+  auto: "davomat avtomatik belgilangan",
 };

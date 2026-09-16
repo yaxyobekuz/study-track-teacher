@@ -2,7 +2,7 @@
 import { toast } from "sonner";
 
 // React
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Icons
 import { AlertTriangle } from "lucide-react";
@@ -47,12 +47,22 @@ const CheckInOutCard = ({ todayRecord }) => {
 
   // Joylashuv — yagona hook (`useGeolocation`): kuzatuv bilan eng aniq
   // natijani tanlaydi va HECH QACHON xato tashlamaydi.
+  //
+  // ⚠️ `auto` — joylashuv oldindan aniqlanadi, lekin FAQAT ruxsat
+  // allaqachon berilgan bo'lsa. Ruxsat hali so'ralmagan qurilmada oyna
+  // odam tugmani bosganda chiqadi (hook sarlavhasidagi sabab: javobsiz
+  // qolgan oynalar Chrome'da saytni jimgina bloklaydi).
   const {
     accuracy: gpsAccuracy,
     error: gpsError,
     loading: gpsLoading,
+    permission: gpsPermission,
     request: requestLocation,
-  } = useGeolocation();
+  } = useGeolocation({ auto: true });
+
+  // Bitta kadr ichidagi ikki bosish holatni ko'rmasdan ikkinchi qaydni
+  // yubormasin ("allaqachon qayd etilgan" xatosi).
+  const submitting = useRef(false);
 
   const [showConfirm, setShowConfirm] = useState(false);
   // Lazy initializer — komponent har qayta render bo'lganda Date.now()
@@ -81,6 +91,8 @@ const CheckInOutCard = ({ todayRecord }) => {
    * joylashuvni "berilmagan" deb yozadi, rahbar esa buni ko'radi.
    */
   const handleCheckIn = async () => {
+    if (submitting.current) return;
+    submitting.current = true;
     setField("loading", true);
     try {
       const location = await requestLocation();
@@ -94,11 +106,14 @@ const CheckInOutCard = ({ todayRecord }) => {
     } catch (err) {
       toast.error(err.response?.data?.message || "Xatolik yuz berdi");
     } finally {
+      submitting.current = false;
       setField("loading", false);
     }
   };
 
   const handleCheckOut = async () => {
+    if (submitting.current) return;
+    submitting.current = true;
     setShowConfirm(false);
     setField("loading", true);
     try {
@@ -113,16 +128,10 @@ const CheckInOutCard = ({ todayRecord }) => {
     } catch (err) {
       toast.error(err.response?.data?.message || "Xatolik yuz berdi");
     } finally {
+      submitting.current = false;
       setField("loading", false);
     }
   };
-
-  // Joylashuvni OLDINDAN so'raymiz: tugma bosilgan paytda ruxsat oynasi
-  // chiqsa, xodim "bosdim-ku, nega hech narsa bo'lmadi?" deb ikkinchi
-  // marta bosardi.
-  useEffect(() => {
-    requestLocation();
-  }, [requestLocation]);
 
   return (
     <Card className="space-y-4">
@@ -206,6 +215,8 @@ const CheckInOutCard = ({ todayRecord }) => {
         accuracy={gpsAccuracy}
         error={gpsError}
         loading={gpsLoading}
+        permission={gpsPermission}
+        onRequest={requestLocation}
       />
 
       {/* Buttons */}

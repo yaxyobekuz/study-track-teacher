@@ -16,6 +16,8 @@ export const profileAPI = {
   getSalary: () => http.get("/payroll/salaries/my"),
   /** Oylik majburiyatlarim: har oy hisoblangani, to'langani, qoldiq. */
   getPayroll: () => http.get("/payroll/my"),
+  /** Oylikdan ushlab qolishlarim: sabab, izoh, qancha va qaysi oyda. */
+  getDeductions: () => http.get("/payroll/deductions/my"),
 
   /**
    * DARS SOATIM — jonli hisob: shartnoma sharti, o'tilgan va rejalashtirilgan
