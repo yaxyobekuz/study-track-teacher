@@ -21,6 +21,9 @@ import Card from "@/shared/components/ui/Card";
 // Queries
 import { useTodayHoliday } from "@/features/holidays/queries/holidays.queries";
 
+// Components
+import MySalaryCard from "@/features/salary/components/MySalaryCard";
+
 // Utils
 import { getDayOfWeekUZ } from "@/shared/utils/date.utils";
 
@@ -60,6 +63,10 @@ const Dashboard = () => {
           </div>
         </Card>
       )}
+
+      {/* Shaxsiy oylik statistikasi — o'qituvchi o'z oyligini, dars soatini
+          va qarzini bir qarashda ko'radi */}
+      <MySalaryCard />
 
       <MySchedules />
 

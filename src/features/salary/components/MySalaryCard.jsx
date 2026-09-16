@@ -1,0 +1,158 @@
+// Icons
+import {
+  Wallet,
+  HandCoins,
+  Hourglass,
+  Clock,
+  BadgePercent,
+  GraduationCap,
+} from "lucide-react";
+
+// Components
+import Card from "@/shared/components/ui/Card";
+
+// Query
+import { useMySalaryStats } from "../queries/salary.queries";
+
+// Utils
+import { formatMoney } from "@/shared/utils/formatMoney";
+
+/**
+ * O'QITUVCHINING O'Z OYLIK STATISTIKASI — bosh sahifa kartasi.
+ *
+ * Joriy oy oyligi (tarkibi bilan), dars soati (reja / o'tgan / qolgan),
+ * stavka, toifa va umumiy (butun tarix) olingan/qarz.
+ */
+
+const StatTile = ({ icon: Icon, label, value, sub, tone = "text-gray-900", bg }) => (
+  <div className="flex items-center gap-3 rounded-2xl bg-white p-4 ring-1 ring-gray-100">
+    <span className={`rounded-xl p-2.5 ${bg}`}>
+      <Icon className="size-5" />
+    </span>
+    <div className="min-w-0">
+      <p className="text-xs text-gray-500">{label}</p>
+      <p className={`truncate text-lg font-bold ${tone}`}>{value}</p>
+      {sub && <p className="truncate text-[11px] text-gray-400">{sub}</p>}
+    </div>
+  </div>
+);
+
+const MySalaryCard = () => {
+  const { data, isLoading } = useMySalaryStats();
+
+  if (isLoading) {
+    return (
+      <Card title="Mening oyligim" icon={Wallet}>
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-20 animate-pulse rounded-2xl bg-gray-100" />
+          ))}
+        </div>
+      </Card>
+    );
+  }
+
+  // Oylik belgilanmagan bo'lsa kartani ko'rsatmaymiz (chalkashlik yaratmaslik uchun)
+  if (!data?.hasSalary) return null;
+
+  const c = data.current;
+  const h = data.hours;
+  const t = data.totals;
+
+  // Oylik tarkibi izohi (soatbay + ustama)
+  const parts = [];
+  if (Number(c.kpiAmount) > 0) parts.push(`Soatbay ${formatMoney(c.kpiAmount)}`);
+  if (Number(c.fixedAmount) > 0) parts.push(`Fiksa ${formatMoney(c.fixedAmount)}`);
+  if (Number(c.allowanceAmount) > 0) parts.push(`Ustama ${formatMoney(c.allowanceAmount)}`);
+
+  return (
+    <Card title={`Mening oyligim — ${data.monthLabel}`} icon={Wallet}>
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Bu oy oyligi */}
+        <StatTile
+          icon={Wallet}
+          label="Bu oy oyligim"
+          value={formatMoney(c.amount)}
+          sub={parts.join(" + ") || null}
+          bg="bg-indigo-50 text-indigo-600"
+          tone="text-gray-900"
+        />
+
+        {/* Bu oy uchun olingani / qolgani */}
+        <StatTile
+          icon={HandCoins}
+          label="Bu oy olganim"
+          value={formatMoney(c.paid)}
+          sub={
+            Number(c.debt) > 0
+              ? `Qoldi: ${formatMoney(c.debt)}`
+              : "To'liq olindi"
+          }
+          bg="bg-green-50 text-green-600"
+          tone="text-green-700"
+        />
+
+        {/* Umumiy qarz (butun tarix) */}
+        <StatTile
+          icon={Hourglass}
+          label="Jami olishim kerak (qarz)"
+          value={formatMoney(t.debt)}
+          sub={`Jami olingan: ${formatMoney(t.paid)}`}
+          bg="bg-amber-50 text-amber-600"
+          tone={Number(t.debt) > 0 ? "text-amber-700" : "text-gray-900"}
+        />
+
+        {/* Dars soati — o'qituvchi bo'lsa */}
+        {h && (
+          <>
+            <StatTile
+              icon={Clock}
+              label="Dars soati (bu oy)"
+              value={`${h.taught} / ${h.planned} soat`}
+              sub={`Qolgan: ${h.remaining} soat · haftasiga ${h.weekly}`}
+              bg="bg-blue-50 text-blue-600"
+              tone="text-gray-900"
+            />
+
+            <StatTile
+              icon={BadgePercent}
+              label="Soatbay stavka"
+              value={`${formatMoney(c.perHourRate)}`}
+              sub="1 dars soati narxi"
+              bg="bg-violet-50 text-violet-600"
+              tone="text-gray-900"
+            />
+
+            <StatTile
+              icon={GraduationCap}
+              label="Toifam"
+              value={c.categoryName || "—"}
+              sub="Malaka toifasi"
+              bg="bg-rose-50 text-rose-600"
+              tone="text-gray-900"
+            />
+          </>
+        )}
+
+        {/* O'qituvchi bo'lmasa — lavozim */}
+        {!h && c.positionName && (
+          <StatTile
+            icon={GraduationCap}
+            label="Lavozim"
+            value={c.positionName}
+            bg="bg-rose-50 text-rose-600"
+          />
+        )}
+      </div>
+
+      {!data.isSealed && (
+        <p className="mt-3 text-xs text-gray-400">
+          Bu — joriy oy uchun taxminiy hisob (dars soatiga qarab o'zgaradi).
+          Oy yopilganda summa muhrlanadi.
+        </p>
+      )}
+    </Card>
+  );
+};
+
+export default MySalaryCard;
