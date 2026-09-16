@@ -1,20 +1,24 @@
 /**
- * Oylik so'rovlari bo'limining statik ma'lumotlari.
+ * Oylik zayavkalari bo'limining statik ma'lumotlari.
  * Reusable static data — feature ichida takrorlanmaydi.
  */
 
-/** So'rov turi (server: type). */
+/** Zayavka turi (server: kind — 'category' | 'bonus'). */
 export const REQUEST_TYPE_OPTIONS = [
-  { value: "raise", label: "Oylik / stavka" },
+  { value: "category", label: "Toifa" },
   { value: "bonus", label: "Ustama" },
-  { value: "other", label: "Boshqa" },
 ];
 
 export const REQUEST_TYPE_LABELS = {
-  raise: "Oylik / stavka",
+  category: "Toifa",
   bonus: "Ustama",
-  other: "Boshqa",
 };
+
+/** Ustama turi (server: bonusType). */
+export const BONUS_TYPE_OPTIONS = [
+  { value: "fixed", label: "So'm (qat'iy summa)" },
+  { value: "percent", label: "Foiz (oylikdan %)" },
+];
 
 /** Ko'rib chiqish holati. */
 export const REQUEST_STATUS_LABELS = {

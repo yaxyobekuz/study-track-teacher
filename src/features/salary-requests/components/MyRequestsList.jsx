@@ -69,7 +69,7 @@ const MyRequestsList = () => {
             <div className="flex items-center justify-between gap-2">
               <p className="flex items-center gap-1.5 text-sm font-medium text-gray-800">
                 <FileText className="size-4 text-gray-400" />
-                {REQUEST_TYPE_LABELS[r.type] || r.type}
+                {REQUEST_TYPE_LABELS[r.kind] || r.kind}
               </p>
               <span
                 className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${REQUEST_STATUS_COLORS[r.status]}`}
@@ -78,15 +78,22 @@ const MyRequestsList = () => {
               </span>
             </div>
 
-            {(r.proposedHourlyRate || r.proposedAmount) && (
+            {/* Toifa zayavkasi — so'ralgan toifa */}
+            {r.kind === "category" && r.requestedCategoryName && (
               <p className="text-sm text-gray-600">
-                Taklif:{" "}
+                So'ralgan toifa: <b>{r.requestedCategoryName}</b>
+              </p>
+            )}
+
+            {/* Ustama zayavkasi — nomi va qiymati */}
+            {r.kind === "bonus" && r.bonusValue && (
+              <p className="text-sm text-gray-600">
+                {r.bonusLabel || "Ustama"}:{" "}
                 <b>
-                  {r.proposedHourlyRate
-                    ? `${r.proposedHourlyRate} so'm/soat`
-                    : `${r.proposedAmount} so'm`}
+                  {r.bonusType === "percent"
+                    ? `${Number(r.bonusValue)}%`
+                    : `${Number(r.bonusValue).toLocaleString("uz-UZ")} so'm`}
                 </b>
-                {r.proposedStartMonthLabel ? ` · ${r.proposedStartMonthLabel} dan` : ""}
               </p>
             )}
 

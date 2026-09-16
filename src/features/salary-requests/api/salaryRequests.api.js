@@ -1,19 +1,26 @@
 import http from "@/shared/api/http";
 
 /**
- * Oylik so'rovlari — o'qituvchi o'z oyligini ko'rib chiqishni so'raydi
- * (hujjat + izoh + ixtiyoriy taklif). Admin panelda ko'rib chiqiladi.
+ * Oylik zayavkalari — o'qituvchi TOIFA yoki USTAMA so'raydi (hujjat + izoh).
+ * Admin panelda ko'rib chiqiladi; tasdiqlansa toifa/ustama avtomatik
+ * qo'llanadi va oylik qayta hisoblanadi.
+ *
+ * Server: /payroll-requests (kind: 'category' | 'bonus').
  */
 export const salaryRequestsAPI = {
-  // O'z so'rovlari (eng yangisi birinchi)
-  getMine: (params) => http.get("/salary-requests/mine", { params }),
+  // O'z zayavkalari (eng yangisi birinchi)
+  getMine: (params) => http.get("/payroll-requests/mine", { params }),
 
-  // Yangi so'rov (multipart — hujjat biriktiriladi)
+  // Toifa zayavkasida tanlanadigan toifalar (joriysi belgilangan)
+  getAvailableCategories: () =>
+    http.get("/payroll-requests/available-categories"),
+
+  // Yangi zayavka (multipart — hujjat biriktiriladi, maydon nomi "files")
   create: (formData) =>
-    http.post("/salary-requests", formData, {
+    http.post("/payroll-requests", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     }),
 
-  // O'z pending so'rovini bekor qilish
-  cancel: (id) => http.delete(`/salary-requests/${id}`),
+  // O'z pending zayavkasini bekor qilish
+  cancel: (id) => http.delete(`/payroll-requests/${id}`),
 };
