@@ -42,7 +42,7 @@ const MySalaryCard = () => {
 
   if (isLoading) {
     return (
-      <Card title="Mening oyligim" icon={Wallet}>
+      <Card title="Mening oyligim" icon={<Wallet className="size-5 text-indigo-600" />}>
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-20 animate-pulse rounded-2xl bg-gray-100" />
@@ -66,7 +66,7 @@ const MySalaryCard = () => {
   if (Number(c.allowanceAmount) > 0) parts.push(`Ustama ${formatMoney(c.allowanceAmount)}`);
 
   return (
-    <Card title={`Mening oyligim — ${data.monthLabel}`} icon={Wallet}>
+    <Card title={`Mening oyligim — ${data.monthLabel}`} icon={<Wallet className="size-5 text-indigo-600" />}>
       <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {/* Bu oy oyligi */}
         <StatTile
