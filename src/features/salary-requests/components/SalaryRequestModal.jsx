@@ -51,6 +51,10 @@ const Content = ({ close }) => {
   });
   const filesRef = useRef(null);
 
+  // Server 20 MB gacha qabul qiladi; undan katta fayl yo'lda (nginx) ham
+  // qaytariladi — foydalanuvchiga yuborishdan OLDIN aniq aytamiz
+  const MAX_FILE_MB = 18;
+
   // Toifa zayavkasi uchun tanlanadigan toifalar (joriysi belgilanadi)
   const { data: categories = [] } = useQuery({
     queryKey: ["salaryRequests", "availableCategories"],
@@ -104,7 +108,23 @@ const Content = ({ close }) => {
         queryClient.invalidateQueries({ queryKey: ["salaryRequests", "mine"] });
         close?.();
       })
-      .catch((err) => toast.error(err.response?.data?.message || "Xatolik yuz berdi"))
+      .catch((err) => {
+        // Xato sababini ANIQ aytamiz — "Xatolik yuz berdi" hech narsa demaydi
+        const status = err.response?.status;
+        const serverMsg = err.response?.data?.message;
+        if (status === 413) {
+          toast.error(
+            "Fayl juda katta — server qabul qilmadi. Rasmni kichraytirib " +
+              "(yoki screenshot qilib) qayta urinib ko'ring.",
+          );
+        } else if (serverMsg) {
+          toast.error(serverMsg);
+        } else if (!err.response) {
+          toast.error("Server bilan aloqa yo'q — internetni tekshiring.");
+        } else {
+          toast.error(`Xatolik yuz berdi (kod: ${status}). Administratorga ayting.`);
+        }
+      })
       .finally(() => setField("loading", false));
   };
 
@@ -167,7 +187,20 @@ const Content = ({ close }) => {
         label="Tasdiqlovchi hujjat (sertifikat, diplom — rasm yoki PDF)"
         accept="image/*,application/pdf,.doc,.docx"
         multiple
-        onChange={(filesList) => (filesRef.current = filesList)}
+        onChange={(filesList) => {
+          const tooBig = [...(filesList || [])].filter(
+            (f) => f.size > MAX_FILE_MB * 1024 * 1024,
+          );
+          if (tooBig.length) {
+            toast.warning(
+              `${tooBig[0].name} juda katta (${Math.round(tooBig[0].size / 1024 / 1024)} MB). ` +
+                `Chegara — ${MAX_FILE_MB} MB. Rasmni kichraytirib yuboring.`,
+            );
+            filesRef.current = null;
+            return;
+          }
+          filesRef.current = filesList;
+        }}
       />
 
       {/* Sabab */}
