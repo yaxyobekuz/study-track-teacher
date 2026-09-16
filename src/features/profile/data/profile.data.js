@@ -8,7 +8,6 @@
 // Icons
 import {
   BookOpen,
-  CalendarClock,
   CalendarDays,
   HandCoins,
   Layers,
@@ -189,7 +188,6 @@ export const getRuleStatus = (rule, currentMonth) => {
  * @param {object|null} args.entries - `GET /payroll/my` payload'i
  */
 export const buildPayrollTiles = ({ salary, entries }) => {
-  const rule = salary?.current ?? null;
   const totals = entries?.totals ?? null;
 
   // Joriy oy majburiyati — qoida bo'lsa ham shakllantirilmagan bo'lishi
@@ -199,17 +197,10 @@ export const buildPayrollTiles = ({ salary, entries }) => {
 
   return [
     {
-      key: "rule",
-      label: "Amaldagi oylik",
-      value: formatMoney(rule?.amount),
-      icon: Wallet,
-      hint: rule?.periodLabel ?? "Oylik qoidasi belgilanmagan",
-    },
-    {
       key: "currentMonth",
-      label: "Joriy oy",
+      label: "Joriy oy oyligi",
       value: formatMoney(currentEntry?.amount),
-      icon: CalendarClock,
+      icon: Wallet,
       hint: currentEntry
         ? `${currentEntry.monthLabel}: ${currentEntry.statusLabel}`
         : `${salary?.currentMonthLabel ?? "Joriy oy"} uchun hali shakllantirilmagan`,
