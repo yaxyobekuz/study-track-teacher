@@ -67,6 +67,8 @@ const MySalaryCard = () => {
   if (Number(c.allowanceAmount) > 0) parts.push(`Ustama ${formatMoney(c.allowanceAmount)}`);
 
   const deductions = (c.deductions ?? []).filter((d) => Number(d.amount) > 0);
+  // Tyutor guruhlari — qaysi sinf, necha o'quvchi, qancha (serverdan tayyor)
+  const tutorLines = (c.allowanceBreakdown ?? []).filter((line) => line.type === "tutor");
 
   return (
     <Card title={`Mening oyligim — ${data.monthLabel}`} icon={<Wallet className="size-5 text-indigo-600" />}>
@@ -159,6 +161,29 @@ const MySalaryCard = () => {
           />
         )}
       </div>
+
+      {/* Tyutor guruhlari uchun qo'shimcha oylik */}
+      {tutorLines.length > 0 && (
+        <ul className="mt-3 space-y-2">
+          {tutorLines.map((line) => (
+            <li
+              key={line.tutorGroupId ?? line.label}
+              className="flex items-start justify-between gap-3 rounded-xl bg-amber-50/60 px-4 py-3"
+            >
+              <div>
+                <p className="text-sm font-medium text-gray-900">{line.label}</p>
+                <p className="text-xs text-gray-600">
+                  {line.studentCount} o'quvchi × {formatMoney(line.perStudentAmount)} +
+                  guruh uchun {formatMoney(line.groupAmount)}
+                </p>
+              </div>
+              <span className="shrink-0 text-sm font-semibold text-amber-700">
+                + {formatMoney(line.amount)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
 
       {/* Ushlab qolish sabablari — izohi bilan */}
       {deductions.length > 0 && (

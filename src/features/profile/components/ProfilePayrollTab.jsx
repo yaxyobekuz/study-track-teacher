@@ -22,6 +22,7 @@ import {
   buildPayrollTiles,
   formatDeductionValue,
   getRuleStatus,
+  allowanceLineLabel,
 } from "../data/profile.data";
 import { profileQueries } from "../queries/profile.queries";
 
@@ -133,8 +134,17 @@ const ProfilePayrollTab = () => {
 
               return (
                 <Tr key={entry.id}>
-                  <Td className="font-medium text-gray-900">
+                  <Td nowrap={false} className="font-medium text-gray-900">
                     {entry.monthLabel}
+                    {/* Ustamalar (tyutor guruhlari ham) — muhrlangan tafsilot */}
+                    {entry.allowanceBreakdown?.map((item, index) => (
+                      <span
+                        key={`${item.label}-${index}`}
+                        className="block text-xs font-normal text-amber-600"
+                      >
+                        + {allowanceLineLabel(item)}: {formatMoney(item.amount)}
+                      </span>
+                    ))}
                   </Td>
 
                   {/* Hisoblangan summadan allaqachon ayirilgan */}

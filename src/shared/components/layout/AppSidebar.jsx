@@ -12,6 +12,7 @@ import {
   ChevronRight,
   ClipboardList,
   AlertTriangle,
+  UsersRound,
 } from "lucide-react";
 
 // Router
@@ -65,6 +66,7 @@ import { authAPI } from "@/features/auth/api/auth.api";
 // Hooks
 import { useIsMobile } from "@/shared/hooks/useMobile";
 import usePermissions from "@/shared/hooks/usePermissions";
+import useAuth from "@/shared/hooks/useAuth";
 
 // Permissions
 import { permissionForPath } from "@/features/permissions/data/permissions.data";
@@ -91,6 +93,20 @@ const navItems = [
       {
         title: "Topshiriqlarim",
         url: "/tasks",
+      },
+    ],
+  },
+  {
+    // TYUTOR — faqat tyutor roli bor xodimga (`/auth/me` → `isTutor`):
+    // biriktirilgan sinflar, o'quvchilar, davomat, baho va qo'shimcha oylik
+    title: "Guruhlarim",
+    icon: UsersRound,
+    isActive: false,
+    tutorOnly: true,
+    items: [
+      {
+        title: "Guruhlarim",
+        url: "/tutor-groups",
       },
     ],
   },
@@ -285,11 +301,13 @@ const Main = () => {
   const isMobile = useIsMobile();
   const { toggleSidebar } = useSidebar();
   const { can } = usePermissions();
+  const { user } = useAuth();
 
   // Ruxsat talab qiladigan sahifalarni yashiramiz; bo'lim bo'sh qolsa — butun
   // bo'limni. Ruxsatsiz sahifalar (`permissionForPath` → null) avvalgidek
-  // hammaga ko'rinadi.
+  // hammaga ko'rinadi. Tyutor bo'limi — faqat tyutor roli borlarga.
   const visibleNavItems = navItems
+    .filter((item) => !item.tutorOnly || user?.isTutor)
     .map((item) => ({
       ...item,
       items: (item.items || []).filter((sub) =>

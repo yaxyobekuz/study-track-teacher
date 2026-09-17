@@ -174,6 +174,22 @@ export const formatDeductionValue = (type, value) =>
       : formatMoney(value);
 
 /** Majburiyat holati uchun badge (admin paneldagi bilan bir xil ranglar). */
+/**
+ * Ustama qatori yorlig'i (`allowanceBreakdown` elementi). Tyutor guruhida
+ * (`type: "tutor"`) sinf va o'quvchilar soni muhrlangan — xodim qo'shimcha
+ * oylik qayerdan kelganini qatorning o'zidan ko'radi.
+ *
+ * @param {{label: string, type: string, value: number, studentCount?: number}} item
+ * @returns {string}
+ */
+export const allowanceLineLabel = (item) => {
+  if (item.type === "percent") return `${item.label} · ${item.value}%`;
+  if (item.type === "tutor" && item.studentCount != null) {
+    return `${item.label} · ${item.studentCount} o'quvchi`;
+  }
+  return item.label;
+};
+
 export const ENTRY_STATUS_META = {
   unpaid: { label: "To'lanmagan", className: "bg-red-100 text-red-700" },
   partial: { label: "Qisman to'langan", className: "bg-amber-100 text-amber-700" },

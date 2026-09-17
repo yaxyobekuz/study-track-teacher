@@ -47,6 +47,8 @@ import SeasonRewardsPage from "@/features/tests/pages/SeasonRewardsPage";
 
 // Pages - Profile
 import ProfilePage from "@/features/profile/pages/ProfilePage";
+import MyTutorGroupsPage from "@/features/tutorGroups/pages/MyTutorGroupsPage";
+import MyTutorGroupPage from "@/features/tutorGroups/pages/MyTutorGroupPage";
 
 // Pages - Salary requests (Oylik so'rovlari)
 import SalaryRequestsPage from "@/features/salary-requests/pages/SalaryRequestsPage";
@@ -119,6 +121,10 @@ const Routes = () => {
 
           {/* Profile — o'z ma'lumotlarim, dars jadvalim, oyligim */}
           <Route path="/profile" element={<ProfilePage />} />
+
+          {/* Tyutor guruhlari — server faqat o'z guruhini qaytaradi */}
+          <Route path="/tutor-groups" element={<MyTutorGroupsPage />} />
+          <Route path="/tutor-groups/:groupId" element={<MyTutorGroupPage />} />
 
           {/* Oylik so'rovlari — oylik/stavka ko'rib chiqish arizasi */}
           <Route path="/salary-requests" element={<SalaryRequestsPage />} />
