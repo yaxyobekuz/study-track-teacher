@@ -230,7 +230,14 @@ export const buildPayrollTiles = ({ salary, entries }) => {
       value: formatMoney(currentEntry?.amount),
       icon: Wallet,
       hint: currentEntry
-        ? `${currentEntry.monthLabel}: ${currentEntry.statusLabel}`
+        ? `${currentEntry.monthLabel}: ${
+            // To'liq to'xtatilgan oy (0 so'm) serverda "paid" — "To'langan" yolg'on bo'lardi
+            Number(currentEntry.amount) === 0 &&
+            Number(currentEntry.paidAmount) === 0 &&
+            Number(currentEntry.suspendedAmount) > 0
+              ? "To'xtatilgan"
+              : currentEntry.statusLabel
+          }`
         : `${salary?.currentMonthLabel ?? "Joriy oy"} uchun hali shakllantirilmagan`,
     },
     {
