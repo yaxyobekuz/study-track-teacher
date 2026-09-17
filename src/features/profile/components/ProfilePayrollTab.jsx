@@ -25,6 +25,8 @@ import {
   allowanceLineLabel,
 } from "../data/profile.data";
 import { profileQueries } from "../queries/profile.queries";
+import { useMySalaryStats } from "@/features/salary/queries/salary.queries";
+import LiveMonthBreakdown from "@/features/salary/components/LiveMonthBreakdown";
 
 /**
  * MENING OYLIGIM — "qancha olaman va qanchasi hali to'lanmagan".
@@ -48,8 +50,9 @@ const ProfilePayrollTab = () => {
     isLoading: isEntriesLoading,
     isError: isEntriesError,
   } = useQuery(profileQueries.payroll());
-  // Ixtiyoriy bo'lim — yuklanmasa oylik tabi baribir ishlaydi
+  // Ixtiyoriy bo'limlar — yuklanmasa oylik tabi baribir ishlaydi
   const { data: suspensions } = useQuery(profileQueries.suspensions());
+  const { data: stats } = useMySalaryStats();
   // Ushlab qolishlar — alohida so'rov: yiqilsa ham oylik jadvali ko'rinaveradi
   const { data: deductions } = useQuery(profileQueries.deductions());
 
@@ -72,10 +75,14 @@ const ProfilePayrollTab = () => {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-4">
-        {buildPayrollTiles({ salary, entries }).map((tile) => (
+        {buildPayrollTiles({ salary, entries, stats }).map((tile) => (
           <StatTile key={tile.key} {...tile} />
         ))}
       </div>
+
+      {/* Dars bo'yicha hisob — vedomost bilan bir xil: dars qoldirmaganda,
+          o'tilmagan darslar uchun ayrilgan, hozirgacha va oy oxirida */}
+      <LiveMonthBreakdown live={stats?.live} monthLabel={stats?.monthLabel} />
 
       {rules.length === 0 ? (
         <Card className="p-0 xs:p-0">

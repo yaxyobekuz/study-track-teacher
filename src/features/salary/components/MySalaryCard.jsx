@@ -14,6 +14,7 @@ import Card from "@/shared/components/ui/Card";
 
 // Query
 import { useMySalaryStats } from "../queries/salary.queries";
+import LiveMonthBreakdown from "./LiveMonthBreakdown";
 
 // Utils
 import { formatMoney } from "@/shared/utils/formatMoney";
@@ -175,6 +176,9 @@ const MySalaryCard = () => {
           />
         )}
       </div>
+
+      {/* Dars bo'yicha hisob — vedomost bilan bir xil: qoldirmaganda / ayrilgan / oy oxirida */}
+      <LiveMonthBreakdown live={data.live} monthLabel={data.monthLabel} className="mt-3" />
 
       {/* Tyutor guruhlari uchun qo'shimcha oylik */}
       {tutorLines.length > 0 && (

@@ -215,7 +215,7 @@ export const getRuleStatus = (rule, currentMonth) => {
  * @param {object|null} args.salary - `GET /payroll/salaries/my` payload'i
  * @param {object|null} args.entries - `GET /payroll/my` payload'i
  */
-export const buildPayrollTiles = ({ salary, entries }) => {
+export const buildPayrollTiles = ({ salary, entries, stats = null }) => {
   const totals = entries?.totals ?? null;
 
   // Joriy oy majburiyati — qoida bo'lsa ham shakllantirilmagan bo'lishi
@@ -227,7 +227,8 @@ export const buildPayrollTiles = ({ salary, entries }) => {
     {
       key: "currentMonth",
       label: "Joriy oy oyligi",
-      value: formatMoney(currentEntry?.amount),
+      // Shakllanmagan oy — jonli hisob (vedomostdagi "Oy oxirida" bilan bir xil)
+      value: formatMoney(currentEntry ? currentEntry.amount : stats?.current?.amount),
       icon: Wallet,
       hint: currentEntry
         ? `${currentEntry.monthLabel}: ${
@@ -238,7 +239,9 @@ export const buildPayrollTiles = ({ salary, entries }) => {
               ? "To'xtatilgan"
               : currentEntry.statusLabel
           }`
-        : `${salary?.currentMonthLabel ?? "Joriy oy"} uchun hali shakllantirilmagan`,
+        : stats?.hasSalary
+          ? `${stats.monthLabel}: oy oxirida (hisoblanmoqda)`
+          : `${salary?.currentMonthLabel ?? "Joriy oy"} uchun hali shakllantirilmagan`,
     },
     {
       key: "paid",
