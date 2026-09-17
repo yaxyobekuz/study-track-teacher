@@ -20,18 +20,17 @@ import { tasksAPI } from "@/features/tasks/api/tasks.api";
 import { taskStatusLabels, taskStatusColors, SUBMITTABLE_STATUSES } from "../data/tasks.data";
 
 // Utils
-import { formatUzDate } from "@/shared/utils/formatDate";
+import { formatDateTimeUz } from "@/shared/utils/date.utils";
 
 // Components
 import Card from "@/shared/components/ui/Card";
+import TaskSubmitForm from "../components/TaskSubmitForm";
 
 const TaskDetailPage = () => {
   const { taskId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const [note, setNote] = useState("");
-  const [files, setFiles] = useState(null);
   const [showSubmitForm, setShowSubmitForm] = useState(false);
 
   const { data: task, isLoading } = useQuery({
@@ -44,23 +43,19 @@ const TaskDetailPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks", "detail", taskId] });
       queryClient.invalidateQueries({ queryKey: ["tasks", "my"] });
-      setShowSubmitForm(false);
-      setNote("");
-      setFiles(null);
-      toast.success("Topshiriq ko'rib chiqishga yuborildi");
     },
-    onError: (err) =>
-      toast.error(err.response?.data?.message || "Xatolik yuz berdi"),
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    if (note) formData.append("note", note);
-    if (files) {
-      for (const file of files) formData.append("files", file);
-    }
-    submitMutation.mutate(formData);
+  const handleSubmit = (formData, reset) => {
+    submitMutation.mutate(formData, {
+      onSuccess: () => {
+        setShowSubmitForm(false);
+        reset();
+        toast.success("Topshiriq ko'rib chiqishga yuborildi");
+      },
+      onError: (err) =>
+        toast.error(err.response?.data?.message || "Xatolik yuz berdi"),
+    });
   };
 
   if (isLoading) {
@@ -107,14 +102,14 @@ const TaskDetailPage = () => {
               </InfoRow>
               <InfoRow label="Ijro muddati">
                 <span className={isOverdue ? "text-red-600 font-semibold" : ""}>
-                  {formatUzDate(task.dueDate)}
+                  {formatDateTimeUz(task.dueDate)}
                   {isOverdue && <span className="ml-1 text-xs">(muddati o'tgan)</span>}
                 </span>
               </InfoRow>
               <InfoRow label="Jarima bali">
                 <span className="font-semibold text-red-600">{task.penaltyPoints} ball</span>
               </InfoRow>
-              <InfoRow label="Yaratilgan">{formatUzDate(task.createdAt)}</InfoRow>
+              <InfoRow label="Yaratilgan">{formatDateTimeUz(task.createdAt)}</InfoRow>
             </div>
             {task.description && (
               <div className="mt-3 pt-3 border-t border-gray-100">
@@ -177,7 +172,7 @@ const TaskDetailPage = () => {
                           <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${taskStatusColors[entry.status]}`}>
                             {taskStatusLabels[entry.status]}
                           </span>
-                          <span className="text-[11px] text-gray-400">{formatUzDate(entry.changedAt)}</span>
+                          <span className="text-[11px] text-gray-400">{formatDateTimeUz(entry.changedAt)}</span>
                         </div>
                         <p className="text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2">
                           {entry.reason}
@@ -201,9 +196,9 @@ const TaskDetailPage = () => {
                 {task.deadlineHistory.map((entry, idx) => (
                   <div key={idx} className="text-xs border-b border-gray-50 pb-2 last:border-0">
                     <div className="flex items-center gap-1 mb-1">
-                      <span className="text-gray-400 line-through">{formatUzDate(entry.oldDueDate)}</span>
+                      <span className="text-gray-400 line-through">{formatDateTimeUz(entry.oldDueDate)}</span>
                       <span className="text-gray-400">→</span>
-                      <span className="font-medium">{formatUzDate(entry.newDueDate)}</span>
+                      <span className="font-medium">{formatDateTimeUz(entry.newDueDate)}</span>
                     </div>
                     <p className="text-gray-500">{entry.reason}</p>
                     {entry.withPenalty && (
@@ -227,44 +222,12 @@ const TaskDetailPage = () => {
                   Bajarildi deb belgilash
                 </button>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-3">
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Izoh (ixtiyoriy)</label>
-                    <textarea
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
-                      rows={3}
-                      placeholder="Bajarilgan ish haqida..."
-                      className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Fayllar (ixtiyoriy)</label>
-                    <input
-                      multiple
-                      type="file"
-                      accept="image/*,video/mp4,video/webm,application/pdf"
-                      onChange={(e) => setFiles(e.target.files)}
-                      className="w-full text-sm"
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowSubmitForm(false)}
-                      className="flex-1 py-2 rounded-lg border border-gray-300 text-sm text-gray-600"
-                    >
-                      Bekor
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={submitMutation.isPending}
-                      className="flex-1 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium disabled:opacity-60"
-                    >
-                      {submitMutation.isPending ? "Yuborilmoqda..." : "Yuborish"}
-                    </button>
-                  </div>
-                </form>
+                <TaskSubmitForm
+                  rules={task.submissionRules}
+                  isPending={submitMutation.isPending}
+                  onSubmit={handleSubmit}
+                  onCancel={() => setShowSubmitForm(false)}
+                />
               )}
             </Card>
           )}

@@ -27,3 +27,21 @@ export const taskStatusOptions = [
 ];
 
 export const SUBMITTABLE_STATUSES = ["pending", "extended", "pending_rejected"];
+
+// Yakunlash formasi — fayl turlari (server `submissionRules.fileTypes`)
+export const FILE_TYPE_LABELS = {
+  image: "rasm",
+  video: "video",
+  document: "hujjat (PDF, Word, Excel)",
+};
+
+const FILE_ACCEPT = {
+  image: "image/jpeg,image/png,image/webp",
+  video: "video/mp4,video/webm,video/quicktime",
+  document:
+    "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain",
+};
+
+/** Ruxsat etilgan turlar → `<input accept>` qiymati. */
+export const buildSubmitAccept = (types = ["image", "video", "document"]) =>
+  types.map((t) => FILE_ACCEPT[t]).filter(Boolean).join(",");
