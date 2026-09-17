@@ -130,7 +130,14 @@ const ProfilePayrollTab = () => {
 
           <Table columns={PAYROLL_ENTRY_COLUMNS}>
             {items.map((entry) => {
-              const badge = ENTRY_STATUS_META[entry.status];
+              // To'liq to'xtatilgan oy (0 so'm) serverda "paid" — "To'langan" deb
+              // ko'rsatilsa yolg'on bo'lardi
+              const badge =
+                Number(entry.amount) === 0 &&
+                Number(entry.paidAmount) === 0 &&
+                Number(entry.suspendedAmount) > 0
+                  ? { label: "To'xtatilgan", className: "bg-slate-200 text-slate-700" }
+                  : ENTRY_STATUS_META[entry.status];
 
               return (
                 <Tr key={entry.id}>
@@ -145,6 +152,18 @@ const ProfilePayrollTab = () => {
                         + {allowanceLineLabel(item)}: {formatMoney(item.amount)}
                       </span>
                     ))}
+                    {/* To'xtatilgan qism — shu oy hisoblanmagan, sababi bilan */}
+                    {entry.suspensionBreakdown
+                      ?.filter((item) => Number(item.amount) > 0)
+                      .map((item, index) => (
+                        <span
+                          key={`suspension-${item.id ?? index}`}
+                          className="block text-xs font-normal text-red-600"
+                        >
+                          − To'xtatildi: {item.label}
+                          {item.reason ? ` (${item.reason})` : ""}: {formatMoney(item.amount)}
+                        </span>
+                      ))}
                   </Td>
 
                   {/* Hisoblangan summadan allaqachon ayirilgan */}

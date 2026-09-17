@@ -67,6 +67,8 @@ const MySalaryCard = () => {
   if (Number(c.allowanceAmount) > 0) parts.push(`Ustama ${formatMoney(c.allowanceAmount)}`);
 
   const deductions = (c.deductions ?? []).filter((d) => Number(d.amount) > 0);
+  // To'xtatilgan qismlar — qaysi qism, nima uchun, qancha (serverdan tayyor)
+  const suspensions = (c.suspensions ?? []).filter((s) => Number(s.amount) > 0);
   // Tyutor guruhlari — qaysi sinf, necha o'quvchi, qancha (serverdan tayyor)
   const tutorLines = (c.allowanceBreakdown ?? []).filter((line) => line.type === "tutor");
 
@@ -82,6 +84,18 @@ const MySalaryCard = () => {
           bg="bg-indigo-50 text-indigo-600"
           tone="text-gray-900"
         />
+
+        {/* Oylik to'xtatildi — qaysi qism va sababi */}
+        {Number(c.suspendedAmount) > 0 && (
+          <StatTile
+            icon={MinusCircle}
+            label="Oylik to'xtatildi"
+            value={`− ${formatMoney(c.suspendedAmount)}`}
+            sub={suspensions.map((s) => `${s.label}: ${s.reason}`).join(", ") || null}
+            bg="bg-slate-100 text-slate-600"
+            tone="text-slate-700"
+          />
+        )}
 
         {/* Ushlab qolindi — sababi bilan (batafsil: Profil → Oylik) */}
         {Number(c.deductionAmount) > 0 && (
