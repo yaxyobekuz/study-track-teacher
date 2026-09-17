@@ -240,7 +240,9 @@ export const buildPayrollTiles = ({ salary, entries, stats = null }) => {
               : currentEntry.statusLabel
           }`
         : stats?.hasSalary
-          ? `${stats.monthLabel}: oy oxirida (hisoblanmoqda)`
+          ? Number(stats.live?.missedAmount) > 0
+            ? `${stats.monthLabel}: dars qoldirmaganda ${formatMoney(stats.live.plannedAmount)}`
+            : `${stats.monthLabel}: oy oxirida (hisoblanmoqda)`
           : `${salary?.currentMonthLabel ?? "Joriy oy"} uchun hali shakllantirilmagan`,
     },
     {

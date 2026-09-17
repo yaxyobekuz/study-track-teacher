@@ -81,7 +81,12 @@ const MySalaryCard = () => {
           icon={Wallet}
           label="Bu oy oyligim"
           value={formatMoney(c.amount)}
-          sub={parts.join(" + ") || null}
+          sub={
+            // Dars qoldirilgan bo'lsa — qoldirmaganda qancha bo'lardi
+            !data.isSealed && Number(data.live?.missedAmount) > 0
+              ? `Dars qoldirmaganda: ${formatMoney(data.live.plannedAmount)}`
+              : parts.join(" + ") || null
+          }
           bg="bg-indigo-50 text-indigo-600"
           tone="text-gray-900"
         />

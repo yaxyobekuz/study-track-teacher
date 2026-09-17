@@ -104,7 +104,7 @@ const HoursHero = ({ data, isLoading }) => {
           isLoading={isLoading}
         />
 
-        <div className="mt-5 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+        <div className="mt-5 grid grid-cols-2 gap-2.5 lg:grid-cols-5">
           <Tile
             index={0}
             icon={Coins}
@@ -118,12 +118,25 @@ const HoursHero = ({ data, isLoading }) => {
             icon={Coins}
             label="Oy oxirida"
             value={formatMoney(data?.projectedAmount)}
-            hint="jadval o'zgarmasa"
+            hint={
+              Number(data?.missedAmount) > 0
+                ? `− ${formatMoney(data.missedAmount)} ayrildi`
+                : "jadval o'zgarmasa"
+            }
             isLoading={isLoading}
             emphasis
           />
+          {/* Dars qoldirilmaganda qancha bo'lardi — "Oy oxirida" bilan solishtirish uchun */}
           <Tile
             index={2}
+            icon={Coins}
+            label="Dars qoldirmaganda"
+            value={formatMoney(data?.plannedAmount ?? data?.projectedAmount)}
+            hint={`${formatHourNumber(data?.plannedHours)} soat — hamma dars`}
+            isLoading={isLoading}
+          />
+          <Tile
+            index={3}
             icon={Timer}
             label="Haftalik yuklama"
             value={formatHourNumber(data?.weeklyHours)}
@@ -131,7 +144,7 @@ const HoursHero = ({ data, isLoading }) => {
             isLoading={isLoading}
           />
           <Tile
-            index={3}
+            index={4}
             icon={Timer}
             label="Qolgan"
             value={formatHourNumber(data?.remainingHours)}
