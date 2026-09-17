@@ -31,6 +31,13 @@ export const profileQueries = {
       queryFn: () => profileAPI.getPayroll().then((r) => r.data.data),
     }),
 
+  /** To'xtatilgan oyligim → `{ items, month, monthLabel }`. */
+  suspensions: () =>
+    queryOptions({
+      queryKey: [...profileKeys.all, "suspensions"],
+      queryFn: () => profileAPI.getSuspensions().then((r) => r.data.data),
+    }),
+
   /** Ushlab qolishlarim → `{ items, totals: { withheld, currentMonth } }`. */
   deductions: () =>
     queryOptions({

@@ -1,5 +1,5 @@
 // Icons
-import { MinusCircle, Wallet } from "lucide-react";
+import { MinusCircle, Wallet, CirclePause } from "lucide-react";
 
 // TanStack Query
 import { useQuery } from "@tanstack/react-query";
@@ -48,6 +48,8 @@ const ProfilePayrollTab = () => {
     isLoading: isEntriesLoading,
     isError: isEntriesError,
   } = useQuery(profileQueries.payroll());
+  // Ixtiyoriy bo'lim — yuklanmasa oylik tabi baribir ishlaydi
+  const { data: suspensions } = useQuery(profileQueries.suspensions());
   // Ushlab qolishlar — alohida so'rov: yiqilsa ham oylik jadvali ko'rinaveradi
   const { data: deductions } = useQuery(profileQueries.deductions());
 
@@ -93,8 +95,21 @@ const ProfilePayrollTab = () => {
 
               return (
                 <Tr key={rule.id}>
-                  <Td align="right" className="font-medium text-gray-900">
-                    {formatMoney(rule.amount)}
+                  {/* Qoidada bitta summa yo'q: fiksa, soat narxi va ustamalar alohida */}
+                  <Td align="right" nowrap={false} className="font-medium text-gray-900">
+                    {Number(rule.fixedAmount) > 0 && (
+                      <span className="block">{formatMoney(rule.fixedAmount)}</span>
+                    )}
+                    {Number(rule.effectiveRate) > 0 && (
+                      <span className="block">{formatMoney(rule.effectiveRate)} × soat</span>
+                    )}
+                    {!(Number(rule.fixedAmount) > 0) && !(Number(rule.effectiveRate) > 0) && "—"}
+                    {(rule.allowanceBreakdown ?? []).map((item, index) => (
+                      <span key={`${item.label}-${index}`} className="block text-xs font-normal text-amber-600">
+                        + {item.label}
+                        {item.type === "percent" ? ` · ${item.value}%` : `: ${formatMoney(item.amount)}`}
+                      </span>
+                    ))}
                   </Td>
 
                   <Td nowrap={false} className="text-gray-500">
@@ -123,6 +138,8 @@ const ProfilePayrollTab = () => {
       {deductions?.items?.length > 0 && (
         <DeductionsSection deductions={deductions} />
       )}
+
+      {suspensions?.items?.length > 0 && <SuspensionsSection suspensions={suspensions} />}
 
       {items.length > 0 && (
         <section className="space-y-3">
@@ -293,6 +310,63 @@ const DeductionsSection = ({ deductions }) => (
               <p className="text-xs text-gray-500">
                 Bekor qilish sababi: {item.cancelReason}
               </p>
+            )}
+          </Card>
+        </li>
+      ))}
+    </ul>
+  </section>
+);
+
+/**
+ * TO'XTATILGAN OYLIK — qaysi oy, oylikning qaysi qismi, NIMA UCHUN (sabab +
+ * izoh) va qancha. Ma'muriyat oylikni (yoki uning bir qismini) bekor qilsa,
+ * xodim buxgalteriyaga emas, shu yerga qaraydi.
+ *
+ * ⚠️ Summa muhrlangan oyda aynan to'xtatilgani, joriy shakllanmagan oyda
+ * "hisoblanmoqda". Bekor qilingan to'xtatish — oylik qaytgan.
+ */
+const SuspensionsSection = ({ suspensions }) => (
+  <section className="space-y-3">
+    <h2 className="font-semibold text-gray-900">To'xtatilgan oylik</h2>
+
+    <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+      {suspensions.items.map((item) => (
+        <li key={item.id}>
+          <Card className="h-full space-y-3">
+            <div className="flex items-start gap-3">
+              <span className="rounded-xl bg-slate-100 p-2 text-slate-600">
+                <CirclePause className="size-5" strokeWidth={1.8} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-gray-900">{item.componentLabel}</p>
+                <p className="mt-0.5 text-sm text-gray-700">Sabab: {item.reason}</p>
+                {item.note && (
+                  <p className="mt-0.5 whitespace-pre-line text-sm text-gray-600">{item.note}</p>
+                )}
+                <p className="mt-1 text-xs text-gray-400">
+                  {item.periodLabel} · {item.createdAtLabel}
+                </p>
+              </div>
+              {item.status === "cancelled" && (
+                <span className="shrink-0 rounded-md bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
+                  Bekor qilingan — oylik qaytgan
+                </span>
+              )}
+            </div>
+
+            {item.months.length > 0 && (
+              <ul className="space-y-1 border-t border-gray-100 pt-2 text-sm">
+                {item.months.map((m) => (
+                  <li key={m.month} className="flex items-center justify-between gap-3">
+                    <span className="text-gray-600">
+                      {m.monthLabel}
+                      {!m.sealed && <span className="ml-1 text-xs text-gray-400">(hisoblanmoqda)</span>}
+                    </span>
+                    <span className="font-medium text-red-600">− {formatMoney(m.amount)}</span>
+                  </li>
+                ))}
+              </ul>
             )}
           </Card>
         </li>
