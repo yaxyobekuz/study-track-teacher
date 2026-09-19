@@ -1,3 +1,6 @@
+// React
+import { useEffect } from "react";
+
 // Toast
 import { toast } from "sonner";
 
@@ -15,8 +18,13 @@ import { logoIcon } from "@/shared/assets/icons";
 
 // API
 import { authAPI } from "@/features/auth/api/auth.api";
+import { AUTH_NOTICE_KEY } from "@/shared/api/http";
+
+// Lib
+import { saveSession } from "@/features/auth/lib/session";
 
 // Hooks
+import useModal from "@/shared/hooks/useModal";
 import useObjectState from "@/shared/hooks/useObjectState";
 
 // Animations
@@ -27,8 +35,23 @@ import Button from "@/shared/components/ui/button/Button";
 import InputGroup from "@/shared/components/ui/input/InputGroup";
 import InputField from "@/shared/components/ui/input/InputField";
 import MainBackgroundPatterns from "@/shared/components/bg/MainBackgroundPatterns";
+import SessionLimitModal from "@/features/auth/components/SessionLimitModal";
 
 const LoginPage = () => {
+  // Seans boshqa qurilmadan ("Qurilmalar") yoki admin tomonidan yakunlangan
+  // bo'lsa, odam nega login sahifasiga tushib qolganini bilishi kerak
+  useEffect(() => {
+    try {
+      const notice = sessionStorage.getItem(AUTH_NOTICE_KEY);
+      if (notice) {
+        sessionStorage.removeItem(AUTH_NOTICE_KEY);
+        toast.warning(notice);
+      }
+    } catch {
+      // xotira yopiq — xabarsiz
+    }
+  }, []);
+
   return (
     <div className="flex flex-row-reverse w-full h-svh">
       {/* Form */}
@@ -54,12 +77,15 @@ const LoginPage = () => {
 
       {/* Background Patterns */}
       <MainBackgroundPatterns />
+
+      <SessionLimitModal />
     </div>
   );
 };
 
 const LoginForm = ({}) => {
   const navigate = useNavigate();
+  const { openModal } = useModal();
 
   const { username, password, setField, isLoading } = useObjectState({
     step: 1,
@@ -77,14 +103,19 @@ const LoginForm = ({}) => {
     authAPI
       .login(data)
       .then((response) => {
-        // Save token to localStorage
-        const { token } = response.data.data;
-        localStorage.setItem("authToken", token);
-
-        // Navigate to dashboard
+        saveSession(response.data.data.token);
         navigate("/dashboard");
       })
       .catch((error) => {
+        // Qurilmalar limiti (o'qituvchi — 3 ta): parol to'g'ri, lekin
+        // boshqa qurilmalardan birini yakunlash kerak. Ro'yxat va tiket
+        // server javobida — oyna shu yerda ochiladi.
+        const details = error.response?.data?.details;
+        if (error.response?.status === 409 && details?.reason === "session_limit") {
+          openModal("sessionLimit", details);
+          return;
+        }
+
         toast.error(
           error.response?.data?.message || "Tizimga kirishda xatolik",
         );

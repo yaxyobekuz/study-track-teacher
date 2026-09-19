@@ -9,6 +9,7 @@ import ProfileMainTab from "../components/ProfileMainTab";
 import ProfilePayrollTab from "../components/ProfilePayrollTab";
 import ProfileWorkloadTab from "../components/ProfileWorkloadTab";
 import ProfileHoursTab from "../components/hours/ProfileHoursTab";
+import ProfileDevicesTab from "../components/devices/ProfileDevicesTab";
 
 // Hooks
 import useAuth from "@/shared/hooks/useAuth";
@@ -19,8 +20,8 @@ import { PROFILE_TABS, resolveTab } from "../data/profile.data";
 /**
  * PROFIL — xodim o'zi haqidagi ma'lumotni ko'radi va tahrirlaydi.
  *
- * Uch tab: Asosiy (ism, login, parol), Dars jadvali (faqat o'qituvchida)
- * va Oylik. Oxirgi ikkitasi admin paneldagi xodim kartasining aynan
+ * Tablar: Asosiy (ism, login, parol), Dars jadvali va Dars soatlarim
+ * (faqat o'qituvchida), Oylik va Qurilmalar (ochiq seanslar). Oxirgi ikkitasi admin paneldagi xodim kartasining aynan
  * o'zi — lekin bu yerda faqat O'ZINIKI: so'rovlar tokendagi odam bo'yicha
  * ishlaydi, ruxsat kaliti kerak emas.
  *
@@ -74,6 +75,8 @@ const ProfilePage = () => {
       {tab === "hours" && <ProfileHoursTab />}
 
       {tab === "payroll" && <ProfilePayrollTab />}
+
+      {tab === "devices" && <ProfileDevicesTab />}
     </div>
   );
 };

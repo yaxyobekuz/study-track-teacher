@@ -62,6 +62,7 @@ import { whiteLogoIcon } from "@/shared/assets/icons";
 
 // API
 import { authAPI } from "@/features/auth/api/auth.api";
+import { signOut } from "@/features/auth/lib/session";
 
 // Hooks
 import { useIsMobile } from "@/shared/hooks/useMobile";
@@ -382,8 +383,10 @@ const Footer = () => {
   const isMobile = useIsMobile();
   const { toggleSidebar } = useSidebar();
 
-  const handleLogout = () => {
-    localStorage.removeItem("authToken");
+  // ⚠️ Seans SERVERDA yopiladi (`signOut`) — aks holda u qurilmalar
+  // limitidan bittasini egallab turardi
+  const handleLogout = async () => {
+    await signOut();
     window.location.href = "/login";
   };
 

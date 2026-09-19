@@ -34,4 +34,14 @@ export const profileAPI = {
 
   /** O'rinbosarlik: men bergan va men olgan darslar. */
   getSubstitutions: () => http.get("/lesson-hours/my/substitutions"),
+
+  /**
+   * QURILMALARIM — ochiq seanslar (Telegram "Qurilmalar" kabi):
+   * `{ limit, total, current, others }`.
+   */
+  getSessions: () => http.get("/auth/sessions"),
+  /** Bitta qurilmadagi seansni yakunlash (joriysi emas — u "Chiqish"). */
+  terminateSession: (id) => http.delete(`/auth/sessions/${id}`),
+  /** Shu qurilmadan boshqa hamma seanslarni yakunlash. */
+  terminateOtherSessions: () => http.delete("/auth/sessions/others"),
 };

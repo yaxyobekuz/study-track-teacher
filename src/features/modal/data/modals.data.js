@@ -9,6 +9,11 @@
  * `<ResponsiveModal name="..." />` da ishlatiladigan kalit bilan bir xil bo'lishi kerak.
  */
 export const MODAL_NAMES = [
+  // Kirish va qurilmalar (Auth, Profile → Qurilmalar)
+  "sessionLimit",
+  "terminateSession",
+  "terminateOtherSessions",
+
   // Xabarlar (Messages)
   "sendMessage",
   "messageDetails",

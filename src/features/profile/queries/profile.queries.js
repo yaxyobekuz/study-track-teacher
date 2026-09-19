@@ -62,6 +62,19 @@ export const profileQueries = {
       placeholderData: keepPreviousData,
     }),
 
+  /**
+   * Qurilmalarim → `{ limit, total, current, others }`.
+   *
+   * Daqiqada bir yangilanadi: "Onlayn" belgisi va boshqa qurilmada
+   * shu orada ochilgan seans tab ochiq turganda ham ko'rinsin.
+   */
+  sessions: () =>
+    queryOptions({
+      queryKey: [...profileKeys.all, "sessions"],
+      queryFn: () => profileAPI.getSessions().then((r) => r.data.data),
+      refetchInterval: 60 * 1000,
+    }),
+
   /** O'rinbosarlik → `{ given, taken, ongoing }`. */
   substitutions: () =>
     queryOptions({

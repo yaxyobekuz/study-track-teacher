@@ -42,6 +42,9 @@ export const PROFILE_TABS = [
   // savolga javob bermaydi, shuning uchun birlashtirilmadi.
   { value: "hours", label: "Dars soatlarim", roles: ["teacher"] },
   { value: "payroll", label: "Oylik" },
+  // Telegram "Qurilmalar" kabi: qayerdan kirilgan, seanslarni yakunlash.
+  // Hamma rolga — ro'yxat va yakunlash tokendagi odamning o'zinikiga.
+  { value: "devices", label: "Qurilmalar" },
 ];
 
 /** URL'dagi `?tab=` qiymati ro'yxatda bo'lmasa — birinchi tab. */
