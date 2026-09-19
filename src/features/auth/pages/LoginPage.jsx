@@ -107,9 +107,9 @@ const LoginForm = ({}) => {
         navigate("/dashboard");
       })
       .catch((error) => {
-        // Qurilmalar limiti (o'qituvchi — 4 ta): parol to'g'ri, lekin
-        // boshqa qurilmalardan birini yakunlash kerak. Ro'yxat va tiket
-        // server javobida — oyna shu yerda ochiladi.
+        // Qurilmalar limiti (o'qituvchi — 4 ta). Faqat xabar: boshqa
+        // qurilmalar ro'yxati ham, ularni yakunlash ham bu yerda YO'Q
+        // (parolni bilgan begona odam bo'lishi mumkin).
         const details = error.response?.data?.details;
         if (error.response?.status === 409 && details?.reason === "session_limit") {
           openModal("sessionLimit", details);

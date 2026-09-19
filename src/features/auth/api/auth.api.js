@@ -7,12 +7,4 @@ export const authAPI = {
 
   /** Seansni SERVERDA yopish — usiz u 30 kun "ochiq" qurilma bo'lib sanalardi. */
   logout: () => http.post("auth/logout"),
-
-  /**
-   * QURILMALAR LIMITI OYNASIDAN DAVOM ETISH — tanlangan seanslar yakunlanadi
-   * va login javobi qaytadi. Token yo'q: kimligini 5 daqiqalik tiket aytadi.
-   *
-   * @param {{ ticket: string, sessionIds?: string[], all?: boolean }} data
-   */
-  resolveSessionLimit: (data) => http.post("auth/login/terminate", data),
 };
