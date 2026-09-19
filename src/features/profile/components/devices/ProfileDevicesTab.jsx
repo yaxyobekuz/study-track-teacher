@@ -24,7 +24,7 @@ import { profileQueries } from "../../queries/profile.queries";
  *
  * Tepada SHU qurilma va "boshqa hammasini yakunlash", pastda qolgan ochiq
  * seanslar — har birini alohida yakunlash mumkin. O'qituvchida bir vaqtda
- * ko'pi bilan 3 ta seans (server `limit`): to'lgan bo'lsa, yangi qurilmadan
+ * ko'pi bilan 4 ta seans (server `limit`): to'lgan bo'lsa, yangi qurilmadan
  * kirishda shu ro'yxatdan birini yakunlash so'raladi.
  *
  * ⚠️ Joriy seans bu yerdan yakunlanmaydi — u "Chiqish" tugmasi.

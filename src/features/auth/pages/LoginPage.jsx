@@ -107,7 +107,7 @@ const LoginForm = ({}) => {
         navigate("/dashboard");
       })
       .catch((error) => {
-        // Qurilmalar limiti (o'qituvchi — 3 ta): parol to'g'ri, lekin
+        // Qurilmalar limiti (o'qituvchi — 4 ta): parol to'g'ri, lekin
         // boshqa qurilmalardan birini yakunlash kerak. Ro'yxat va tiket
         // server javobida — oyna shu yerda ochiladi.
         const details = error.response?.data?.details;

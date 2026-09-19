@@ -11,7 +11,7 @@ const LOGOUT_TIMEOUT_MS = 3000;
  * CHIQISH — avval seans SERVERDA yopiladi, keyin token o'chiriladi.
  *
  * ⚠️ Faqat tokenni o'chirish YETMAYDI: server seansni 30 kun "ochiq"
- * deb biladi va o'qituvchining 3 ta qurilma limitidan bittasini egallab
+ * deb biladi va o'qituvchining 4 ta qurilma limitidan bittasini egallab
  * turardi — "Chiqish" ni bosgan odam keyingi safar boshqa qurilmada
  * "limit to'lgan" oynasiga tushardi.
  *

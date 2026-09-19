@@ -30,7 +30,7 @@ let cachedDeviceId = null;
  * QURILMA IDENTIFIKATORI — shu brauzer uchun bir marta yaratiladi
  * (o'quvchi panelidagi bilan AYNI).
  *
- * ⚠️ NIMA UCHUN KERAK: o'qituvchi bir vaqtda 3 ta qurilmada ishlaydi va
+ * ⚠️ NIMA UCHUN KERAK: o'qituvchi bir vaqtda 4 ta qurilmada ishlaydi va
  * server qurilmani faqat "Chrome · Windows" yorlig'i bilan tanisa, uydagi
  * va maktabdagi ikkita kompyuter BITTA qurilma bo'lib, bir-birini tizimdan
  * chiqarib yuborardi. "Qurilmalar" ro'yxati ham ularni ajrata olmasdi.
