@@ -163,3 +163,29 @@ export const locationSummary = (record) => {
     severe: status === "outside",
   };
 };
+
+// ─────────────────────────────────────────────
+// KUNNI YOPISH ("Men ketdim" oynasi)
+//
+// Holatlar serverdagi `checkoutGate.service.js` bilan AYNI.
+// ─────────────────────────────────────────────
+
+export const CHECKOUT_LESSON_STATE_COLORS = {
+  done: "bg-green-100 text-green-700",
+  pending: "bg-red-100 text-red-700",
+  notStarted: "bg-gray-100 text-gray-600",
+};
+
+export const CHECKOUT_CLOSED_LABELS = {
+  sunday: "Bugun yakshanba — dars yo'q",
+  holiday: "Bugun bayram — dars yo'q",
+  vacation: "Ta'til oyi — dars yo'q",
+};
+
+/**
+ * Server qoidasi (`checkoutGate.service.js`): darsga KAMIDA BITTA baho —
+ * oylikdagi "dars o'tildimi" bilan AYNI. Baho dars boshlangandan "Men ketdim"
+ * gacha qo'yiladi — dars tugashi yopmaydi.
+ */
+export const CHECKOUT_GRADE_REQUIREMENT =
+  "Talab: har bir darsga kamida bitta baho. Bugungi darslarga baho \"Men ketdim\" bosilguncha qo'yiladi.";

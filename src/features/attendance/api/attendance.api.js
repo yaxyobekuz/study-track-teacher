@@ -12,4 +12,8 @@ export const attendanceAPI = {
   cancelExcuseRequest: (id) => http.delete(`/attendance/excuse/${id}`),
   // O'z roliga tegishli "Kelmaslik sabablari"
   getAbsenceReasons: () => http.get("/absence-reasons/applicable"),
+  // Kunni yopish — "Men ketdim" dan oldin ishlar ro'yxati va rahbariyatga so'rov
+  getCheckoutReadiness: () => http.get("/attendance/checkout-readiness"),
+  createCheckoutRequest: (data) => http.post("/attendance/checkout-requests", data),
+  cancelCheckoutRequest: (id) => http.delete(`/attendance/checkout-requests/${id}`),
 };

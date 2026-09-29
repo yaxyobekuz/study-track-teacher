@@ -20,7 +20,7 @@ import Button from "@/shared/components/ui/button/Button";
 import useObjectState from "@/shared/hooks/useObjectState";
 
 // Router
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 // Icons
 import {
@@ -152,8 +152,22 @@ const AddGrade = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [access]);
 
-  // Load saved selections from localStorage
+  // "Men ketdim" oynasidagi "Baho qo'yish" havolasi aynan o'sha darsni ochadi
+  const [searchParams] = useSearchParams();
+
+  // Load saved selections from localStorage (havoladagi dars ustun)
   useEffect(() => {
+    const linkClass = searchParams.get("classId");
+    const linkSubject = searchParams.get("subjectId");
+    const linkOrder = searchParams.get("lessonOrder");
+    if (linkClass && linkSubject && linkOrder) {
+      setFields({
+        selectedClass: linkClass,
+        selectedSubjectWithOrder: `${linkSubject}_${linkOrder}`,
+      });
+      return;
+    }
+
     const savedClass = localStorage.getItem("addGrade_selectedClass");
     const savedSubjectWithOrder = localStorage.getItem(
       "addGrade_selectedSubjectWithOrder",

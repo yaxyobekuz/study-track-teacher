@@ -16,7 +16,11 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 // Components
 import Card from "@/shared/components/ui/Card";
 import GeolocationStatus from "./GeolocationStatus";
+import CheckoutGatePanel from "./CheckoutGatePanel";
 import Button from "@/shared/components/ui/button/Button";
+
+// Queries
+import { checkoutReadinessKey } from "../queries/attendance.queries";
 
 // Hooks
 import useGeolocation from "@/shared/hooks/useGeolocation";
@@ -111,21 +115,32 @@ const CheckInOutCard = ({ todayRecord }) => {
     }
   };
 
+  /**
+   * ⚠️ KUNNI YOPISH: server ishlar tugamaganini ko'rsa 409 qaytaradi
+   * (`details.reason = "checkout_blocked"`). Oyna yopilmaydi — ro'yxat
+   * javobdagi AYNI tayyorlik bilan yangilanadi (masalan oyna ochiq turganda
+   * yangi topshiriq kelgan bo'lsa).
+   */
   const handleCheckOut = async () => {
     if (submitting.current) return;
     submitting.current = true;
-    setShowConfirm(false);
     setField("loading", true);
     try {
       const location = await requestLocation();
       await attendanceAPI.checkOut(location || {});
+      setShowConfirm(false);
       queryClient.invalidateQueries({ queryKey: ["attendance", "today"] });
+      queryClient.invalidateQueries({ queryKey: checkoutReadinessKey });
       toast.success(
         location
           ? "Ketganlik qayd etildi"
           : "Ketganlik qayd etildi — joylashuvsiz",
       );
     } catch (err) {
+      const details = err.response?.data?.details;
+      if (details?.reason === "checkout_blocked" && details.readiness) {
+        queryClient.setQueryData(checkoutReadinessKey, details.readiness);
+      }
       toast.error(err.response?.data?.message || "Xatolik yuz berdi");
     } finally {
       submitting.current = false;
@@ -247,30 +262,13 @@ const CheckInOutCard = ({ todayRecord }) => {
         )}
       </div>
 
-      {/* Checkout Confirmation */}
-      {showConfirm && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 space-y-3">
-          <p className="text-sm font-medium text-red-800">
-            Haqiqatan ham ketmoqchimisiz?
-          </p>
-          <div className="flex gap-2">
-            <Button
-              variant="danger"
-              className="flex-1"
-              disabled={loading}
-              onClick={handleCheckOut}
-            >
-              Ha, ketdim{loading && "..."}
-            </Button>
-            <Button
-              variant="secondary"
-              className="flex-1"
-              onClick={() => setShowConfirm(false)}
-            >
-              Bekor qilish
-            </Button>
-          </div>
-        </div>
+      {/* Kunni yakunlash — ishlar ro'yxati, tasdiq yoki rahbariyat ruxsati */}
+      {showConfirm && !hasCheckedOut && (
+        <CheckoutGatePanel
+          loading={loading}
+          onConfirm={handleCheckOut}
+          onCancel={() => setShowConfirm(false)}
+        />
       )}
 
       {/* Late Notification */}
