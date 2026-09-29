@@ -24,6 +24,7 @@ import Select from "@/shared/components/ui/select/Select";
 import EmptyState from "@/shared/components/ui/EmptyState";
 import Table, { Td, Tr } from "@/shared/components/ui/Table";
 import StatTile from "@/features/profile/components/StatTile";
+import AttendanceHistoryCard from "../components/AttendanceHistoryCard";
 
 // Utils
 import { cn } from "@/shared/utils/cn";
@@ -47,7 +48,7 @@ const formatGrade = (value) => (value == null ? "—" : String(value));
 
 /**
  * GURUH MANZARASI (tyutorning o'zi uchun) — o'quvchilar, bugungi va oylik
- * davomat, baholar hamda shu guruh uchun qo'shimcha oylik.
+ * davomat, kunlik davomat tarixi, baholar hamda shu guruh uchun qo'shimcha oylik.
  *
  * Oylik davomat foizi davomat hisobotining O'ZIDAN keladi — admin panel bilan
  * bir xil raqam chiqadi.
@@ -151,25 +152,13 @@ const MyTutorGroupPage = () => {
         />
       </div>
 
-      {/* Kunlar kesimida davomat */}
+      {/* Kunlik davomat tarixi: o'quvchi × kun va tanlangan kun tafsiloti */}
       {attendance.byDay.length > 0 && (
-        <Card title="Kunlar kesimida davomat">
-          <div className="mt-3 flex flex-wrap gap-2">
-            {attendance.byDay.map((day) => (
-              <div
-                key={day.date}
-                className="min-w-20 rounded-xl border border-gray-100 px-2.5 py-1.5 text-center"
-              >
-                <p className="text-xs text-gray-500">
-                  {formatDateUz(day.date, { hideYear: true })}
-                </p>
-                <p className={cn("text-sm font-semibold", percentClass(day.percent))}>
-                  {formatPercent(day.percent)}
-                </p>
-              </div>
-            ))}
-          </div>
-        </Card>
+        <AttendanceHistoryCard
+          byDay={attendance.byDay}
+          students={students}
+          monthLabel={data.monthLabel}
+        />
       )}
 
       {/* O'quvchilar */}
