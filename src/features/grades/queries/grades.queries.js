@@ -38,7 +38,11 @@ const studentsWithGradesKey = (params) => [
   "students-with-grades",
   params,
 ];
-const myTodayClassesKey = [...gradesKeys.all, "my-today-classes"];
+const gradingClassesKey = (date) => [
+  ...gradesKeys.all,
+  "grading-classes",
+  date ?? "today",
+];
 
 export const gradesQueries = {
   /** Students with their grades for a class on a given date (GradesPage table). */
@@ -73,14 +77,18 @@ export const gradesQueries = {
       enabled: Boolean(classId && date),
     }),
 
-  /** Today's classes for the current teacher, derived from their schedule. */
-  myTodayClasses: () =>
+  /**
+   * Baho qo'yish mumkin bo'lgan sinflar — `[{ id, name, grantOnly }]`.
+   *
+   * ⚠️ Server baho yozish bilan AYNI qoidadan oladi (o'z darsi,
+   * o'rinbosarlik, fanga ruxsat). Ilgari faqat o'z jadvalidan
+   * (`/schedules/my-today`) olinardi va ruxsat berilgan sinf ro'yxatda
+   * chiqmasdi. `date` — ochib berilgan o'tgan kun; bo'lmasa bugun.
+   */
+  gradingClasses: (date) =>
     queryOptions({
-      queryKey: myTodayClassesKey,
-      queryFn: () =>
-        schedulesAPI
-          .getMyToday()
-          .then((r) => r.data.data.map((schedule) => schedule.class)),
+      queryKey: gradingClassesKey(date),
+      queryFn: () => gradesAPI.getGradingClasses(date).then((r) => r.data.data),
     }),
 
   /**

@@ -17,6 +17,7 @@ import Select from "@/shared/components/ui/select/Select";
 import Button from "@/shared/components/ui/button/Button";
 
 // Hooks
+import useAuth from "@/shared/hooks/useAuth";
 import useObjectState from "@/shared/hooks/useObjectState";
 
 // Router
@@ -26,6 +27,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import {
   CalendarOff,
   CalendarClock,
+  KeyRound,
   MapPinOff,
   Trash2,
   Loader2,
@@ -46,6 +48,15 @@ import { useTodayHoliday } from "@/features/holidays/queries/holidays.queries";
 /** Kun tanlovidagi "Bugun" — Radix `Select` bo'sh satrni qabul qilmaydi. */
 const TODAY = "today";
 
+/**
+ * Dars qaysi yo'l bilan ochilgan — fan tanlovidagi belgi. O'z darsida
+ * belgi yo'q; o'rinbosarlik va boshliq bergan ruxsat alohida ko'rinadi.
+ */
+const ACCESS_SUFFIX = {
+  substitution: " · o'rinbosarlik",
+  grant: " · ruxsat bilan",
+};
+
 /** "Siz maktabda emassiz — bugun ..." → "Bugun ..." (sarlavha alohida turadi). */
 const presenceReason = (message = "") => {
   const reason = message.replace(/^Siz maktabda emassiz\s*—\s*/, "");
@@ -63,6 +74,11 @@ const presenceReason = (message = "") => {
  * baho qo'yilmagan darsi bor ochiq kunlar chiqadi (server oylik hisobidan
  * oladi). Bu kunlarga istalgan joydan baho qo'yiladi va qo'yilgan baho
  * darsni o'tilgan qiladi.
+ *
+ * ⚠️ BOSHQA SINF/FANGA — FAQAT BOSHLIQ RUXSATI BILAN (`myAccess.grants`):
+ * ruxsat berilgan sinf ro'yxatda, fan esa "ruxsat bilan" belgisi bilan
+ * chiqadi. Boshqa o'qituvchi qo'ygan baho faqat ko'rinadi — uni o'sha
+ * o'qituvchi o'zgartiradi (server ham shuni talab qiladi).
  */
 const AddGrade = () => {
   const {
@@ -95,20 +111,14 @@ const AddGrade = () => {
   const activeDay = openDays.find((day) => day.date === selectedDay) ?? null;
   const notAtSchool = Boolean(access?.presence && !access.presence.atSchool);
 
-  // Today's classes from the teacher's schedule
-  const { data: todayClasses = [] } = useQuery(gradesQueries.myTodayClasses());
+  const { user } = useAuth();
+  const grants = access?.grants ?? [];
 
-  // O'tgan kunda sinflar — shu kunning baho qo'yilmagan darslaridan
-  const classOptions = isPastDay
-    ? [
-        ...new Map(
-          (activeDay?.lessons ?? []).map((l) => [
-            l.classId,
-            { id: l.classId, name: l.className },
-          ]),
-        ).values(),
-      ]
-    : todayClasses;
+  // Baho qo'yish mumkin bo'lgan sinflar — o'z darsi, o'rinbosarlik va
+  // boshliq ruxsati (server baho yozish bilan AYNI qoidadan beradi)
+  const { data: classOptions = [] } = useQuery(
+    gradesQueries.gradingClasses(pastDate),
+  );
 
   // Subjects the teacher teaches in the selected class
   const { data: teacherSubjectsData } = useQuery(
@@ -387,6 +397,9 @@ const AddGrade = () => {
         />
       )}
 
+      {/* Boshliq bergan fanga ruxsatlar */}
+      {grants.length > 0 && <GrantsCard grants={grants} />}
+
       {/* Filters */}
       {!todayBlocked && (
         <div className="grid grid-cols-2 gap-4">
@@ -402,7 +415,7 @@ const AddGrade = () => {
               })
             }
             options={classOptions.map((cls) => ({
-              label: cls.name,
+              label: cls.grantOnly ? `${cls.name} · ruxsat bilan` : cls.name,
               value: cls.id,
             }))}
           />
@@ -417,7 +430,7 @@ const AddGrade = () => {
             options={subjects.map((subject) => {
               const displayOrder = subject.order || 1;
               return {
-                label: `${displayOrder}. ${subject.name}`,
+                label: `${displayOrder}. ${subject.name}${ACCESS_SUFFIX[subject.access] ?? ""}`,
                 value: `${subject.id}_${subject.order}`,
               };
             })}
@@ -494,6 +507,11 @@ const AddGrade = () => {
                       .map((student, index) => {
                         const hasGrade = student.grade !== null;
                         const isRowLoading = loadingStudentId === student.id;
+                        // Boshqa o'qituvchi qo'ygan baho — faqat ko'rinadi
+                        const foreignGrade =
+                          hasGrade &&
+                          Boolean(user?.id) &&
+                          student.grade.teacherId !== user.id;
 
                         return (
                           <tr key={student.id} className="hover:bg-gray-50">
@@ -520,6 +538,8 @@ const AddGrade = () => {
                                       strokeWidth={2}
                                     />
                                   </div>
+                                ) : foreignGrade ? (
+                                  <ForeignGrade grade={student.grade} />
                                 ) : (
                                   <>
                                     <Select
@@ -660,5 +680,67 @@ const OpenDaysCard = ({
     </Card>
   );
 };
+
+/**
+ * BOSHQA O'QITUVCHI QO'YGAN BAHO — faqat ko'rish.
+ *
+ * Masalan, ruxsat bilan boshqa o'qituvchi sertifikatli o'quvchiga qo'ygan
+ * baho (yoki aksincha). Uni faqat qo'ygan odam o'zgartiradi — tanlov
+ * ko'rsatilsa, server "ruxsatingiz yo'q" deb rad etardi.
+ */
+const ForeignGrade = ({ grade }) => {
+  const teacher = grade.teacher
+    ? `${grade.teacher.firstName ?? ""} ${grade.teacher.lastName ?? ""}`.trim()
+    : "";
+
+  return (
+    <div className="flex items-center gap-2">
+      <span
+        className={cn(
+          "inline-flex h-10 w-10 items-center justify-center rounded-md text-sm font-semibold",
+          getGradeColor(grade.grade),
+        )}
+      >
+        {grade.grade}
+      </span>
+      <span className="max-w-[10rem] truncate text-xs text-gray-500">
+        {teacher ? `${teacher} qo'ygan` : "Boshqa o'qituvchi qo'ygan"}
+      </span>
+    </div>
+  );
+};
+
+/**
+ * BOSHLIQ BERGAN FANGA RUXSATLAR — qaysi sinf va fanga, qachongacha.
+ * Kutilayotgani (hali boshlanmagan) ham ko'rinadi: o'qituvchi oldindan bilsin.
+ */
+const GrantsCard = ({ grants }) => (
+  <Card className="space-y-2 border border-emerald-100 bg-emerald-50/60">
+    <div className="flex items-start gap-3">
+      <KeyRound className="mt-0.5 size-5 shrink-0 text-emerald-600" strokeWidth={1.8} />
+      <div>
+        <p className="font-semibold text-emerald-900">Sizga baho qo'yish ruxsati berilgan</p>
+        <p className="text-sm text-emerald-700">
+          Bu sinf va fanlarga ham baho qo'ya olasiz — ular ro'yxatda "ruxsat bilan" deb belgilangan.
+        </p>
+      </div>
+    </div>
+
+    <ul className="flex flex-wrap gap-1.5">
+      {grants.map((grant) => (
+        <li key={grant.id} className="rounded-lg bg-white px-2.5 py-1.5 text-xs text-gray-700">
+          <span className="font-medium">
+            {grant.className} · {grant.subjectName}
+          </span>
+          {" · "}
+          {grant.mode === "lesson" ? `${grant.rangeLabel}, ${grant.scopeLabel}` : grant.rangeLabel}
+          {grant.status === "upcoming" && (
+            <span className="text-emerald-700"> · {grant.statusLabel.toLowerCase()}</span>
+          )}
+        </li>
+      ))}
+    </ul>
+  </Card>
+);
 
 export default AddGrade;

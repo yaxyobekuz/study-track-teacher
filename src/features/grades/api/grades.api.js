@@ -26,12 +26,20 @@ export const gradesAPI = {
     // Otherwise it's a student ID (for owner viewing specific student)
     return http.get(`/grades/student/${dateOrStudentId}`);
   },
+  /**
+   * Baho qo'yish mumkin bo'lgan sinflar — o'z darsi, o'rinbosarlik va
+   * boshliq bergan fanga ruxsat (`[{ id, name, grantOnly }]`).
+   * `date` — boshliq ochib bergan o'tgan kun (bo'lmasa bugun).
+   */
+  getGradingClasses: (date) =>
+    http.get("/grades/teacher/classes", { params: date ? { date } : undefined }),
   // `date` — boshliq ochib bergan o'tgan kun (bo'lmasa bugun)
   getTeacherSubjects: (classId, date) =>
     http.get(`/grades/teacher/subjects/${classId}`, { params: date ? { date } : undefined }),
   /**
    * Baho qo'yish huquqi: bugun maktabdami (`presence`), boshliq ochgan
-   * oynalar (`unlocks`) va ochiq kunlardagi baho qo'yilmagan darslar (`days`).
+   * oynalar (`unlocks`), ochiq kunlardagi baho qo'yilmagan darslar (`days`)
+   * va boshliq bergan fanga ruxsatlar (`grants`).
    */
   getMyAccess: () => http.get("/grades/access/my"),
   getStudentsWithGrades: (params) =>
