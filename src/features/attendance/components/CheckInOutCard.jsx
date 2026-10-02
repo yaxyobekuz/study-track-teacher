@@ -164,6 +164,10 @@ const CheckInOutCard = ({ todayRecord }) => {
               {schedule.source === "schedule" && (
                 <span className="block text-xs text-blue-600">
                   Dars jadvalingiz bo'yicha
+                  {/* Kelish vaqti = birinchi darsdan oldin: "nega 08:20" ko'rinib tursin */}
+                  {schedule.firstLessonTime && schedule.arrivalLeadMinutes
+                    ? `: birinchi dars ${schedule.firstLessonTime}, kelish ${schedule.arrivalLeadMinutes} daqiqa oldin`
+                    : ""}
                 </span>
               )}
             </p>
