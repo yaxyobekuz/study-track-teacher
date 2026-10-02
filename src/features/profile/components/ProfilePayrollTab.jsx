@@ -27,6 +27,7 @@ import {
 import { profileQueries } from "../queries/profile.queries";
 import { useMySalaryStats } from "@/features/salary/queries/salary.queries";
 import LiveMonthBreakdown from "@/features/salary/components/LiveMonthBreakdown";
+import AbsenceDaysCard from "@/features/salary/components/AbsenceDaysCard";
 
 /**
  * MENING OYLIGIM — "qancha olaman va qanchasi hali to'lanmagan".
@@ -83,6 +84,9 @@ const ProfilePayrollTab = () => {
       {/* Dars bo'yicha hisob — vedomost bilan bir xil: dars qoldirmaganda,
           o'tilmagan darslar uchun ayrilgan, hozirgacha va oy oxirida */}
       <LiveMonthBreakdown live={stats?.live} monthLabel={stats?.monthLabel} />
+
+      {/* Kelmagan kunlar — qaysi kuni va har kun uchun qancha ayrildi */}
+      <AbsenceDaysCard absence={stats?.current?.absence} monthLabel={stats?.monthLabel} />
 
       {rules.length === 0 ? (
         <Card className="p-0 xs:p-0">
@@ -176,6 +180,16 @@ const ProfilePayrollTab = () => {
                         + {allowanceLineLabel(item)}: {formatMoney(item.amount)}
                       </span>
                     ))}
+                    {/* Kelmagan kunlar — fiksadan kunlik ayirma, kunlari bilan */}
+                    {Number(entry.absenceAmount) > 0 && entry.absence && (
+                      <span className="block text-xs font-normal text-red-600">
+                        − Kelmagan kunlar ({entry.absence.dayCount} kun ×{" "}
+                        {formatMoney(entry.absence.dailyRate)}): {formatMoney(entry.absenceAmount)}
+                        <span className="block text-gray-400">
+                          {entry.absence.days.map((day) => day.dateLabel).join(", ")}
+                        </span>
+                      </span>
+                    )}
                     {/* To'xtatilgan qism — shu oy hisoblanmagan, sababi bilan */}
                     {entry.suspensionBreakdown
                       ?.filter((item) => Number(item.amount) > 0)

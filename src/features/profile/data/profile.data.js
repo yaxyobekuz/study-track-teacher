@@ -9,6 +9,7 @@
 import {
   BookOpen,
   CalendarDays,
+  CalendarOff,
   HandCoins,
   Layers,
   TrendingDown,
@@ -226,7 +227,10 @@ export const buildPayrollTiles = ({ salary, entries, stats = null }) => {
   const currentEntry =
     entries?.items?.find((item) => item.month === salary?.currentMonth) ?? null;
 
-  return [
+  // Kelmagan kunlar — muhrlangan bo'lsa muhrdan, aks holda jonli (server hal qiladi)
+  const absence = stats?.current?.absence ?? null;
+
+  const tiles = [
     {
       key: "currentMonth",
       label: "Joriy oy oyligi",
@@ -267,6 +271,19 @@ export const buildPayrollTiles = ({ salary, entries, stats = null }) => {
         : "To'lanmagan oylik yo'q",
     },
   ];
+
+  if (absence?.dayCount > 0) {
+    tiles.push({
+      key: "absence",
+      label: "Kelmagan kunlar uchun ayrildi",
+      value: `− ${formatMoney(absence.amount)}`,
+      icon: CalendarOff,
+      valueClassName: "text-red-600",
+      hint: `${stats.monthLabel}: ${absence.dayCount} kun × ${formatMoney(absence.dailyRate)}`,
+    });
+  }
+
+  return tiles;
 };
 
 // ─────────────────────────────────────────────

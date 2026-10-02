@@ -11,6 +11,9 @@ import { formatMoney } from "@/shared/utils/formatMoney";
  *     qo'yilmagan) — yana dars o'tilmasa bu summa o'sib boradi;
  *   · hozir qancha hisoblangan va oy oxirida qancha bo'ladi.
  *
+ * Kelmagan ish kunlari uchun fiksadan ayirma (`live.absence`) ham shu
+ * yerda — u soatga bog'liq emas, "Dars qoldirmaganda" dan OLDIN ayiriladi.
+ *
  * ⚠️ Summalar serverdan tayyor — frontendda arifmetika yo'q.
  *
  * @param {{ live: object, monthLabel: string, className?: string }} props
@@ -54,6 +57,18 @@ const LiveMonthBreakdown = ({ live, monthLabel, className }) => {
           </li>
         ))}
 
+        {Number(live.absence?.amount) > 0 && (
+          <li className="flex items-start justify-between gap-3">
+            <span className="text-gray-600">
+              Kelmagan kunlar
+              <span className="block text-xs text-gray-400">
+                {live.absence.dayCount} kun × {formatMoney(live.absence.dailyRate)} — fiksa oylikdan
+              </span>
+            </span>
+            <span className="shrink-0 font-medium text-red-600">− {formatMoney(live.absence.amount)}</span>
+          </li>
+        )}
+
         {(live.deductions ?? []).map((item, index) => (
           <li key={`deduction-${index}`} className="flex items-start justify-between gap-3">
             <span className="text-gray-600">
@@ -69,7 +84,9 @@ const LiveMonthBreakdown = ({ live, monthLabel, className }) => {
             Dars qoldirmaganda
             <span className="block text-xs text-gray-400">
               {live.plannedHours} soat — rejadagi hamma dars
-              {Number(live.plannedDeductionAmount) > 0 || Number(live.plannedSuspendedAmount) > 0
+              {Number(live.plannedDeductionAmount) > 0 ||
+              Number(live.plannedSuspendedAmount) > 0 ||
+              Number(live.plannedAbsenceAmount) > 0
                 ? ", ayirmalardan keyin"
                 : ""}
             </span>
@@ -118,7 +135,9 @@ const LiveMonthBreakdown = ({ live, monthLabel, className }) => {
       <p className="mt-3 text-xs text-gray-400">
         {live.paysByHours
           ? "Bugungi va keyingi darslar reja sifatida hisoblangan. Dars o'tilmasa (kelmasangiz yoki baho qo'yilmasa) uning puli ayriladi."
-          : "Oylik fiksa — o'tilmagan darslar summaga ta'sir qilmaydi."}
+          : live.absence
+            ? "Oylik fiksa — o'tilmagan darslar summaga ta'sir qilmaydi, lekin kelmagan har bir ish kuni uchun kunlik summa ayriladi."
+            : "Oylik fiksa — o'tilmagan darslar summaga ta'sir qilmaydi."}
       </p>
     </div>
   );

@@ -7,6 +7,7 @@ import {
   BadgePercent,
   GraduationCap,
   MinusCircle,
+  CalendarOff,
 } from "lucide-react";
 
 // Components
@@ -15,9 +16,13 @@ import Card from "@/shared/components/ui/Card";
 // Query
 import { useMySalaryStats } from "../queries/salary.queries";
 import LiveMonthBreakdown from "./LiveMonthBreakdown";
+import AbsenceDaysCard from "./AbsenceDaysCard";
 
 // Utils
 import { formatMoney } from "@/shared/utils/formatMoney";
+
+// Data
+import { absenceSummaryOf } from "../data/salary.data";
 
 /**
  * O'QITUVCHINING O'Z OYLIK STATISTIKASI — bosh sahifa kartasi.
@@ -70,6 +75,8 @@ const MySalaryCard = () => {
   const deductions = (c.deductions ?? []).filter((d) => Number(d.amount) > 0);
   // To'xtatilgan qismlar — qaysi qism, nima uchun, qancha (serverdan tayyor)
   const suspensions = (c.suspensions ?? []).filter((s) => Number(s.amount) > 0);
+  // Kelmagan kunlar — fiksadan kunlik ayirma (serverdan tayyor)
+  const absence = Number(c.absenceAmount) > 0 ? c.absence : null;
   // Tyutor guruhlari — qaysi sinf, necha o'quvchi, qancha (serverdan tayyor)
   const tutorLines = (c.allowanceBreakdown ?? []).filter((line) => line.type === "tutor");
 
@@ -90,6 +97,18 @@ const MySalaryCard = () => {
           bg="bg-indigo-50 text-indigo-600"
           tone="text-gray-900"
         />
+
+        {/* Kelmagan kunlar — necha kun va kunlik summa (batafsil pastda) */}
+        {absence && (
+          <StatTile
+            icon={CalendarOff}
+            label="Kelmagan kunlar uchun ayrildi"
+            value={`− ${formatMoney(c.absenceAmount)}`}
+            sub={absenceSummaryOf(absence, formatMoney)}
+            bg="bg-red-50 text-red-600"
+            tone="text-red-600"
+          />
+        )}
 
         {/* Oylik to'xtatildi — qaysi qism va sababi */}
         {Number(c.suspendedAmount) > 0 && (
@@ -184,6 +203,9 @@ const MySalaryCard = () => {
 
       {/* Dars bo'yicha hisob — vedomost bilan bir xil: qoldirmaganda / ayrilgan / oy oxirida */}
       <LiveMonthBreakdown live={data.live} monthLabel={data.monthLabel} className="mt-3" />
+
+      {/* Kelmagan kunlar — qaysi kuni va har kun uchun qancha ayrildi */}
+      <AbsenceDaysCard absence={absence} monthLabel={data.monthLabel} className="mt-3" />
 
       {/* Tyutor guruhlari uchun qo'shimcha oylik */}
       {tutorLines.length > 0 && (
