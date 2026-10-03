@@ -6,8 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 
 // Components
 import ResponsiveModal from "@/shared/components/ui/ResponsiveModal";
-import AbsenceDaysCard from "@/features/salary/components/AbsenceDaysCard";
-import MissedLessonDaysCard from "@/features/salary/components/MissedLessonDaysCard";
+import PayrollReasonsCard from "./PayrollReasonsCard";
 
 // Hooks
 import useModal from "@/shared/hooks/useModal";
@@ -26,7 +25,8 @@ import { profileQueries } from "../queries/profile.queries";
  * Uch savolga javob:
  *   · QANCHA VAQT UCHUN — ish kunlari, dars soati va ularning narxi;
  *   · QANCHA OYLIK — tarkib: fiksa + soat × narx + ustamalar − ayirmalar;
- *   · NEGA KAM — kelmagan kunlar va o'tilmagan darslar, kuni va summasi bilan.
+ *   · NEGA KAM — kelmagan kunlar, o'tilmagan va o'rinbosarga berilgan darslar,
+ *     kuni va summasi bilan (`PayrollReasonsCard`); sabab bo'lmasa — ochiq aytiladi.
  *
  * Ma'lumot: `{ month }` (YYYYMM). Shakllangan oy muhrdan, shakllanmagani
  * jonli hisobdan — server hal qiladi. ⚠️ Frontendda arifmetika yo'q.
@@ -104,6 +104,9 @@ const PayrollMonthDetail = ({ data }) => {
       </div>
 
       <Notes data={data} />
+
+      {/* ── Nega kam: har bir sabab kuni va summasi bilan ── */}
+      <PayrollReasonsCard data={data} />
 
       {/* ── Qancha vaqt uchun ── */}
       <WorkSummary work={work} isCurrentMonth={data.isCurrentMonth} />
@@ -199,23 +202,15 @@ const PayrollMonthDetail = ({ data }) => {
           )}
         </ul>
 
-        {/* O'tilmagan darslar zanjirda YO'Q: ular ayirma emas, pul yozilmagan
-            soat. "Nega kam" degan savolga javob — pastdagi kartada. */}
-        {Number(data.missedLessons?.amount) > 0 && (
+        {/* O'tilmagan va berilgan darslar zanjirda YO'Q: ular ayirma emas,
+            pul yozilmagan soat — kunlari yuqoridagi "nega kamaydi" da. */}
+        {work.paysByHours && (Number(data.missedLessons?.hours) > 0 || Number(data.substitutedOut?.hours) > 0) && (
           <p className="mt-3 text-xs text-gray-500">
-            O'tilmagan {data.missedLessons.hours} soat dars uchun pul yozilmagan (−{" "}
-            {formatMoney(data.missedLessons.amount)}) — kunlari pastda.
+            O'tilmagan va o'rinbosarga berilgan darslar uchun soat yozilmagan — kunlari
+            yuqorida.
           </p>
         )}
       </section>
-
-      {/* ── Nega kam: kunlar ── */}
-      <AbsenceDaysCard absence={data.absence} monthLabel={data.monthLabel} />
-      <MissedLessonDaysCard
-        missed={data.missedLessons}
-        monthLabel={data.monthLabel}
-        isCurrentMonth={data.isCurrentMonth}
-      />
     </div>
   );
 };
@@ -256,6 +251,20 @@ const Notes = ({ data }) => {
       ))}
     </ul>
   );
+};
+
+/**
+ * Soat qayerdan kelgani (son, pul emas): "jadval 98 − berildi 4 + o'rniga 2 −
+ * o'tilmadi 4". Hech narsa ayirilmagan/qo'shilmagan bo'lsa — yo'q.
+ */
+const hoursEquationOf = (work) => {
+  if (work.scheduledHours == null) return null;
+  const parts = [
+    work.substitutedOutHours > 0 && `− berildi ${work.substitutedOutHours}`,
+    work.substitutedInHours > 0 && `+ o'rniga chiqildi ${work.substitutedInHours}`,
+    work.missedHours > 0 && `− o'tilmadi ${work.missedHours}`,
+  ].filter(Boolean);
+  return parts.length ? `jadval ${work.scheduledHours} ${parts.join(" ")}` : null;
 };
 
 // Tailwind sinflari to'liq yozilishi shart (dinamik `xs:grid-cols-${n}` yig'ilmaydi)
@@ -299,11 +308,9 @@ const WorkSummary = ({ work, isCurrentMonth }) => {
           : `${work.paidHours} soat`,
       hint: [
         `1 soat = ${formatMoney(work.perHourRate)}`,
-        work.missedHours > 0 && `o'tilmadi ${work.missedHours}`,
-        isCurrentMonth && work.remainingHours > 0 && `qoldi ${work.remainingHours}`,
-      ]
-        .filter(Boolean)
-        .join(" · "),
+        hoursEquationOf(work),
+        isCurrentMonth && work.remainingHours > 0 && `${work.remainingHours} soat hali oldinda`,
+      ].filter(Boolean),
     });
   }
 
@@ -318,7 +325,11 @@ const WorkSummary = ({ work, isCurrentMonth }) => {
             {label}
           </p>
           <p className={cn("mt-0.5 text-base font-semibold", tone)}>{value}</p>
-          {hint && <p className="text-[11px] text-gray-400">{hint}</p>}
+          {(Array.isArray(hint) ? hint : [hint]).filter(Boolean).map((line) => (
+            <p key={line} className="text-[11px] text-gray-400">
+              {line}
+            </p>
+          ))}
         </div>
       ))}
     </div>
