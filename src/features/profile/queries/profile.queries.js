@@ -46,6 +46,18 @@ export const profileQueries = {
     }),
 
   /**
+   * Bitta oyim batafsil → `{ work, fixedAmount, kpiAmount, ..., absence,
+   * missedLessons, payment }`. `month` — server bergan YYYYMM (joriy oy
+   * `salary.currentMonth` dan: brauzer soati Toshkentdan farq qilishi mumkin).
+   */
+  monthBreakdown: (month) =>
+    queryOptions({
+      queryKey: [...profileKeys.all, "breakdown", month],
+      queryFn: () => profileAPI.getMonthBreakdown(month).then((r) => r.data.data),
+      enabled: Boolean(month),
+    }),
+
+  /**
    * Dars soatim → shartnoma sharti, soat, jonli maosh, kesimlar, tarix.
    *
    * `params.month` berilmasa server joriy oyni oladi — oy tanlagich

@@ -164,7 +164,50 @@ export const PAYROLL_ENTRY_COLUMNS = [
   { label: "To'langan", align: "right" },
   { label: "Qoldiq", align: "right" },
   "Holat",
+  // "Batafsil" tugmasi — oy qanday hisoblangani (`PayrollMonthModal`)
+  { label: "", align: "right" },
 ];
+
+/**
+ * QANCHA VAQT UCHUN QANCHA — majburiyat qatoridagi tarkib satrlari
+ * (muhrlangan qismlardan): "Fiksa: 3 000 000 so'm", "Dars: 80 soat ×
+ * 50 000 so'm = 4 000 000 so'm". Ustamalar va ayirmalar o'z satrlarida.
+ *
+ * ⚠️ Arifmetika yo'q — har bir summa majburiyatda tayyor.
+ *
+ * @param {object} entry - `GET /payroll/my` elementi
+ * @returns {string[]}
+ */
+export const entryCompositionLines = (entry) => {
+  const lines = [];
+  if (Number(entry.fixedAmount) > 0) {
+    lines.push(`Fiksa: ${formatMoney(entry.fixedAmount)}`);
+  }
+  if (Number(entry.perHourRate) > 0) {
+    lines.push(
+      `Dars: ${entry.lessonHours} soat × ${formatMoney(entry.perHourRate)} = ${formatMoney(entry.kpiAmount)}`,
+    );
+  }
+  return lines;
+};
+
+/**
+ * Majburiyat holati belgisi. To'liq to'xtatilgan oy (0 so'm) serverda
+ * "paid" — "To'langan" deb ko'rsatilsa yolg'on bo'lardi.
+ *
+ * @param {{amount: string, paidAmount: string, suspendedAmount?: string,
+ *   status: string, statusLabel?: string}} entry
+ * @returns {{label: string, className: string}}
+ */
+export const entryBadgeOf = (entry) =>
+  Number(entry.amount) === 0 &&
+  Number(entry.paidAmount) === 0 &&
+  Number(entry.suspendedAmount) > 0
+    ? { label: "To'xtatilgan", className: "bg-slate-200 text-slate-700" }
+    : (ENTRY_STATUS_META[entry.status] ?? {
+        label: entry.statusLabel ?? entry.status,
+        className: "bg-gray-100 text-gray-600",
+      });
 
 /**
  * Ushlab qolish qiymati matni: "10% oylikdan", "4 dars soati", "500 000 so'm".
@@ -272,7 +315,9 @@ export const buildPayrollTiles = ({ salary, entries, stats = null }) => {
     },
   ];
 
-  if (absence?.dayCount > 0) {
+  // ⚠️ Summa bo'yicha, kun soni bo'yicha EMAS: fiksasiz (sof soatbay)
+  // xodimda kelmagan kun 0 so'm bilan yoziladi va "− 0 so'm" chalg'itardi
+  if (Number(absence?.amount) > 0) {
     tiles.push({
       key: "absence",
       label: "Kelmagan kunlar uchun ayrildi",

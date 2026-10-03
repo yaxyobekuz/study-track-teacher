@@ -1,5 +1,5 @@
 // Icons
-import { MinusCircle, Wallet, CirclePause } from "lucide-react";
+import { ChevronRight, MinusCircle, Wallet, CirclePause } from "lucide-react";
 
 // TanStack Query
 import { useQuery } from "@tanstack/react-query";
@@ -16,10 +16,11 @@ import { formatMoney } from "@/shared/utils/formatMoney";
 
 // Data & queries
 import {
-  ENTRY_STATUS_META,
   PAYROLL_ENTRY_COLUMNS,
   PAYROLL_RULE_COLUMNS,
   buildPayrollTiles,
+  entryBadgeOf,
+  entryCompositionLines,
   formatDeductionValue,
   getRuleStatus,
   allowanceLineLabel,
@@ -28,6 +29,11 @@ import { profileQueries } from "../queries/profile.queries";
 import { useMySalaryStats } from "@/features/salary/queries/salary.queries";
 import LiveMonthBreakdown from "@/features/salary/components/LiveMonthBreakdown";
 import AbsenceDaysCard from "@/features/salary/components/AbsenceDaysCard";
+import MissedLessonDaysCard from "@/features/salary/components/MissedLessonDaysCard";
+import PayrollMonthModal from "./PayrollMonthModal";
+
+// Hooks
+import useModal from "@/shared/hooks/useModal";
 
 /**
  * MENING OYLIGIM — "qancha olaman va qanchasi hali to'lanmagan".
@@ -56,6 +62,12 @@ const ProfilePayrollTab = () => {
   const { data: stats } = useMySalaryStats();
   // Ushlab qolishlar — alohida so'rov: yiqilsa ham oylik jadvali ko'rinaveradi
   const { data: deductions } = useQuery(profileQueries.deductions());
+  // Joriy oy batafsil — o'tilmagan darslar kunlar kesimida. Oy SERVERDAN
+  // (`salary.currentMonth`, Toshkent vaqti); yiqilsa tab baribir ishlaydi.
+  const { data: currentBreakdown } = useQuery(
+    profileQueries.monthBreakdown(salary?.currentMonth),
+  );
+  const { openModal } = useModal();
 
   if (isSalaryLoading || isEntriesLoading) {
     return <Card className="py-10 text-center text-gray-500">Yuklanmoqda...</Card>;
@@ -85,8 +97,43 @@ const ProfilePayrollTab = () => {
           o'tilmagan darslar uchun ayrilgan, hozirgacha va oy oxirida */}
       <LiveMonthBreakdown live={stats?.live} monthLabel={stats?.monthLabel} />
 
-      {/* Kelmagan kunlar — qaysi kuni va har kun uchun qancha ayrildi */}
-      <AbsenceDaysCard absence={stats?.current?.absence} monthLabel={stats?.monthLabel} />
+      {/* Kelmagan kunlar — qaysi kuni va har kun uchun qancha ayrildi.
+          ⚠️ Summa bo'yicha: fiksasiz xodimda kun "0 so'm" bilan yoziladi */}
+      <AbsenceDaysCard
+        absence={Number(stats?.current?.absenceAmount) > 0 ? stats.current.absence : null}
+        monthLabel={stats?.monthLabel}
+      />
+
+      {/* O'tilmagan darslar — soatbay qism: qaysi kuni, qaysi dars, nega va qancha */}
+      <MissedLessonDaysCard
+        missed={currentBreakdown?.missedLessons}
+        monthLabel={currentBreakdown?.monthLabel}
+        isCurrentMonth
+      />
+
+      {/* Joriy oyning to'liq hisobi — tarkib zanjiri va har bir ayirma */}
+      {currentBreakdown?.hasSalary && (
+        <button
+          type="button"
+          onClick={() =>
+            openModal("payrollMonth", {
+              month: currentBreakdown.month,
+              monthLabel: currentBreakdown.monthLabel,
+            })
+          }
+          className="flex w-full items-center justify-between gap-3 rounded-2xl bg-white px-4 py-3 text-left ring-1 ring-gray-100 transition-colors duration-200 hover:bg-indigo-50/60"
+        >
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold text-gray-900">
+              {currentBreakdown.monthLabel} — oylik qanday hisoblanmoqda
+            </span>
+            <span className="block text-xs text-gray-500">
+              Fiksa, dars soati × narx, ustamalar va har bir ayirma — kuni va summasi bilan
+            </span>
+          </span>
+          <ChevronRight className="size-4 shrink-0 text-gray-400" strokeWidth={2.2} />
+        </button>
+      )}
 
       {rules.length === 0 ? (
         <Card className="p-0 xs:p-0">
@@ -160,17 +207,18 @@ const ProfilePayrollTab = () => {
             {items.map((entry) => {
               // To'liq to'xtatilgan oy (0 so'm) serverda "paid" — "To'langan" deb
               // ko'rsatilsa yolg'on bo'lardi
-              const badge =
-                Number(entry.amount) === 0 &&
-                Number(entry.paidAmount) === 0 &&
-                Number(entry.suspendedAmount) > 0
-                  ? { label: "To'xtatilgan", className: "bg-slate-200 text-slate-700" }
-                  : ENTRY_STATUS_META[entry.status];
+              const badge = entryBadgeOf(entry);
 
               return (
                 <Tr key={entry.id}>
                   <Td nowrap={false} className="font-medium text-gray-900">
                     {entry.monthLabel}
+                    {/* Qancha vaqt uchun qancha — fiksa va dars soati × narx */}
+                    {entryCompositionLines(entry).map((line) => (
+                      <span key={line} className="block whitespace-nowrap text-xs font-normal text-gray-500">
+                        {line}
+                      </span>
+                    ))}
                     {/* Ustamalar (tyutor guruhlari ham) — muhrlangan tafsilot */}
                     {entry.allowanceBreakdown?.map((item, index) => (
                       <span
@@ -243,12 +291,31 @@ const ProfilePayrollTab = () => {
                       {badge?.label ?? entry.statusLabel}
                     </span>
                   </Td>
+
+                  {/* Oy qanday hisoblangani: tarkib, kelmagan kunlar, o'tilmagan darslar */}
+                  <Td align="right">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        openModal("payrollMonth", {
+                          month: entry.month,
+                          monthLabel: entry.monthLabel,
+                        })
+                      }
+                      className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-indigo-600 transition-colors duration-200 hover:bg-indigo-50"
+                    >
+                      Batafsil
+                      <ChevronRight className="size-3.5" strokeWidth={2.2} />
+                    </button>
+                  </Td>
                 </Tr>
               );
             })}
           </Table>
         </section>
       )}
+
+      <PayrollMonthModal />
     </div>
   );
 };

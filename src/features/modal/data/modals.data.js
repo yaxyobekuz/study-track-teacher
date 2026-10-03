@@ -14,6 +14,9 @@ export const MODAL_NAMES = [
   "terminateSession",
   "terminateOtherSessions",
 
+  // Profil → Oylik: bitta oy qanday hisoblangani
+  "payrollMonth",
+
   // Xabarlar (Messages)
   "sendMessage",
   "messageDetails",

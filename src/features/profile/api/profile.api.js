@@ -20,6 +20,12 @@ export const profileAPI = {
   getSuspensions: () => http.get("/payroll/suspensions/my"),
   /** Oylikdan ushlab qolishlarim: sabab, izoh, qancha va qaysi oyda. */
   getDeductions: () => http.get("/payroll/deductions/my"),
+  /**
+   * BITTA OYIM BATAFSIL — "oylik qanday hisoblandi va nega kam": tarkib
+   * (fiksa + soat × narx + ustamalar − ayirmalar), kelmagan kunlar va
+   * o'tilmagan darslar kunlar kesimida, to'lovlar. `month` — YYYYMM.
+   */
+  getMonthBreakdown: (month) => http.get("/payroll/my/breakdown", { params: { month } }),
 
   /**
    * DARS SOATIM — jonli hisob: shartnoma sharti, o'tilgan va rejalashtirilgan
