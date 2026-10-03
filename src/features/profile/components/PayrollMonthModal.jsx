@@ -121,7 +121,7 @@ const PayrollMonthDetail = ({ data }) => {
               label="Fiksa oylik"
               hint={
                 work.workDays
-                  ? `${work.workDays} ish kuni uchun${data.positionName ? ` · ${data.positionName}` : ""}`
+                  ? `${work.workDays} kun uchun (yakshanbasiz)${data.positionName ? ` · ${data.positionName}` : ""}`
                   : data.positionName
               }
               value={formatMoney(data.fixedAmount)}
@@ -270,7 +270,7 @@ const hoursEquationOf = (work) => {
 // Tailwind sinflari to'liq yozilishi shart (dinamik `xs:grid-cols-${n}` yig'ilmaydi)
 const WORK_GRID_COLS = { 1: "", 2: "xs:grid-cols-2", 3: "xs:grid-cols-3" };
 
-/** QANCHA VAQT UCHUN — ish kunlari va dars soati, narxi bilan. */
+/** QANCHA VAQT UCHUN — fiksa bo'linadigan kunlar va dars soati, narxi bilan. */
 const WorkSummary = ({ work, isCurrentMonth }) => {
   const tiles = [];
 
@@ -278,11 +278,11 @@ const WorkSummary = ({ work, isCurrentMonth }) => {
     tiles.push({
       key: "days",
       icon: CalendarDays,
-      label: "Ish kunlari",
+      label: "Oy kunlari",
       value: `${work.workDays} kun`,
       hint: work.dailyRate
-        ? `1 ish kuni = ${formatMoney(work.dailyRate)}`
-        : "Yakshanba va bayramlarsiz",
+        ? `1 kun = ${formatMoney(work.dailyRate)}`
+        : "Yakshanbalarsiz, dam olish kunlari ichida",
     });
   }
 
@@ -292,7 +292,7 @@ const WorkSummary = ({ work, isCurrentMonth }) => {
       icon: CalendarOff,
       label: "Kelmagan kunlar",
       value: `${work.absentDays} kun`,
-      hint: work.absentDays > 0 ? "Har biri uchun 1 ish kuni ayrildi" : "Kelmagan kun yo'q",
+      hint: work.absentDays > 0 ? "Har biri uchun 1 kunlik summa ayrildi" : "Kelmagan kun yo'q",
       tone: work.absentDays > 0 ? "text-red-600" : "text-gray-900",
     });
   }

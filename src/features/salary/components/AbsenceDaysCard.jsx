@@ -13,8 +13,8 @@ import { ABSENCE_STATUS_META } from "../data/salary.data";
  * `current.absence`).
  *
  * Xodim "nega kam" degan savolga shu yerda javob oladi: qaysi kuni kelmagan
- * va o'sha kun uchun qancha ayrilgan. Fiksa oylik oyning ish kunlariga
- * (yakshanba va bayramlarsiz) bo'linadi — kunlik summa serverdan tayyor.
+ * va o'sha kun uchun qancha ayrilgan. Fiksa oylik oyning yakshanbadan boshqa
+ * kunlariga (dam olish kunlari ichida) bo'linadi — kunlik summa serverdan tayyor.
  *
  * ⚠️ Frontendda arifmetika yo'q: summa ham, sana yorlig'i ham serverdan.
  *
@@ -34,8 +34,8 @@ const AbsenceDaysCard = ({ absence, monthLabel, className }) => {
             Kelmagan kunlar{monthLabel ? ` — ${monthLabel}` : ""}
           </p>
           <p className="mt-0.5 text-xs text-gray-500">
-            Fiksa oylik {absence.workDays} ish kuniga bo'linadi (yakshanba va bayramlarsiz): kuniga{" "}
-            {formatMoney(absence.dailyRate)}. Kelmagan har bir ish kuni uchun shu summa ayriladi.
+            Fiksa oylik {absence.workDays} kunga bo'linadi (yakshanbalarsiz, dam olish kunlari ichida):
+            kuniga {formatMoney(absence.dailyRate)}. Kelmagan har bir ish kuni uchun shu summa ayriladi.
           </p>
         </div>
       </div>
