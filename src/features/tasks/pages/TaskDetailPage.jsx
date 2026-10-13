@@ -17,7 +17,17 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { tasksAPI } from "@/features/tasks/api/tasks.api";
 
 // Data
-import { taskStatusLabels, taskStatusColors, SUBMITTABLE_STATUSES } from "../data/tasks.data";
+import {
+  taskStatusLabels,
+  taskStatusColors,
+  SUBMITTABLE_STATUSES,
+  kindMeta,
+  stateMeta,
+  resolveTimeState,
+} from "../data/tasks.data";
+
+// Hooks
+import useNow from "../hooks/useNow";
 
 // Utils
 import { formatDateTimeUz } from "@/shared/utils/date.utils";
@@ -25,8 +35,11 @@ import { formatDateTimeUz } from "@/shared/utils/date.utils";
 // Components
 import Card from "@/shared/components/ui/Card";
 import TaskSubmitForm from "../components/TaskSubmitForm";
+import TaskWindowBar from "../components/TaskWindowBar";
+import TaskLinksList from "../components/TaskLinksList";
 
 const TaskDetailPage = () => {
+  const now = useNow();
   const { taskId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -68,9 +81,12 @@ const TaskDetailPage = () => {
 
   if (!task) return null;
 
-  const isOverdue =
-    new Date(task.dueDate) < new Date() &&
-    !["completed", "stopped"].includes(task.status);
+  // Vaqt holati JONLI hisoblanadi (`taskWindow.helpers.js` bilan AYNI
+  // qoida): "hozir bajarilish vaqti" oraliq boshlanganda yonadi
+  const state = resolveTimeState(task, now);
+  const meta = stateMeta(state);
+  const kind = kindMeta(task.kind);
+  const isOverdue = state === "missed";
 
   const canSubmit = SUBMITTABLE_STATUSES.includes(task.status);
 
@@ -85,8 +101,10 @@ const TaskDetailPage = () => {
           <ArrowLeft className="size-4" />
         </button>
         <h1 className="text-xl font-bold text-gray-800">Topshiriq tafsilotlari</h1>
-        <span className={`ml-auto inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${taskStatusColors[task.status]}`}>
-          {taskStatusLabels[task.status]}
+        <span
+          className={`ml-auto inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium ${meta.chip}`}
+        >
+          {meta.label}
         </span>
       </div>
 
@@ -100,16 +118,46 @@ const TaskDetailPage = () => {
               <InfoRow label="Sarlavha">
                 <span className="font-medium">{task.title}</span>
               </InfoRow>
-              <InfoRow label="Ijro muddati">
-                <span className={isOverdue ? "text-red-600 font-semibold" : ""}>
-                  {formatDateTimeUz(task.dueDate)}
-                  {isOverdue && <span className="ml-1 text-xs">(muddati o'tgan)</span>}
+              <InfoRow label="Turi">
+                <span
+                  className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium ${kind.chip}`}
+                >
+                  {kind.label}
+                </span>
+              </InfoRow>
+              <InfoRow label="Holati">
+                <span
+                  className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium ${taskStatusColors[task.status]}`}
+                >
+                  {taskStatusLabels[task.status]}
                 </span>
               </InfoRow>
               <InfoRow label="Jarima bali">
                 <span className="font-semibold text-red-600">{task.penaltyPoints} ball</span>
               </InfoRow>
               <InfoRow label="Yaratilgan">{formatDateTimeUz(task.createdAt)}</InfoRow>
+            </div>
+
+            {/* Bajarish vaqti — oraliq bo'lsa ikkala vaqt va jonli hisob */}
+            <div
+              className={`mt-3 rounded-xl p-3 ${
+                state === "active" ? "bg-red-50" : isOverdue ? "bg-red-50" : "bg-gray-50"
+              }`}
+            >
+              <p className="mb-1.5 text-xs font-medium text-gray-600">
+                {task.startDate ? "Bajarish vaqti" : "Ijro muddati"}
+              </p>
+              <TaskWindowBar task={task} now={now} state={state} />
+              {state === "active" && (
+                <p className="mt-2 text-xs font-medium text-red-700">
+                  Hozir shu topshiriqni bajarish vaqti
+                </p>
+              )}
+              {isOverdue && (
+                <p className="mt-2 text-xs font-medium text-red-700">
+                  Muddat o'tdi — ish topshirilmagan
+                </p>
+              )}
             </div>
             {task.description && (
               <div className="mt-3 pt-3 border-t border-gray-100">
@@ -118,6 +166,13 @@ const TaskDetailPage = () => {
               </div>
             )}
           </Card>
+
+          {/* Havolalar */}
+          {task.links?.length > 0 && (
+            <Card>
+              <TaskLinksList links={task.links} />
+            </Card>
+          )}
 
           {/* Owner attachments */}
           {task.attachments?.length > 0 && (

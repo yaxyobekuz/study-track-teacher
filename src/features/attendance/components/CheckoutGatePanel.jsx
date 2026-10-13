@@ -413,9 +413,26 @@ const GradesSection = ({ grades, closed }) => (
   </section>
 );
 
+/**
+ * TUGAMAGAN TOPSHIRIQLAR — "Men ketdim" dan oldin.
+ *
+ * ⚠️ HAR QATOR BUTUNLAY BOSILADI va o'sha topshiriqning sahifasiga olib
+ * boradi: ro'yxatni ko'rib turgan odam uni yopish uchun "Topshirish"
+ * havolasini qidirib o'tirmasligi kerak.
+ *
+ * `pending_review` bu yerga tushmaydi — u o'qituvchi tomonidan TUGAGAN,
+ * qaror endi rahbarda (`checkoutGate.service.js`).
+ */
 const TasksSection = ({ tasks }) => (
   <section className="space-y-2">
-    <p className="text-sm font-medium text-gray-900">Topshiriqlar</p>
+    <p className="text-sm font-medium text-gray-900">
+      Topshiriqlar
+      {tasks.items.length > 0 && (
+        <span className="ml-1.5 text-xs font-normal text-red-600">
+          {tasks.items.length} ta bajarilmagan
+        </span>
+      )}
+    </p>
 
     {tasks.items.length === 0 ? (
       <p className="text-sm text-gray-500">
@@ -424,10 +441,16 @@ const TasksSection = ({ tasks }) => (
     ) : (
       <ul className="space-y-2">
         {tasks.items.map((task) => (
-          <li
-            key={task.id}
-            className="flex items-center justify-between gap-3 rounded-lg border border-gray-100 px-3 py-2"
-          >
+          <li key={task.id}>
+            <Link
+              to={`/tasks/${task.id}`}
+              className={cn(
+                "flex items-center justify-between gap-3 rounded-lg border px-3 py-2 transition-colors",
+                task.overdue
+                  ? "border-red-200 bg-red-50/60 active:bg-red-100"
+                  : "border-gray-100 active:bg-gray-50",
+              )}
+            >
             <div className="min-w-0">
               <p className="line-clamp-2 text-sm font-medium text-gray-900">
                 {task.title}
@@ -438,7 +461,7 @@ const TasksSection = ({ tasks }) => (
                   task.overdue ? "text-red-600" : "text-gray-500",
                 )}
               >
-                Muddat: {task.dueLabel}
+                {task.startLabel ? `${task.startLabel} — ${task.dueLabel}` : `Muddat: ${task.dueLabel}`}
                 {task.overdue && " · muddati o'tgan"}
               </p>
               {task.locked && (
@@ -460,14 +483,10 @@ const TasksSection = ({ tasks }) => (
                 {taskStatusLabels[task.status] ?? task.status}
               </span>
               {!task.locked && (
-                <Link
-                  to={`/tasks/${task.id}`}
-                  className="text-xs text-blue-600 hover:underline"
-                >
-                  Topshirish
-                </Link>
+                <span className="text-xs text-blue-600">Topshirish →</span>
               )}
             </div>
+            </Link>
           </li>
         ))}
       </ul>
