@@ -253,6 +253,24 @@ export const formatHolidayDate = (holiday) => {
   return "—";
 };
 
+/**
+ * Istalgan instant `<input type="datetime-local">` QIYMATI sifatida:
+ * "2026-09-08T14:30".
+ *
+ * ⚠️ FORMAT EMAS, ekranga CHIQMAYDI (`dates.md` §3 istisnosi — ISO qiymat
+ * faqat mashina o'qiydigan joyda: input qiymati, API parametri, fayl nomi).
+ * Ko'rsatish uchun `formatDateTimeUz` ishlatiladi.
+ *
+ * ⚠️ `toISOString().slice(0, 16)` TO'G'RIDAN-TO'G'RI ishlatilmaydi: u UTC
+ * soatini berardi va Toshkentda input 5 soat orqada ochilardi.
+ */
+export const toDateTimeInputValue = (value) => {
+  const date = toDate(value);
+  if (!date) return "";
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 16);
+};
+
 /* ------------------------------------------------------------------ *
  * Eski nomlar (deprecated)
  *

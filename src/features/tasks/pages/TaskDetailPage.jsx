@@ -56,6 +56,11 @@ const TaskDetailPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks", "detail", taskId] });
       queryClient.invalidateQueries({ queryKey: ["tasks", "my"] });
+      // ⚠️ SHAXSIY RO'YXAT HAM ESKIRADI: xodim o'ziga belgilagan ishini
+      // shu sahifadan yakunlashi mumkin, ro'yxati esa boshqa namespace'da
+      // (`selfTasks`) — usiz yakunlangan ish ro'yxatda hali "jarayonda"
+      // bo'lib turardi.
+      queryClient.invalidateQueries({ queryKey: ["selfTasks"] });
     },
   });
 
@@ -64,7 +69,12 @@ const TaskDetailPage = () => {
       onSuccess: () => {
         setShowSubmitForm(false);
         reset();
-        toast.success("Topshiriq ko'rib chiqishga yuborildi");
+        // ⚠️ SHAXSIY ISHDA TASDIQLASH KUTILMAYDI: server uni darhol
+        // yakunlaydi (`submitTaskCompletion` → `completed`), shuning
+        // uchun "ko'rib chiqishga yuborildi" deyish yolg'on bo'lardi.
+        toast.success(
+          task?.selfAssigned ? "Ish yakunlandi" : "Topshiriq ko'rib chiqishga yuborildi",
+        );
       },
       onError: (err) =>
         toast.error(err.response?.data?.message || "Xatolik yuz berdi"),
@@ -118,6 +128,15 @@ const TaskDetailPage = () => {
               <InfoRow label="Sarlavha">
                 <span className="font-medium">{task.title}</span>
               </InfoRow>
+              {/* O'ZI BELGILAGAN ISH — "buni menga kim berdi" degan savolga
+                  javob: hech kim, o'zim */}
+              {task.selfAssigned && (
+                <InfoRow label="Manba">
+                  <span className="rounded-full bg-green-50 px-2 py-0.5 text-[11px] font-medium text-green-700">
+                    O'zim belgilagan
+                  </span>
+                </InfoRow>
+              )}
               <InfoRow label="Turi">
                 <span
                   className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium ${kind.chip}`}
@@ -132,8 +151,15 @@ const TaskDetailPage = () => {
                   {taskStatusLabels[task.status]}
                 </span>
               </InfoRow>
-              <InfoRow label="Jarima bali">
-                <span className="font-semibold text-red-600">{task.penaltyPoints} ball</span>
+              {/* ⚠️ SHAXSIY ISHDA JARIMA YO'Q (biznes qarori) — "0 ball" deb
+                  ko'rsatish "kechiksam nol ball jarima" degan noto'g'ri
+                  ma'noni berardi */}
+              <InfoRow label="Jarima">
+                {task.selfAssigned ? (
+                  <span className="font-semibold text-green-700">Yo'q</span>
+                ) : (
+                  <span className="font-semibold text-red-600">{task.penaltyPoints} ball</span>
+                )}
               </InfoRow>
               <InfoRow label="Yaratilgan">{formatDateTimeUz(task.createdAt)}</InfoRow>
             </div>
@@ -282,6 +308,9 @@ const TaskDetailPage = () => {
                   isPending={submitMutation.isPending}
                   onSubmit={handleSubmit}
                   onCancel={() => setShowSubmitForm(false)}
+                  submitLabel={
+                    task.selfAssigned ? "Bajardim — yakunlash" : "Tekshiruvga yuborish"
+                  }
                 />
               )}
             </Card>

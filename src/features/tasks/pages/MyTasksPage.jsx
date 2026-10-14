@@ -4,6 +4,9 @@ import { toast } from "sonner";
 // React
 import { useState } from "react";
 
+// Router
+import { useSearchParams } from "react-router-dom";
+
 // Tanstack Query
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -26,8 +29,24 @@ import { cn } from "@/shared/utils/cn";
 import Card from "@/shared/components/ui/Card";
 import TaskCheckCard from "../components/TaskCheckCard";
 import TaskSubmitForm from "../components/TaskSubmitForm";
+import MySelfTasks from "@/features/selfTasks/pages/MySelfTasks";
 
 const PAGE_LIMIT = 20;
+
+/**
+ * IKKI TAB — IKKI BOSHQA SAVOL.
+ *
+ *   "Menga berilgan"   — rahbar bergan ish: jarimasi bor, tasdiqlanadi.
+ *   "O'zim belgilagan" — o'z rejam: jarima yo'q, o'zim yopaman.
+ *
+ * ⚠️ BIR RO'YXATDA ARALASHTIRILMAYDI (server tomonda ham —
+ * `self_assigned`): aralashsa, "bu ishni menga kim berdi" degan savol
+ * javobsiz qolardi. Tab URL'da (`?tab=self`).
+ */
+const TABS = [
+  { value: "assigned", label: "Menga berilgan" },
+  { value: "self", label: "O'zim belgilagan" },
+];
 
 /**
  * TOPSHIRIQLARIM — ijrochining asosiy ekrani.
@@ -48,11 +67,15 @@ const PAGE_LIMIT = 20;
 const MyTasksPage = () => {
   const now = useNow();
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
 
+  const tab = searchParams.get("tab") === "self" ? "self" : "assigned";
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState("all");
   const [submitting, setSubmitting] = useState(null);
 
+  // ⚠️ So'rov FAQAT faol tabda: ochilmagan tabning ro'yxatini oldindan
+  // yuklash ortiqcha trafik bo'lardi.
   const { data, isLoading } = useQuery({
     queryKey: ["tasks", "my", page, filter],
     queryFn: () => {
@@ -60,6 +83,7 @@ const MyTasksPage = () => {
       if (filter !== "all") params.state = filter;
       return tasksAPI.getMy(params).then((res) => res.data);
     },
+    enabled: tab === "assigned",
   });
 
   const submitMutation = useMutation({
@@ -92,34 +116,42 @@ const MyTasksPage = () => {
     );
   };
 
+  const selectTab = (value) => {
+    const params = new URLSearchParams(searchParams);
+    if (value === "self") params.set("tab", "self");
+    else params.delete("tab");
+    setSearchParams(params);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-gray-800">Topshiriqlarim</h1>
-          {activeCount > 0 && (
-            <p className="mt-0.5 text-sm font-medium text-red-600">
-              {activeCount} ta topshiriqning bajarilish vaqti — hozir
+          {tab === "self" ? (
+            <p className="mt-0.5 text-sm text-gray-500">
+              O'zingizga belgilagan ishlar — jarima yo'q, tasdiqlash kutilmaydi
             </p>
+          ) : (
+            activeCount > 0 && (
+              <p className="mt-0.5 text-sm font-medium text-red-600">
+                {activeCount} ta topshiriqning bajarilish vaqti — hozir
+              </p>
+            )
           )}
         </div>
       </div>
 
-      {/* Kesimlar */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1">
-        {MY_TASK_FILTERS.map((item) => (
+      {/* Tablar */}
+      <div className="flex gap-1 rounded-full bg-gray-100 p-0.5">
+        {TABS.map((item) => (
           <button
             key={item.value}
             type="button"
-            onClick={() => {
-              setFilter(item.value);
-              setPage(1);
-            }}
+            onClick={() => selectTab(item.value)}
             className={cn(
-              "shrink-0 rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
-              filter === item.value
-                ? "bg-blue-600 text-white"
-                : "bg-white text-gray-600 ring-1 ring-gray-200",
+              "flex-1 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+              tab === item.value ? "bg-white text-gray-900 shadow-sm" : "text-gray-500",
             )}
           >
             {item.label}
@@ -127,49 +159,77 @@ const MyTasksPage = () => {
         ))}
       </div>
 
-      {isLoading ? (
-        <div className="space-y-2.5">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-28 animate-pulse rounded-2xl bg-white" />
-          ))}
-        </div>
-      ) : tasks.length === 0 ? (
-        <Card className="flex flex-col items-center gap-2 py-12 text-gray-400">
-          <ClipboardList className="size-8" strokeWidth={1.5} />
-          <p className="text-sm">
-            {filter === "all"
-              ? "Sizda topshiriq yo'q"
-              : "Bu kesim bo'yicha topshiriq topilmadi"}
-          </p>
-        </Card>
+      {tab === "self" ? (
+        <MySelfTasks />
       ) : (
-        <div className="space-y-2.5">
-          {tasks.map((task) => (
-            <TaskCheckCard key={task.id} task={task} now={now} onSubmitClick={setSubmitting} />
-          ))}
-        </div>
-      )}
+        <>
+          {/* Kesimlar */}
+          <div className="flex gap-1.5 overflow-x-auto pb-1">
+            {MY_TASK_FILTERS.map((item) => (
+              <button
+                key={item.value}
+                type="button"
+                onClick={() => {
+                  setFilter(item.value);
+                  setPage(1);
+                }}
+                className={cn(
+                  "shrink-0 rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+                  filter === item.value
+                    ? "bg-blue-600 text-white"
+                    : "bg-white text-gray-600 ring-1 ring-gray-200",
+                )}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
 
-      {pagination?.totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm">
-          <button
-            disabled={!pagination.hasPrevPage}
-            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-            className="rounded-lg border border-gray-300 px-3 py-1.5 disabled:opacity-50"
-          >
-            Oldingi
-          </button>
-          <span className="text-gray-500">
-            {pagination.page} / {pagination.totalPages}
-          </span>
-          <button
-            disabled={!pagination.hasNextPage}
-            onClick={() => setPage((prev) => prev + 1)}
-            className="rounded-lg border border-gray-300 px-3 py-1.5 disabled:opacity-50"
-          >
-            Keyingi
-          </button>
-        </div>
+          {isLoading ? (
+            <div className="space-y-2.5">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="h-28 animate-pulse rounded-2xl bg-white" />
+              ))}
+            </div>
+          ) : tasks.length === 0 ? (
+            <Card className="flex flex-col items-center gap-2 py-12 text-gray-400">
+              <ClipboardList className="size-8" strokeWidth={1.5} />
+              <p className="text-sm">
+                {filter === "all"
+                  ? "Sizda topshiriq yo'q"
+                  : "Bu kesim bo'yicha topshiriq topilmadi"}
+              </p>
+            </Card>
+          ) : (
+            <div className="space-y-2.5">
+              {tasks.map((task) => (
+                <TaskCheckCard key={task.id} task={task} now={now} onSubmitClick={setSubmitting} />
+              ))}
+            </div>
+          )}
+
+          {pagination?.totalPages > 1 && (
+            <div className="flex items-center justify-between text-sm">
+              <button
+                disabled={!pagination.hasPrevPage}
+                onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                className="rounded-lg border border-gray-300 px-3 py-1.5 disabled:opacity-50"
+              >
+                Oldingi
+              </button>
+              <span className="text-gray-500">
+                {pagination.page} / {pagination.totalPages}
+              </span>
+              <button
+                disabled={!pagination.hasNextPage}
+                onClick={() => setPage((prev) => prev + 1)}
+                className="rounded-lg border border-gray-300 px-3 py-1.5 disabled:opacity-50"
+              >
+                Keyingi
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {/* Topshirish oynasi — ro'yxatdan chiqmasdan */}

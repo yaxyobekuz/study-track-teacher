@@ -34,8 +34,20 @@ const DEFAULT_RULES = {
  * @param {boolean} props.isPending
  * @param {(formData: FormData, reset: () => void) => void} props.onSubmit
  * @param {() => void} props.onCancel
+ * @param {string} [props.submitLabel] - tugma matni. ⚠️ XODIM O'ZIGA
+ *   BELGILAGAN ishda u BOSHQA bo'ladi ("Bajardim — yakunlash"), chunki
+ *   o'sha oqimda tasdiqlash bosqichi yo'q: ish shu zahoti yakunlanadi va
+ *   "tekshiruvga yuborildi" deb yozilsa, odam javob kutib qolardi.
+ *   Forma esa BITTA qoladi — qoidalar (nechta fayl, izoh) ikki oqimda bir
+ *   xil va ikkinchi nusxada ular asta-sekin uzoqlashardi.
  */
-const TaskSubmitForm = ({ rules: incoming, isPending, onSubmit, onCancel }) => {
+const TaskSubmitForm = ({
+  rules: incoming,
+  isPending,
+  onSubmit,
+  onCancel,
+  submitLabel = "Tekshiruvga yuborish",
+}) => {
   const rules = { ...DEFAULT_RULES, ...(incoming || {}) };
   const inputRef = useRef(null);
   const [note, setNote] = useState("");
@@ -219,7 +231,7 @@ const TaskSubmitForm = ({ rules: incoming, isPending, onSubmit, onCancel }) => {
           disabled={!ready || isPending}
           className="flex-1 rounded-xl bg-blue-600 py-2.5 text-sm font-medium text-white disabled:opacity-50"
         >
-          {isPending ? "Yuborilmoqda..." : "Tekshiruvga yuborish"}
+          {isPending ? "Yuborilmoqda..." : submitLabel}
         </button>
       </div>
     </form>
