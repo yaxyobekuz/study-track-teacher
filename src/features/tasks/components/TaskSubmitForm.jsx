@@ -1,3 +1,6 @@
+// Toast
+import { toast } from "sonner";
+
 // React
 import { useRef, useState } from "react";
 
@@ -65,8 +68,32 @@ const TaskSubmitForm = ({ rules: incoming, isPending, onSubmit, onCancel }) => {
   ];
   const ready = checks.every((c) => c.ok);
 
-  const addFiles = (list) =>
-    setFiles((prev) => [...prev, ...Array.from(list || [])].slice(0, rules.maxFiles));
+  const addFiles = (list) => {
+    const picked = Array.from(list || []);
+
+    // ⚠️ HAJMI OSHGAN FAYL YUBORILMAYDI. Usiz so'rovni oldingi qavat
+    // (proksi) rad etardi va brauzer buni "CORS xatosi" deb ko'rsatardi —
+    // rad etilgan javobda CORS sarlavhalari bo'lmaydi, ya'ni xodim
+    // haqiqiy sababni ("fayl juda katta") umuman ko'rmasdi.
+    const limitMb = rules.maxFileSizeMb;
+    if (limitMb) {
+      const limit = limitMb * 1024 * 1024;
+      const tooBig = picked.filter((file) => file.size > limit);
+      if (tooBig.length > 0) {
+        toast.error(
+          tooBig.length === 1
+            ? `"${tooBig[0].name}" juda katta (${(tooBig[0].size / 1024 / 1024).toFixed(1)} MB). Maksimal hajm — ${limitMb} MB.`
+            : `${tooBig.length} ta fayl ${limitMb} MB dan katta va qo'shilmadi.`,
+        );
+      }
+      const fits = picked.filter((file) => file.size <= limit);
+      if (fits.length === 0) return;
+      setFiles((prev) => [...prev, ...fits].slice(0, rules.maxFiles));
+      return;
+    }
+
+    setFiles((prev) => [...prev, ...picked].slice(0, rules.maxFiles));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
