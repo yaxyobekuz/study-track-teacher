@@ -36,6 +36,7 @@ import InputGroup from "@/shared/components/ui/input/InputGroup";
 import InputField from "@/shared/components/ui/input/InputField";
 import MainBackgroundPatterns from "@/shared/components/bg/MainBackgroundPatterns";
 import SessionLimitModal from "@/features/auth/components/SessionLimitModal";
+import BranchSelectForm from "@/features/auth/components/BranchSelectForm";
 
 const LoginPage = () => {
   // Seans boshqa qurilmadan ("Qurilmalar") yoki admin tomonidan yakunlangan
@@ -87,41 +88,116 @@ const LoginForm = ({}) => {
   const navigate = useNavigate();
   const { openModal } = useModal();
 
-  const { username, password, setField, isLoading } = useObjectState({
+  const {
+    username,
+    password,
+    setField,
+    setFields,
+    isLoading,
+    branchSelection,
+    pendingBranchId,
+  } = useObjectState({
     step: 1,
     username: "",
     password: "",
     isLoading: false,
+    // Ikki yoki undan ortiq filialli xodim uchun server qaytargan tanlov
+    // javobi: `{ selectionToken, branches, homeBranchId, user }`.
+    //
+    // ⚠️ XOTIRADA, `localStorage` da EMAS: sahifa yangilansa oqim parol
+    // qadamidan boshlanadi. Tanlov tokeni 5 daqiqa yashaydi va u access
+    // token EMAS — u bilan API'ga kirib bo'lmaydi.
+    branchSelection: null,
+    pendingBranchId: null,
   });
+
+  /**
+   * Kirish xatosi — IKKALA qadam uchun bitta joy.
+   *
+   * ⚠️ Qurilmalar limiti (o'qituvchi — 4 ta) tanlov qadamida ham chiqadi:
+   * seans aynan o'sha yerda ochiladi. Faqat xabar: boshqa qurilmalar
+   * ro'yxati ham, ularni yakunlash ham bu yerda YO'Q (parolni bilgan
+   * begona odam bo'lishi mumkin).
+   */
+  const handleError = (error, fallback) => {
+    const details = error.response?.data?.details;
+
+    if (error.response?.status === 409 && details?.reason === "session_limit") {
+      openModal("sessionLimit", details);
+      return details;
+    }
+
+    toast.error(error.response?.data?.message || fallback);
+    return details;
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setField("isLoading", true);
 
-    const data = { username, password: password?.trim() };
+    // ⚠️ `branchSelect: true` — "men filial tanlash oynasini ko'rsata
+    // olaman". Bayroqsiz so'rov avvalgidek UY filialiga token oladi, ya'ni
+    // eski mijozlar (mobil ilova) buzilmaydi.
+    const data = { username, password: password?.trim(), branchSelect: true };
 
     authAPI
       .login(data)
+      .then((response) => {
+        const result = response.data.data;
+
+        // Ko'p filialli xodim: token hali BERILMAGAN va seans ochilmagan —
+        // avval qaysi filialda ishlashini aytadi
+        if (result.branchSelectionRequired) {
+          setField("branchSelection", result);
+          return;
+        }
+
+        saveSession(result.token);
+        navigate("/dashboard");
+      })
+      .catch((error) => handleError(error, "Tizimga kirishda xatolik"))
+      .finally(() => setField("isLoading", false));
+  };
+
+  /** Filial tanlandi — seans AYNAN shu filialda ochiladi. */
+  const handleBranchSelect = (branch) => {
+    setFields({ isLoading: true, pendingBranchId: branch.id });
+
+    authAPI
+      .selectLoginBranch({
+        selectionToken: branchSelection.selectionToken,
+        branchId: branch.id,
+      })
       .then((response) => {
         saveSession(response.data.data.token);
         navigate("/dashboard");
       })
       .catch((error) => {
-        // Qurilmalar limiti (o'qituvchi — 4 ta). Faqat xabar: boshqa
-        // qurilmalar ro'yxati ham, ularni yakunlash ham bu yerda YO'Q
-        // (parolni bilgan begona odam bo'lishi mumkin).
-        const details = error.response?.data?.details;
-        if (error.response?.status === 409 && details?.reason === "session_limit") {
-          openModal("sessionLimit", details);
-          return;
-        }
+        const details = handleError(error, "Filialga kirishda xatolik");
 
-        toast.error(
-          error.response?.data?.message || "Tizimga kirishda xatolik",
-        );
+        // Tanlov tokeni 5 daqiqa yashaydi: muddati tugasa parolni qaytadan
+        // kiritish kerak — oynada qolib, har bosishda xato olmasin
+        if (details?.reason === "selection_expired") {
+          setFields({ branchSelection: null, password: "" });
+        }
       })
-      .finally(() => setField("isLoading", false));
+      .finally(() => setFields({ isLoading: false, pendingBranchId: null }));
   };
+
+  // Filialni tanlash qadami — parol allaqachon tekshirilgan
+  if (branchSelection) {
+    return (
+      <BranchSelectForm
+        isLoading={isLoading}
+        pendingId={pendingBranchId}
+        branches={branchSelection.branches}
+        fullName={branchSelection.user?.firstName}
+        homeBranchId={branchSelection.homeBranchId}
+        onSelect={handleBranchSelect}
+        onBack={() => setFields({ branchSelection: null, password: "" })}
+      />
+    );
+  }
 
   return (
     <div className="max-w-md w-full animate__animated animate__fadeIn">
