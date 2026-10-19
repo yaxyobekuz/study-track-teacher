@@ -25,6 +25,7 @@ import EmptyState from "@/shared/components/ui/EmptyState";
 import Table, { Td, Tr } from "@/shared/components/ui/Table";
 import StatTile from "@/features/profile/components/StatTile";
 import AttendanceHistoryCard from "../components/AttendanceHistoryCard";
+import GroupCertificatesSection from "@/features/certificates/components/GroupCertificatesSection";
 
 // Utils
 import { cn } from "@/shared/utils/cn";
@@ -217,6 +218,9 @@ const MyTutorGroupPage = () => {
           </Table>
         )}
       </section>
+
+      {/* Sertifikat rejalari — guruh rahbari muddat va yo'nalishni to'g'rilaydi */}
+      <GroupCertificatesSection classId={group.classId} />
 
       {/* Fanlar bo'yicha baholar */}
       {grades.bySubject.length > 0 && (

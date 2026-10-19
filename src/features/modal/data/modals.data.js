@@ -9,6 +9,9 @@
  * `<ResponsiveModal name="..." />` da ishlatiladigan kalit bilan bir xil bo'lishi kerak.
  */
 export const MODAL_NAMES = [
+  // Guruhlarim → sertifikat rejasi: muddat va yo'nalishni to'g'rilash
+  "editGroupCertificate",
+
   // Kirish va qurilmalar (Auth, Profile → Qurilmalar)
   "sessionLimit",
   "terminateSession",
