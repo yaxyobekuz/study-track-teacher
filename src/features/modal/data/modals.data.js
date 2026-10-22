@@ -12,6 +12,9 @@ export const MODAL_NAMES = [
   // Guruhlarim → sertifikat rejasi: muddat va yo'nalishni to'g'rilash
   "editGroupCertificate",
 
+  // Baho qo'yish → bahosi yo'q o'quvchilarning hammasiga bitta baho
+  "bulkGrade",
+
   // Kirish va qurilmalar (Auth, Profile → Qurilmalar)
   "sessionLimit",
   "terminateSession",

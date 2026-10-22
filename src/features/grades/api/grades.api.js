@@ -45,6 +45,11 @@ export const gradesAPI = {
   getStudentsWithGrades: (params) =>
     http.get("/grades/students-with-grades", { params }),
   create: (data) => http.post("/grades", data),
+  /**
+   * Hammaga baho qo'yish — `{ classId, subjectId, lessonOrder, grade, date? }`.
+   * Server faqat bahosi YO'Q va darsda BOR o'quvchilarga yozadi.
+   */
+  bulkCreate: (data) => http.post("/grades/bulk", data),
   update: (id, data) => http.put(`/grades/${id}`, data),
   delete: (id) => http.delete(`/grades/${id}`),
   getMissingToday: () => http.get("/grades/missing-today"),

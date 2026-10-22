@@ -17,6 +17,18 @@ export const useCreateGrade = () => {
   });
 };
 
+/**
+ * Give one grade to every ungraded student who is in the lesson that day.
+ * Invalidates every grades read, same as a single create.
+ */
+export const useBulkCreateGrades = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => gradesAPI.bulkCreate(data).then((r) => r.data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: gradesKeys.all }),
+  });
+};
+
 /** Update an existing grade. */
 export const useUpdateGrade = () => {
   const qc = useQueryClient();

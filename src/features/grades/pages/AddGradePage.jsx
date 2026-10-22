@@ -16,8 +16,11 @@ import Input from "@/shared/components/ui/input/Input";
 import Select from "@/shared/components/ui/select/Select";
 import Button from "@/shared/components/ui/button/Button";
 
+import BulkGradeModal from "@/features/grades/components/BulkGradeModal";
+
 // Hooks
 import useAuth from "@/shared/hooks/useAuth";
+import useModal from "@/shared/hooks/useModal";
 import useObjectState from "@/shared/hooks/useObjectState";
 
 // Router
@@ -31,10 +34,14 @@ import {
   MapPinOff,
   Trash2,
   Loader2,
+  UsersRound,
 } from "lucide-react";
 
 // Helpers
 import { getGradeColor } from "@/shared/helpers/grade.helpers";
+
+// Data
+import { GRADE_OPTIONS } from "@/features/grades/data/grades.data";
 
 // Queries
 import { gradesQueries } from "@/features/grades/queries/grades.queries";
@@ -79,6 +86,11 @@ const presenceReason = (message = "") => {
  * ruxsat berilgan sinf ro'yxatda, fan esa "ruxsat bilan" belgisi bilan
  * chiqadi. Boshqa o'qituvchi qo'ygan baho faqat ko'rinadi — uni o'sha
  * o'qituvchi o'zgartiradi (server ham shuni talab qiladi).
+ *
+ * ⚠️ HAMMAGA BAHO QO'YISH — bahosi YO'Q va darsda BOR (`student.expected`)
+ * o'quvchilarga bitta baho (`POST /grades/bulk`). Qo'yilgan bahoga
+ * tegilmaydi. Ruxsat bilan ochilgan darsda ko'rinmaydi: u dars egasining
+ * jurnali, hammaga yozilsa egasi o'z sinfiga baho qo'ya olmay qolardi.
  */
 const AddGrade = () => {
   const {
@@ -149,6 +161,38 @@ const AddGrade = () => {
   const { mutate: createGrade } = useCreateGrade();
   const { mutate: updateGrade } = useUpdateGrade();
   const { mutate: deleteGrade } = useDeleteGrade();
+  const { openModal } = useModal();
+
+  // HAMMAGA BAHO — kim qo'yiladi, kim chetda (server yozuvi bilan AYNI tartib:
+  // avval "bahosi bor", keyin "darsda yo'q")
+  const selectedSubject =
+    subjects.find((s) => `${s.id}_${s.order}` === selectedSubjectWithOrder) ?? null;
+  const bulkAllowed = Boolean(selectedSubject) && selectedSubject.access !== "grant";
+  const pendingStudents = students.filter((s) => s.grade === null && s.expected);
+  const awayStudents = students.filter((s) => s.grade === null && !s.expected);
+  const gradedCount = students.length - pendingStudents.length - awayStudents.length;
+
+  const openBulkGrade = () => {
+    const className = classOptions.find((cls) => cls.id === selectedClass)?.name ?? "";
+
+    openModal("bulkGrade", {
+      payload: {
+        classId: selectedClass,
+        subjectId,
+        lessonOrder: parseInt(lessonOrder),
+        ...(pastDate ? { date: pastDate } : {}),
+      },
+      lessonLabel: `${className} · ${selectedSubject.order}-dars · ${selectedSubject.name}`,
+      dayLabel: isPastDay && activeDay ? `${activeDay.dateLabel}, ${activeDay.dayName}` : "Bugun",
+      pending: pendingStudents,
+      gradedCount,
+      away: awayStudents,
+      // Baho shu fandagi boshqa darsga ham tarqaladi (server `teacherLessons` bilan AYNI)
+      spreads:
+        subjects.filter((s) => s.id === selectedSubject.id && s.access !== "grant")
+          .length > 1,
+    });
+  };
 
   // Ochiq kun yopilsa (muddati tugadi yoki hamma darsiga baho qo'yildi) — bugunga qaytadi
   useEffect(() => {
@@ -474,6 +518,34 @@ const AddGrade = () => {
           {/* Students Table */}
           {students.length > 0 && !loading && (
             <>
+              {bulkAllowed && pendingStudents.length > 0 && (
+                <Card className="mb-4 flex flex-wrap items-center justify-between gap-3 border border-blue-100 bg-blue-50/60">
+                  <div className="flex items-start gap-3">
+                    <UsersRound
+                      className="mt-0.5 size-5 shrink-0 text-blue-600"
+                      strokeWidth={1.8}
+                    />
+                    <div>
+                      <p className="font-semibold text-blue-900">
+                        Hammaga baho qo'yish
+                      </p>
+                      <p className="text-sm text-blue-700">
+                        Bahosi yo'q {pendingStudents.length} ta o'quvchiga bitta
+                        baho. Qo'yilgan baholar o'zgarmaydi.
+                      </p>
+                    </div>
+                  </div>
+
+                  <Button
+                    size="sm"
+                    disabled={studentsFetching || loadingStudentId !== null}
+                    onClick={openBulkGrade}
+                  >
+                    Baho tanlash
+                  </Button>
+                </Card>
+              )}
+
               <Input
                 type="search"
                 className="mb-4"
@@ -559,13 +631,7 @@ const AddGrade = () => {
                                           ? getGradeColor(student.grade.grade)
                                           : "",
                                       )}
-                                      options={[
-                                        { label: "5 - A'lo", value: "5" },
-                                        { label: "4 - Yaxshi", value: "4" },
-                                        { label: "3 - Qoniqarli", value: "3" },
-                                        { label: "2 - Qoniqarsiz", value: "2" },
-                                        { label: "1 - Yomon", value: "1" },
-                                      ]}
+                                      options={GRADE_OPTIONS}
                                     />
 
                                     {hasGrade && (
@@ -602,6 +668,8 @@ const AddGrade = () => {
           </p>
         </div>
       )}
+
+      <BulkGradeModal />
     </div>
   );
 };
