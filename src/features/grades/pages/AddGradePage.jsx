@@ -488,12 +488,40 @@ const AddGrade = () => {
         selectedSubjectWithOrder &&
         currentTopic && (
           <Card className="mb-4 space-y-1.5">
-            <h3 className="text-lg font-semibold text-gray-900">
+            {/* Daraja va kitob — ixtiyoriy: mavzular faylida bo'lmasa
+                chizilmaydi */}
+            {(currentTopic.level || currentTopic.book) && (
+              <div className="flex flex-wrap items-center gap-1.5">
+                {currentTopic.level && (
+                  <span
+                    title="Daraja"
+                    className="rounded bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700"
+                  >
+                    {currentTopic.level}
+                  </span>
+                )}
+                {currentTopic.book && (
+                  <span
+                    title="Kitob"
+                    className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600"
+                  >
+                    {currentTopic.book}
+                  </span>
+                )}
+              </div>
+            )}
+
+            <h3 className="text-lg font-semibold text-gray-900 break-words">
               {currentTopic.name}
             </h3>
 
             {currentTopic.description && (
-              <p className="text-gray-600">{currentTopic.description}</p>
+              <p className="text-gray-600 break-words">
+                <span className="font-medium text-gray-700">
+                  Nimalar o'rgatiladi:
+                </span>{" "}
+                {currentTopic.description}
+              </p>
             )}
           </Card>
         )}
