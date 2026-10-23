@@ -2,6 +2,7 @@
 import {
   BookOpen,
   Calendar,
+  UserCheck,
   PartyPopper,
   ClipboardList,
   GraduationCap,
@@ -83,6 +84,15 @@ const Dashboard = () => {
               strokeWidth={1.5}
             />
             <p className="font-medium text-gray-900">Baholar jurnali</p>
+          </Link>
+
+          {/* O'quvchilar davomati — bugungi darsi bor sinflar */}
+          <Link
+            to="/attendance/students"
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <UserCheck className="size-6 text-primary mr-3" strokeWidth={1.5} />
+            <p className="font-medium text-gray-900">O'quvchilar davomati</p>
           </Link>
 
           {/* Messages */}

@@ -34,6 +34,9 @@ import GivenPenaltiesPage from "@/features/penalties/pages/GivenPenaltiesPage";
 import AttendancePage from "@/features/attendance/pages/AttendancePage";
 import MyAttendancePage from "@/features/attendance/pages/MyAttendancePage";
 
+// Pages - O'quvchilar davomati (o'z darsiga belgilash)
+import StudentAttendancePage from "@/features/studentAttendance/pages/StudentAttendancePage";
+
 // Pages - Tests
 import TestsPage from "@/features/tests/pages/TestsPage";
 import CreateTestPage from "@/features/tests/pages/CreateTestPage";
@@ -104,6 +107,12 @@ const Routes = () => {
           {/* Attendance */}
           <Route path="/attendance" element={<AttendancePage />} />
           <Route path="/attendance/my" element={<MyAttendancePage />} />
+
+          {/* O'quvchilar davomati — server faqat o'z darsi bor sinflarni beradi */}
+          <Route
+            path="/attendance/students"
+            element={<StudentAttendancePage />}
+          />
 
           {/* Tests */}
           <Route path="/tests" element={<TestsPage />} />
