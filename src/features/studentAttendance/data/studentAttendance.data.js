@@ -63,8 +63,28 @@ export const lessonLabel = (lesson) =>
     .filter(Boolean)
     .join(" · ");
 
+/**
+ * NEGA BU SINF MENDA — server `access` belgisi.
+ *
+ * ⚠️ Belgi panelda HISOBLANMAYDI, serverdan keladi (`resolveMarkableClasses`):
+ * huquq ikki manbadan (dars jadvali va sinf rahbarligi) va ularni panel
+ * o'zidan taxmin qilsa, ekran bilan server bir-biriga qarama-qarshi javob
+ * berardi.
+ */
+export const ACCESS_META = {
+  lesson: { label: "Darsim", className: "bg-gray-100 text-gray-600" },
+  leader: { label: "Sinf rahbarligim", className: "bg-primary/10 text-primary" },
+  both: {
+    label: "Darsim · sinf rahbarligim",
+    className: "bg-primary/10 text-primary",
+  },
+};
+
 /** Sinf tanlagichidagi satr: "5-A — 18/20 belgilandi". */
 export const classOptionLabel = (cls) => {
   const marked = cls.summary.total - cls.summary.unmarked;
-  return `${cls.name} — ${marked}/${cls.summary.total} belgilandi`;
+  // Sinf rahbarligidagi sinf ajralib turadi: unda bugun darsi bo'lmasligi ham
+  // mumkin va odam "nega bu yerda" deb o'ylab qolmasin
+  const suffix = cls.access && cls.access !== "lesson" ? " · rahbarligim" : "";
+  return `${cls.name}${suffix} — ${marked}/${cls.summary.total} belgilandi`;
 };

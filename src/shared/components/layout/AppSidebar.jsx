@@ -161,8 +161,8 @@ const navItems = [
         url: "/attendance",
       },
       {
-        // O'z darsiga kirgan o'quvchilar davomati — ruxsat kaliti yo'q,
-        // server faqat bugungi darsi bor sinflarni qaytaradi
+        // O'quvchilar davomati — ruxsat kaliti yo'q: server o'z darsi bor
+        // sinflarni va SINF RAHBARLIGIDAGI sinflarni qaytaradi
         title: "O'quvchilar davomati",
         url: "/attendance/students",
       },

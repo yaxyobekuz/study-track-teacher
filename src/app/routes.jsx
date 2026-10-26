@@ -108,7 +108,8 @@ const Routes = () => {
           <Route path="/attendance" element={<AttendancePage />} />
           <Route path="/attendance/my" element={<MyAttendancePage />} />
 
-          {/* O'quvchilar davomati — server faqat o'z darsi bor sinflarni beradi */}
+          {/* O'quvchilar davomati — server o'z darsi bor sinflarni va
+              sinf rahbarligidagi sinflarni beradi */}
           <Route
             path="/attendance/students"
             element={<StudentAttendancePage />}

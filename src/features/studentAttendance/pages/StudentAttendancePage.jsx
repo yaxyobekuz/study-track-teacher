@@ -23,6 +23,9 @@ import SummaryCards from "../components/SummaryCards";
 import MarkToolbar from "../components/MarkToolbar";
 import StudentMarkRow from "../components/StudentMarkRow";
 
+// Utils
+import { cn } from "@/shared/utils/cn";
+
 // Hooks
 import useObjectState from "@/shared/hooks/useObjectState";
 import useMarkAttendance from "../hooks/useMarkAttendance";
@@ -33,6 +36,7 @@ import { useMarkStudentAttendance } from "../queries/studentAttendance.mutations
 
 // Data
 import {
+  ACCESS_META,
   CLOSED_TITLES,
   lessonLabel,
   classOptionLabel,
@@ -45,12 +49,19 @@ const presenceReason = (message = "") => {
 };
 
 /**
- * O'QUVCHILAR DAVOMATI — o'qituvchi o'z darsiga belgilaydi.
+ * O'QUVCHILAR DAVOMATI — xodim o'zi javob beradigan sinfga belgilaydi.
  *
- * ⚠️ SINFLAR SERVERDAN: faqat bugun o'zi dars o'tadigan (yoki o'rinbosar
- * bo'lib chiqadigan) sinflar chiqadi. Panel ro'yxatni o'zidan to'ldirmaydi
- * va saqlashda ham serverning qarori ustun — eskirgan ekran begona sinfga
- * tegmaydi.
+ * ⚠️ SINFLAR SERVERDAN va IKKI MANBADAN: bugun o'zi dars o'tadigan (yoki
+ * o'rinbosar bo'lib chiqadigan) sinflar HAMDA o'zi SINF RAHBARI bo'lgan
+ * sinflar. Ikkinchisi dars jadvaliga bog'liq emas — sinf rahbari ertalab
+ * guruhiga kelib bor-yo'qni belgilaydi, shuning uchun unda bugun darsi
+ * bo'lmasligi ham mumkin (darslar ro'yxati bo'sh chiqadi).
+ *
+ * Har sinfda NEGA u yerda ekani turadi (`access`) — bitta ro'yxatda ikki
+ * manba aralashganda "nega bu sinf menda" degan savol qolmasin.
+ *
+ * Panel ro'yxatni o'zidan to'ldirmaydi va saqlashda ham serverning qarori
+ * ustun — eskirgan ekran begona sinfga tegmaydi.
  *
  * ⚠️ FAQAT BUGUN: o'tgan kunni ma'muriyat to'g'rilaydi, shuning uchun kun
  * tanlagichi ATAYLAB yo'q (baho qo'yishdagi "ochilgan kunlar" bu yerda
@@ -213,8 +224,8 @@ const StudentAttendancePage = () => {
         <Card>
           <EmptyState
             icon={Users}
-            title="Bugun darsingiz yo'q"
-            description="Davomat faqat o'zingiz dars o'tadigan sinflarga belgilanadi. Jadvalda bugungi darsingiz bo'lmasa, bu ro'yxat bo'sh turadi."
+            title="Bugun belgilash uchun sinf yo'q"
+            description="Davomat o'zingiz dars o'tadigan sinflarga va sinf rahbarligingizdagi sinfga belgilanadi. Bugun jadvalda darsingiz bo'lmasa va sinf rahbarligi biriktirilmagan bo'lsa, bu ro'yxat bo'sh turadi."
             action={
               <Button asChild variant="outline" size="sm">
                 <Link to="/schedules">Dars jadvalim</Link>
@@ -240,9 +251,20 @@ const StudentAttendancePage = () => {
             />
           </div>
 
-          {/* Tanlangan sinfning bugungi darslari */}
+          {/* NEGA BU SINF MENDA + tanlangan sinfning bugungi darslari */}
           {activeClass && (
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
+              {ACCESS_META[activeClass.access] && (
+                <span
+                  className={cn(
+                    "rounded-lg px-2.5 py-1 text-xs font-medium",
+                    ACCESS_META[activeClass.access].className,
+                  )}
+                >
+                  {ACCESS_META[activeClass.access].label}
+                </span>
+              )}
+
               {activeClass.lessons.map((lesson) => (
                 <span
                   key={lesson.order}
@@ -251,6 +273,14 @@ const StudentAttendancePage = () => {
                   {lessonLabel(lesson)}
                 </span>
               ))}
+
+              {/* Sinf rahbarligidagi sinfda bugun darsi bo'lmasligi NORMAL */}
+              {activeClass.lessons.length === 0 && (
+                <span className="text-xs text-gray-500">
+                  Bugun bu sinfda darsingiz yo&apos;q — davomatni sinf rahbari
+                  sifatida belgilaysiz
+                </span>
+              )}
             </div>
           )}
 
