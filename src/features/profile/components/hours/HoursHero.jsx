@@ -5,6 +5,9 @@ import { Coins, Timer } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 import { formatMoney } from "@/shared/utils/formatMoney";
 
+// Data
+import { SELF_PAYROLL_VISIBLE } from "@/shared/data/selfPayroll.data";
+
 // Tokens
 import {
   CHIP,
@@ -28,6 +31,10 @@ import {
  * ⚠️ IKKI RAQAM YONMA-YON: "hozirgacha yig'ildi" va "oy oxirida chiqadi".
  * Bittasi ko'rsatilsa, oyning 10-kunidagi past raqam "maosh kamayibdi"
  * deb o'qilardi.
+ *
+ * ⚠️ PUL KAFELLARI XODIMGA YOPIQ (`selfPayroll.data.js`) — soat
+ * kafellari qoladi. Server ham summani bermaydi (`/lesson-hours/my`),
+ * ya'ni bayroqsiz bu yerda "0 so'm" turardi.
  *
  * ⚠️ HERO FONIDAGI `tide` — bu ekrandagi UZLUKSIZ HARAKATLARNING
  * BIRINCHISI. Ikkinchisi jonli nuqta halqasi. Uchinchisi qo'shilmaydi.
@@ -104,37 +111,71 @@ const HoursHero = ({ data, isLoading }) => {
           isLoading={isLoading}
         />
 
-        <div className="mt-5 grid grid-cols-2 gap-2.5 lg:grid-cols-5">
-          <Tile
-            index={0}
-            icon={Coins}
-            label="Hozirgacha yig'ildi"
-            value={formatMoney(data?.accruedAmount)}
-            hint="o'tilgan soat bo'yicha"
-            isLoading={isLoading}
-          />
-          <Tile
-            index={1}
-            icon={Coins}
-            label="Oy oxirida"
-            value={formatMoney(data?.projectedAmount)}
-            hint={
-              Number(data?.missedAmount) > 0
-                ? `− ${formatMoney(data.missedAmount)} ayrildi`
-                : "jadval o'zgarmasa"
-            }
-            isLoading={isLoading}
-            emphasis
-          />
-          {/* Dars qoldirilmaganda qancha bo'lardi — "Oy oxirida" bilan solishtirish uchun */}
-          <Tile
-            index={2}
-            icon={Coins}
-            label="Dars qoldirmaganda"
-            value={formatMoney(data?.plannedAmount ?? data?.projectedAmount)}
-            hint={`${formatHourNumber(data?.plannedHours)} soat — hamma dars`}
-            isLoading={isLoading}
-          />
+        <div
+          className={cn(
+            "mt-5 grid grid-cols-2 gap-2.5",
+            SELF_PAYROLL_VISIBLE ? "lg:grid-cols-5" : "lg:grid-cols-4",
+          )}
+        >
+          {SELF_PAYROLL_VISIBLE && (
+            <>
+              <Tile
+                index={0}
+                icon={Coins}
+                label="Hozirgacha yig'ildi"
+                value={formatMoney(data?.accruedAmount)}
+                hint="o'tilgan soat bo'yicha"
+                isLoading={isLoading}
+              />
+              <Tile
+                index={1}
+                icon={Coins}
+                label="Oy oxirida"
+                value={formatMoney(data?.projectedAmount)}
+                hint={
+                  Number(data?.missedAmount) > 0
+                    ? `− ${formatMoney(data.missedAmount)} ayrildi`
+                    : "jadval o'zgarmasa"
+                }
+                isLoading={isLoading}
+                emphasis
+              />
+              {/* Dars qoldirilmaganda qancha bo'lardi — "Oy oxirida" bilan solishtirish uchun */}
+              <Tile
+                index={2}
+                icon={Coins}
+                label="Dars qoldirmaganda"
+                value={formatMoney(data?.plannedAmount ?? data?.projectedAmount)}
+                hint={`${formatHourNumber(data?.plannedHours)} soat — hamma dars`}
+                isLoading={isLoading}
+              />
+            </>
+          )}
+
+          {/* Dars qoldirmaganda qancha SOAT bo'lardi — pul yopiq bo'lsa
+              "nega soatim kam" degan savol shu kafelda javob topadi */}
+          {!SELF_PAYROLL_VISIBLE && (
+            <>
+              <Tile
+                index={0}
+                icon={Timer}
+                label="Hamma dars o'tilsa"
+                value={formatHourNumber(data?.plannedHours)}
+                hint="jadvaldagi barcha dars"
+                isLoading={isLoading}
+              />
+              <Tile
+                index={1}
+                icon={Timer}
+                label="O'tilmagan"
+                value={formatHourNumber(data?.missedHours)}
+                hint="kelmagan kun yoki baho yo'q"
+                isLoading={isLoading}
+                emphasis
+              />
+            </>
+          )}
+
           <Tile
             index={3}
             icon={Timer}

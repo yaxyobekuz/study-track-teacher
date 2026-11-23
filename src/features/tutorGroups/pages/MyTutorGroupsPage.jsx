@@ -16,6 +16,7 @@ import { cn } from "@/shared/utils/cn";
 import { formatMoney } from "@/shared/utils/formatMoney";
 
 // Data & queries
+import { SELF_PAYROLL_VISIBLE } from "@/shared/data/selfPayroll.data";
 import { GROUP_STATUS_META } from "../data/tutorGroups.data";
 import { tutorGroupsQueries } from "../queries/tutorGroups.queries";
 
@@ -24,6 +25,10 @@ import { tutorGroupsQueries } from "../queries/tutorGroups.queries";
  * oylik. Guruh bosilsa o'quvchilar, davomat va baholar ochiladi.
  *
  * Summa serverdan tayyor keladi: bu yerda arifmetika yo'q.
+ *
+ * ⚠️ QO'SHIMCHA OYLIK XODIMGA YOPIQ (`selfPayroll.data.js`): guruh,
+ * o'quvchilar soni va davri qoladi, summa esa serverdan ham kelmaydi
+ * (`/tutor-groups/my`) — bayroqsiz bu yerda "0 so'm" turardi.
  */
 const MyTutorGroupsPage = () => {
   const { data, isLoading, isError } = useQuery(tutorGroupsQueries.my());
@@ -49,7 +54,9 @@ const MyTutorGroupsPage = () => {
         {totals.groupCount > 0 && (
           <p className="text-sm text-gray-500">
             {data.monthLabel}: {totals.groupCount} ta guruh, {totals.studentCount} ta
-            o'quvchi · qo'shimcha oylik {formatMoney(totals.monthlyAmount)}
+            o'quvchi
+            {SELF_PAYROLL_VISIBLE &&
+              ` · qo'shimcha oylik ${formatMoney(totals.monthlyAmount)}`}
           </p>
         )}
       </div>
@@ -98,16 +105,18 @@ const MyTutorGroupsPage = () => {
                   />
                 </div>
 
-                <div className="mt-3 flex items-end justify-between gap-3 border-t border-gray-100 pt-3">
-                  <p className="text-xs text-gray-500">
-                    {group.studentCount} × {formatMoney(group.perStudentAmount)}
-                    {" + "}guruh uchun {formatMoney(group.groupAmount)}
-                  </p>
-                  <p className="shrink-0 font-semibold text-gray-900">
-                    {formatMoney(group.monthlyAmount)}
-                    <span className="text-xs font-normal text-gray-400"> / oy</span>
-                  </p>
-                </div>
+                {SELF_PAYROLL_VISIBLE && (
+                  <div className="mt-3 flex items-end justify-between gap-3 border-t border-gray-100 pt-3">
+                    <p className="text-xs text-gray-500">
+                      {group.studentCount} × {formatMoney(group.perStudentAmount)}
+                      {" + "}guruh uchun {formatMoney(group.groupAmount)}
+                    </p>
+                    <p className="shrink-0 font-semibold text-gray-900">
+                      {formatMoney(group.monthlyAmount)}
+                      <span className="text-xs font-normal text-gray-400"> / oy</span>
+                    </p>
+                  </div>
+                )}
               </Link>
             );
           })}

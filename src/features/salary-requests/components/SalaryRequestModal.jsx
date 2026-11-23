@@ -9,6 +9,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 // API
 import { salaryRequestsAPI } from "../api/salaryRequests.api";
+import { SELF_PAYROLL_VISIBLE } from "@/shared/data/selfPayroll.data";
 
 // Hooks
 import useObjectState from "@/shared/hooks/useObjectState";
@@ -66,8 +67,15 @@ const Content = ({ close }) => {
   const categoryOptions = categories.map((c) => ({
     value: c.id,
     // Toifasiz o'qituvchiga barcha bo'lim toifalari keladi — bo'lim nomi
-    // bilan ajratiladi ("MTB / 2-toifa")
-    label: `${c.departmentName ? c.departmentName + " / " : ""}${c.name} — ${Number(c.perHourRate).toLocaleString("uz-UZ")} so'm/soat${c.isCurrent ? " (joriy toifangiz)" : ""}`,
+    // bilan ajratiladi ("MTB / 2-toifa").
+    // ⚠️ SOAT NARXI YOZILMAYDI (`selfPayroll.data.js`): toifa stavkasi ham
+    // oylik ma'lumoti va server uni javobda bermaydi — yorliqda
+    // "NaN so'm/soat" chiqardi. Zayavka oqimining o'zi ochiq.
+    label: `${c.departmentName ? c.departmentName + " / " : ""}${c.name}${
+      SELF_PAYROLL_VISIBLE
+        ? ` — ${Number(c.perHourRate).toLocaleString("uz-UZ")} so'm/soat`
+        : ""
+    }${c.isCurrent ? " (joriy toifangiz)" : ""}`,
     disabled: c.isCurrent,
   }));
 

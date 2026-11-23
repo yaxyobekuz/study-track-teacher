@@ -43,6 +43,7 @@ import {
   percentClass,
 } from "../data/tutorGroups.data";
 import { tutorGroupsQueries } from "../queries/tutorGroups.queries";
+import { SELF_PAYROLL_VISIBLE } from "@/shared/data/selfPayroll.data";
 
 const formatPercent = (value) => (value == null ? "—" : `${value}%`);
 const formatGrade = (value) => (value == null ? "—" : String(value));
@@ -111,9 +112,13 @@ const MyTutorGroupPage = () => {
       </div>
 
       {/* Ko'rsatkichlar */}
+      {/* ⚠️ "Qo'shimcha oylik" kafeli xodimga YOPIQ (`selfPayroll.data.js`):
+          summa serverdan ham kelmaydi, shuning uchun kafel chizilmaydi va
+          to'r bitta ustunga qisqaradi. */}
       <div
         className={cn(
-          "grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-5",
+          "grid grid-cols-1 gap-3 xs:grid-cols-2",
+          SELF_PAYROLL_VISIBLE ? "lg:grid-cols-5" : "lg:grid-cols-4",
           isFetching && "opacity-70",
         )}
       >
@@ -137,20 +142,22 @@ const MyTutorGroupPage = () => {
           value={formatGrade(grades.average)}
           hint={`${grades.count} ta baho`}
         />
-        <StatTile
-          icon={Wallet}
-          label="Qo'shimcha oylik"
-          value={formatMoney(payroll.sealed?.amount ?? payroll.liveAmount)}
-          hint={
-            payroll.sealed
-              ? `${data.monthLabel} oyligida muhrlangan${
-                  payroll.sealed.studentCount != null
-                    ? ` (${payroll.sealed.studentCount} o'quvchi)`
-                    : ""
-                }`
-              : `${students.length} × ${formatMoney(group.perStudentAmount)} + ${formatMoney(group.groupAmount)}`
-          }
-        />
+        {SELF_PAYROLL_VISIBLE && (
+          <StatTile
+            icon={Wallet}
+            label="Qo'shimcha oylik"
+            value={formatMoney(payroll.sealed?.amount ?? payroll.liveAmount)}
+            hint={
+              payroll.sealed
+                ? `${data.monthLabel} oyligida muhrlangan${
+                    payroll.sealed.studentCount != null
+                      ? ` (${payroll.sealed.studentCount} o'quvchi)`
+                      : ""
+                  }`
+                : `${students.length} × ${formatMoney(group.perStudentAmount)} + ${formatMoney(group.groupAmount)}`
+            }
+          />
+        )}
       </div>
 
       {/* Kunlik davomat tarixi: o'quvchi × kun va tanlangan kun tafsiloti */}

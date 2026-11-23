@@ -37,6 +37,7 @@ import {
   gridDelay,
 } from "../../data/ledger.tokens";
 import { MISSED_LESSONS_HINT } from "../../data/profile.data";
+import { SELF_PAYROLL_VISIBLE } from "@/shared/data/selfPayroll.data";
 import { profileQueries } from "../../queries/profile.queries";
 
 /**
@@ -135,7 +136,9 @@ const ProfileHoursTab = () => {
         <div className="rounded-2xl bg-white px-4 py-3">
           <p className={T.hint}>
             Sizga hali oylik qoidasi belgilanmagan. Shartnoma sharti kiritilgach,
-            bu ekranda maosh hisobi avtomatik ko'rinadi.
+            bu ekranda{" "}
+            {SELF_PAYROLL_VISIBLE ? "maosh hisobi" : "dars soati hisobi"}{" "}
+            avtomatik ko'rinadi.
           </p>
         </div>
       )}
@@ -159,7 +162,10 @@ const ProfileHoursTab = () => {
         <SubstitutionList subs={subs} delay={gridDelay(3)} />
       </div>
 
-      <HistoryPanel {...state} delay={gridDelay(4)} />
+      {/* ⚠️ "Oxirgi oylar" — MUHRLANGAN OYLIK summalari, ya'ni butunlay pul:
+          xodimga yopiq (`selfPayroll.data.js`) va server ham `history` ni
+          bermaydi. Summasi olingan diagramma ma'nosiz ustunlar bo'lardi. */}
+      {SELF_PAYROLL_VISIBLE && <HistoryPanel {...state} delay={gridDelay(4)} />}
     </div>
   );
 };
