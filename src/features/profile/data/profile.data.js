@@ -21,6 +21,7 @@ import { formatMoney } from "@/shared/utils/formatMoney";
 
 // Data
 import { days } from "@/shared/data/days.data";
+import { SELF_PAYROLL_VISIBLE } from "@/shared/data/selfPayroll.data";
 
 // ─────────────────────────────────────────────
 // Tablar
@@ -42,7 +43,10 @@ export const PROFILE_TABS = [
   // qancha soat o'tdi va shu soat qanchaga aylanmoqda. Ikkalasi bir
   // savolga javob bermaydi, shuning uchun birlashtirilmadi.
   { value: "hours", label: "Dars soatlarim", roles: ["teacher"] },
-  { value: "payroll", label: "Oylik" },
+  // ⚠️ "Oylik" tabi xodimga YOPIQ (`selfPayroll.data.js`): ro'yxatda
+  // bo'lmagani uchun `?tab=payroll` havolasi ham "Asosiy" ni ochadi
+  // (`resolveTab`) — bo'sh tab ochilib "yuklab bo'lmadi" chiqmaydi.
+  ...(SELF_PAYROLL_VISIBLE ? [{ value: "payroll", label: "Oylik" }] : []),
   // Telegram "Qurilmalar" kabi: qayerdan kirilgan, seanslarni yakunlash.
   // Hamma rolga — ro'yxat va yakunlash tokendagi odamning o'zinikiga.
   { value: "devices", label: "Qurilmalar" },

@@ -31,6 +31,9 @@ import { getDayOfWeekUZ } from "@/shared/utils/date.utils";
 // API
 import { schedulesAPI } from "@/features/schedules/api/schedules.api";
 
+// Data
+import { SELF_PAYROLL_VISIBLE } from "@/shared/data/selfPayroll.data";
+
 const Dashboard = () => {
   // Holiday Info
   const { data: holidayInfo = { isHoliday: false, holiday: null } } =
@@ -66,8 +69,10 @@ const Dashboard = () => {
       )}
 
       {/* Shaxsiy oylik statistikasi — o'qituvchi o'z oyligini, dars soatini
-          va qarzini bir qarashda ko'radi */}
-      <MySalaryCard />
+          va qarzini bir qarashda ko'radi.
+          ⚠️ Oylik xodimga YOPIQ (`selfPayroll.data.js`): karta chizilmaydi,
+          chunki uning manbasi (`/payroll/my-stats`) serverda 403 qaytaradi. */}
+      {SELF_PAYROLL_VISIBLE && <MySalaryCard />}
 
       <MySchedules />
 
